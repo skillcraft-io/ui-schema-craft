@@ -1,0 +1,59 @@
+{
+    "name": "skillcraft-io/ui-schema-craft",
+    "description": "UI Schema Craft for Laravel Applications",
+    "type": "library",
+    "keywords": [
+        "laravel",
+        "ui",
+        "component",
+        "schema",
+        "form-builder"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "William Troiano",
+            "email": "skillcraft.opensource@pm.me",
+            "homepage": "https://williamtroiano.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0",
+        "skillcraft-io/hook-flow": "@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "orchestra/testbench": "^8.0",
+        "mockery/mockery": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Skillcraft\\UiSchemaCraft\\": "src/"
+        },
+        "files": [
+            "helpers/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Skillcraft\\UiSchemaCraft\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Skillcraft\\UiSchemaCraft\\Providers\\UiSchemaCraftServiceProvider"
+            ],
+            "aliases": {
+                "PropertyBuilder": "Skillcraft\\UiSchemaCraft\\Facades\\PropertyBuilder"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
+}
