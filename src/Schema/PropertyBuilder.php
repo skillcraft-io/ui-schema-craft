@@ -515,7 +515,8 @@ class PropertyBuilder
 
     public function timestamp(string $name): Property
     {
-        return $this->datetime($name)
+        return $this->string($name)
+            ->format('date-time')
             ->description('Timestamp field');
     }
 
