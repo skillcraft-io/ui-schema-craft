@@ -160,6 +160,12 @@ class Property
         return $this;
     }
 
+    public function reference(string $ref): static
+    {
+        $this->attributes['$ref'] = $ref;
+        return $this;
+    }
+
     public function toArray(): array
     {
         $schema = [
