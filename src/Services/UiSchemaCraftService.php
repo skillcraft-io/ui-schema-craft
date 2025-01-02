@@ -2,75 +2,161 @@
 
 namespace Skillcraft\UiSchemaCraft\Services;
 
-use Illuminate\Support\Collection;
+use Skillcraft\UiSchemaCraft\Registry\ComponentRegistryInterface;
+use Skillcraft\UiSchemaCraft\Factory\ComponentFactoryInterface;
+use Skillcraft\UiSchemaCraft\State\StateManagerInterface;
+use Skillcraft\UiSchemaCraft\Validation\ValidationResult;
+use Illuminate\Support\Str;
+use Skillcraft\UiSchemaCraft\Exceptions\ComponentTypeNotFoundException;
 
 class UiSchemaCraftService
 {
-    protected Collection $schemas;
-    protected string $config = 'ui-schema-craft.schemas';
+    public function __construct(
+        private readonly ComponentRegistryInterface $registry,
+        private readonly ComponentFactoryInterface $factory,
+        private readonly StateManagerInterface $stateManager
+    ) {}
 
-    public function __construct()
+    /**
+     * Get component schema with optional state
+     *
+     * @param string $type Component type
+     * @param string|null $stateId Optional state ID
+     * @return array{schema: array, state: ?array}
+     * @throws ComponentTypeNotFoundException
+     */
+    public function getComponent(string $type, ?string $stateId = null): array
     {
-        $this->schemas = collect(config($this->config));
-    }
-
-    public function addSchema(string $schemaClass): void
-    {
-        $schema = new $schemaClass;
-        $this->schemas->put($schema->getIdentifier(), $schemaClass);
-    }
-
-    public function addSchemas(array $schemaClasses): void
-    {
-        foreach ($schemaClasses as $schemaClass) {
-            $this->addSchema($schemaClass);
-        }
-    }
-
-    public function registerSchema(string $name, string $schemaClass): void
-    {
-        $this->schemas->put($name, $schemaClass);
-    }
-
-    public function getSchema(string $name): ?array
-    {
-        if (! $this->schemas->has($name)) {
-            return null;
+        $component = $this->createComponent($type);
+        $schema = $component->toArray();
+        
+        $state = null;
+        if ($stateId) {
+            $state = $this->stateManager->load($stateId);
         }
 
-        $schemaClass = $this->schemas->get($name);
-        $schema = new $schemaClass;
-
-        return $schema->toArray();
+        return [
+            'schema' => $schema,
+            'state' => $state,
+        ];
     }
 
-    public function getExampleData(string $name): ?array
+    /**
+     * Save component state
+     *
+     * @param string $type Component type
+     * @param array $state State data
+     * @param string|null $stateId Optional state ID
+     * @return array{stateId: string, state: array, validation: ?array}
+     * @throws ComponentTypeNotFoundException
+     */
+    public function saveState(string $type, array $state, ?string $stateId = null): array
     {
-        if (! $this->schemas->has($name)) {
-            return null;
+        $component = $this->createComponent($type);
+        
+        // Validate state
+        $validationResult = $component->validate($state);
+        if ($validationResult->hasErrors()) {
+            return [
+                'stateId' => $stateId,
+                'state' => $state,
+                'validation' => $validationResult->toArray(),
+            ];
         }
 
-        $schemaClass = $this->schemas->get($name);
-        $schema = new $schemaClass;
+        // Generate ID if not provided
+        $stateId = $stateId ?? (string) Str::uuid();
+        
+        $this->stateManager->save($stateId, $component, $state);
 
-        return $schema->getExampleData();
+        return [
+            'stateId' => $stateId,
+            'state' => $state,
+            'validation' => null,
+        ];
     }
 
-    public function getAllSchemas(): array
+    /**
+     * Delete component state
+     *
+     * @param string $stateId
+     * @return void
+     */
+    public function deleteState(string $stateId): void
     {
-        return $this->schemas->map(function ($schemaClass) {
-            $schema = new $schemaClass;
-
-            return $schema->toArray();
-        })->toArray();
+        $this->stateManager->delete($stateId);
     }
 
-    public function getAllExampleData(): array
+    /**
+     * Get all states for a component type
+     *
+     * @param string $type Component type
+     * @return array
+     * @throws ComponentTypeNotFoundException
+     */
+    public function getComponentStates(string $type): array
     {
-        return $this->schemas->map(function ($schemaClass) {
-            $schema = new $schemaClass;
+        if (!$this->hasComponent($type)) {
+            throw new ComponentTypeNotFoundException($type);
+        }
 
-            return $schema->getExampleData();
-        })->toArray();
+        return $this->stateManager->getStatesForComponent($type);
+    }
+
+    /**
+     * Create a new component instance
+     *
+     * @param string $type
+     * @param array $config
+     * @return mixed
+     */
+    public function createComponent(string $type, array $config = []): mixed
+    {
+        return $this->factory->create($type, $config);
+    }
+
+    /**
+     * Create a component from a schema array
+     *
+     * @param array $schema
+     * @return mixed
+     */
+    public function createFromSchema(array $schema): mixed
+    {
+        return $this->factory->createFromSchema($schema);
+    }
+
+    /**
+     * Validate component data
+     *
+     * @param string $type
+     * @param array $data
+     * @return ValidationResult
+     */
+    public function validate(string $type, array $data): ValidationResult
+    {
+        $component = $this->registry->get($type);
+        return $component->validate($data);
+    }
+
+    /**
+     * Get all registered components
+     *
+     * @return array
+     */
+    public function getComponents(): array
+    {
+        return $this->registry->all();
+    }
+
+    /**
+     * Check if a component type exists
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function hasComponent(string $type): bool
+    {
+        return $this->registry->has($type);
     }
 }

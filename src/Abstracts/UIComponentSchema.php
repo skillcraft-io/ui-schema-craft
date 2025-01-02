@@ -2,60 +2,94 @@
 
 namespace Skillcraft\UiSchemaCraft\Abstracts;
 
-abstract class UIComponentSchema
+use Skillcraft\UiSchemaCraft\Composition\ComposableInterface;
+use Skillcraft\UiSchemaCraft\Composition\ComposableTrait;
+use Skillcraft\UiSchemaCraft\Validation\ValidationResult;
+
+abstract class UIComponentSchema implements ComposableInterface
 {
-    protected string $type = 'component';
+    use ComposableTrait;
 
+    protected string $type;
     protected string $component;
+    protected string $version = '1.0.0';
 
-    protected array $props = [];
-
-    protected array $example = [];
-
+    /**
+     * Get component properties schema
+     *
+     * @return array
+     */
     abstract protected function properties(): array;
 
-    public function __construct()
-    {
-        $this->buildSchema();
-    }
+    /**
+     * Get example data for the component
+     *
+     * @return array
+     */
+    abstract protected function getExampleData(): array;
 
-    protected function buildSchema(): void
-    {
-        $properties = $this->properties();
-        $schema = [];
-
-        foreach ($properties as $property) {
-            $schema[$property->getName()] = $property->toArray();
-        }
-
-        $this->props = [
-            'config' => [
-                'type' => 'object',
-                'properties' => $schema,
-            ],
-        ];
-    }
-
-    public function getIdentifier(): string
-    {
-        return $this->component;
-    }
-
+    /**
+     * Convert component to array representation
+     *
+     * @return array
+     */
     public function toArray(): array
     {
         return [
             'type' => $this->type,
             'component' => $this->component,
-            'props' => $this->props,
-            'example' => (! app()->isProduction()) ? $this->getExampleData() : null,
-            'data' => $this->getLiveData(),
+            'version' => $this->version,
+            'properties' => $this->properties(),
+            'children' => $this->getChildrenSchema(),
         ];
     }
 
-    public function getExampleData(): array
+    /**
+     * Validate component data
+     *
+     * @param array $data
+     * @return ValidationResult
+     */
+    public function validate(array $data): ValidationResult
     {
-        return $this->example;
+        $result = new ValidationResult();
+        
+        foreach ($this->properties() as $property) {
+            if (!$property->validate($data[$property->getName()] ?? null)) {
+                $result->addError($property->getName(), $property->getValidationMessage());
+            }
+        }
+
+        // Validate children if present
+        if (isset($data['children'])) {
+            foreach ($this->getChildren() as $child) {
+                if (isset($data['children'][$child->getIdentifier()])) {
+                    $childResult = $child->validate($data['children'][$child->getIdentifier()]);
+                    $result->merge($childResult);
+                }
+            }
+        }
+
+        return $result;
     }
 
-    abstract public function getLiveData(): array;
+    /**
+     * Get component identifier
+     *
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * Get component version
+     *
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return $this->version;
+    }
 }

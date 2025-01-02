@@ -3,72 +3,97 @@
 namespace Skillcraft\UiSchemaCraft\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Skillcraft\HookFlow\Facades\Hook;
-use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
-use Skillcraft\UiSchemaCraft\Examples\AnalyticsDashboardSchema;
-use Skillcraft\UiSchemaCraft\Examples\BlogPostSchema;
-use Skillcraft\UiSchemaCraft\Examples\ProductConfigurationSchema;
-use Skillcraft\UiSchemaCraft\Examples\UserProfileSchema;
-use Skillcraft\UiSchemaCraft\HookFlow\AddUiComponentHook;
-use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
+use Illuminate\Support\Facades\Event;
 use Skillcraft\UiSchemaCraft\Services\UiSchemaCraftService;
+use Skillcraft\UiSchemaCraft\Registry\ComponentRegistryInterface;
+use Skillcraft\UiSchemaCraft\Registry\ComponentRegistry;
+use Skillcraft\UiSchemaCraft\Factory\ComponentFactoryInterface;
+use Skillcraft\UiSchemaCraft\Factory\ComponentFactory;
+use Skillcraft\UiSchemaCraft\State\StateManagerInterface;
+use Skillcraft\UiSchemaCraft\State\StateManager;
+use Skillcraft\UiSchemaCraft\Validation\CompositeValidator;
+use Skillcraft\UiSchemaCraft\Validation\Rules\RequiredRule;
 
 class UiSchemaCraftServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
-        // Register the PropertyBuilder singleton
-        $this->app->singleton('ui-schema-craft.property-builder', function ($app) {
-            return new PropertyBuilder;
-        });
-
-        // Merge config
         $this->mergeConfigFrom(
             __DIR__.'/../../config/ui-schema-craft.php',
             'ui-schema-craft'
         );
+
+        // Register Core Services
+        $this->registerCoreServices();
+
+        // Register Main Service
+        $this->app->singleton('ui-schema', function ($app) {
+            return new UiSchemaCraftService(
+                $app->make(ComponentRegistryInterface::class),
+                $app->make(ComponentFactoryInterface::class),
+                $app->make(StateManagerInterface::class)
+            );
+        });
     }
 
     public function boot(): void
     {
-        // Publish config
-        $this->publishes([
-            __DIR__.'/../../config/ui-schema-craft.php' => config_path('ui-schema-craft.php'),
-        ], 'config');
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../../config/ui-schema-craft.php' => config_path('ui-schema-craft.php'),
+            ], 'ui-schema-craft-config');
+        }
 
-        $this->app->booted(function () {
+        // Register default components if configured
+        if (config('ui-schema-craft.register_default_components', true)) {
+            $this->registerDefaultComponents();
+        }
+    }
 
-            /**
-             * The Class Filter Hook can be found
-             */
-            Hook::register(new AddUiComponentHook);
-
-            /**
-             * This code here is for example of registration of
-             * external schemas (From other packages/plugins).
-             *
-             * @See Examples for class definitions and properties
-             */
-            if (app()->environment('local') && config('ui-schema-craft.enable_examples')) {
-                $external_schemas = [
-                    AnalyticsDashboardSchema::class,
-                    ProductConfigurationSchema::class,
-                    UserProfileSchema::class,
-                    BlogPostSchema::class,
-                ];
-
-                foreach ($external_schemas as $schema) {
-                    Hook::execute(
-                        AddUiComponentHook::class, [
-                            'schema' => $schema,
-                        ]);
-                }
-
-                // Quickly Check whats been registered by enabled dd_examples
-                if (config('ui-schema-craft.dd_examples')) {
-                    dd(app(UiSchemaCraftService::class)->getAllSchemas());
-                }
-            }
+    protected function registerCoreServices(): void
+    {
+        // Register Validator
+        $this->app->singleton(CompositeValidator::class, function ($app) {
+            $validator = new CompositeValidator();
+            $validator->addRule(new RequiredRule());
+            return $validator;
         });
+
+        // Register Component Registry
+        $this->app->singleton(ComponentRegistryInterface::class, function ($app) {
+            return new ComponentRegistry(
+                $app->make(CompositeValidator::class)
+            );
+        });
+
+        // Register Component Factory
+        $this->app->singleton(ComponentFactoryInterface::class, function ($app) {
+            return new ComponentFactory(
+                $app->make(ComponentRegistryInterface::class)
+            );
+        });
+
+        // Register State Manager
+        $this->app->singleton(StateManagerInterface::class, function ($app) {
+            return new StateManager(
+                $app->make('cache.store'),
+                config('ui-schema-craft.state_ttl', 3600)
+            );
+        });
+    }
+
+    protected function registerDefaultComponents(): void
+    {
+        $registry = $this->app->make(ComponentRegistryInterface::class);
+        
+        // Register default components
+        $defaultComponents = [
+            \Skillcraft\UiSchemaCraft\Components\FormField::class,
+            \Skillcraft\UiSchemaCraft\Components\FormGroup::class,
+        ];
+
+        foreach ($defaultComponents as $componentClass) {
+            $registry->register(new $componentClass());
+        }
     }
 }

@@ -2,6 +2,13 @@
 
 namespace Skillcraft\UiSchemaCraft\Schema;
 
+use Skillcraft\UiSchemaCraft\Properties\Types\StringPropertyType;
+use Skillcraft\UiSchemaCraft\Properties\Types\NumberPropertyType;
+use Skillcraft\UiSchemaCraft\Properties\Types\BooleanPropertyType;
+use Skillcraft\UiSchemaCraft\Properties\Types\ArrayPropertyType;
+use Skillcraft\UiSchemaCraft\Properties\Types\ObjectPropertyType;
+use Skillcraft\UiSchemaCraft\Validation\Rules\LaravelValidationRule;
+
 class PropertyBuilder
 {
     protected array $properties = [];
@@ -320,10 +327,6 @@ class PropertyBuilder
                 $builder->boolean('multiple')
                     ->default(false)
                     ->description('Allow multiple files');
-
-                $builder->boolean('dragDrop')
-                    ->default(true)
-                    ->description('Enable drag and drop');
 
                 $builder->string('uploadUrl')
                     ->required()
@@ -2495,5 +2498,86 @@ class PropertyBuilder
                     ->required()
                     ->description('Widget size in layout');
             });
+    }
+
+    public function when(string|array $field, mixed $value, array|string $rules): self
+    {
+        $this->properties[$field] = Property::object($field)
+            ->withBuilder(function (PropertyBuilder $builder) use ($value, $rules) {
+                $builder->string('condition')->default($value);
+                $builder->array('rules')->default($rules);
+            });
+        return $this;
+    }
+
+    public function whenNot(string|array $field, mixed $value, array|string $rules): self
+    {
+        $this->properties[$field] = Property::object($field)
+            ->withBuilder(function (PropertyBuilder $builder) use ($value, $rules) {
+                $builder->string('condition')->default($value);
+                $builder->array('rules')->default($rules);
+                $builder->boolean('negate')->default(true);
+            });
+        return $this;
+    }
+
+    public function requiredWith(string|array $fields): self
+    {
+        $fields = is_array($fields) ? implode(',', $fields) : $fields;
+        $this->properties[$fields] = Property::object($fields)
+            ->withBuilder(function (PropertyBuilder $builder) {
+                $builder->string('rule')->default('required_with');
+            });
+        return $this;
+    }
+
+    public function requiredWithout(string|array $fields): self
+    {
+        $fields = is_array($fields) ? implode(',', $fields) : $fields;
+        $this->properties[$fields] = Property::object($fields)
+            ->withBuilder(function (PropertyBuilder $builder) {
+                $builder->string('rule')->default('required_without');
+            });
+        return $this;
+    }
+
+    public function requiredIf(string $field, mixed $value): self
+    {
+        $this->properties[$field] = Property::object($field)
+            ->withBuilder(function (PropertyBuilder $builder) use ($value) {
+                $builder->string('rule')->default('required_if');
+                $builder->string('condition')->default($value);
+            });
+        return $this;
+    }
+
+    public function requiredUnless(string $field, mixed $value): self
+    {
+        $this->properties[$field] = Property::object($field)
+            ->withBuilder(function (PropertyBuilder $builder) use ($value) {
+                $builder->string('rule')->default('required_unless');
+                $builder->string('condition')->default($value);
+            });
+        return $this;
+    }
+
+    public function prohibitedIf(string $field, mixed $value): self
+    {
+        $this->properties[$field] = Property::object($field)
+            ->withBuilder(function (PropertyBuilder $builder) use ($value) {
+                $builder->string('rule')->default('prohibited_if');
+                $builder->string('condition')->default($value);
+            });
+        return $this;
+    }
+
+    public function excludeIf(string $field, mixed $value): self
+    {
+        $this->properties[$field] = Property::object($field)
+            ->withBuilder(function (PropertyBuilder $builder) use ($value) {
+                $builder->string('rule')->default('exclude_if');
+                $builder->string('condition')->default($value);
+            });
+        return $this;
     }
 }

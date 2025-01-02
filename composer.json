@@ -1,6 +1,6 @@
 {
     "name": "skillcraft-io/ui-schema-craft",
-    "description": "UI Schema Craft for Laravel Applications",
+    "description": "A Laravel package for building dynamic UI components with schema-based validation and state management",
     "type": "library",
     "keywords": [
         "laravel",
@@ -19,8 +19,10 @@
         }
     ],
     "require": {
-        "php": "^8.3",
-        "illuminate/support": "^10.0|^11.0",
+        "php": "^8.1",
+        "illuminate/support": "^10.0",
+        "illuminate/contracts": "^10.0",
+        "illuminate/cache": "^10.0",
         "skillcraft-io/hook-flow": "@dev"
     },
     "require-dev": {
@@ -47,9 +49,12 @@
                 "Skillcraft\\UiSchemaCraft\\Providers\\UiSchemaCraftServiceProvider"
             ],
             "aliases": {
-                "PropertyBuilder": "Skillcraft\\UiSchemaCraft\\Facades\\PropertyBuilder"
+                "UiSchema": "Skillcraft\\UiSchemaCraft\\Facades\\UiSchema"
             }
         }
+    },
+    "suggest": {
+        "skillcraft-io/ui-schema-craft-blade": "Blade components for UI Schema Craft"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
