@@ -5,18 +5,15 @@ namespace Skillcraft\UiSchemaCraft\Registry;
 use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
 use Skillcraft\UiSchemaCraft\Events\ComponentRegisteredEvent;
 use Skillcraft\UiSchemaCraft\Exceptions\ComponentAlreadyRegisteredException;
-use Skillcraft\UiSchemaCraft\Validation\CompositeValidator;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class ComponentRegistry implements ComponentRegistryInterface
 {
     private array $components = [];
-    private CompositeValidator $validator;
     private Dispatcher $events;
 
-    public function __construct(CompositeValidator $validator, Dispatcher $events)
+    public function __construct(Dispatcher $events)
     {
-        $this->validator = $validator;
         $this->events = $events;
     }
 
@@ -45,10 +42,5 @@ class ComponentRegistry implements ComponentRegistryInterface
     public function all(): array
     {
         return $this->components;
-    }
-
-    public function getValidator(): CompositeValidator
-    {
-        return $this->validator;
     }
 }

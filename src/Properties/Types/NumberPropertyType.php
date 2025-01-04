@@ -53,7 +53,8 @@ class NumberPropertyType extends AbstractPropertyType
 
     public function getDefaultValue(): float|int
     {
-        return $this->getOption('default', 0);
+        $default = $this->getOption('default', 0);
+        return $this->cast($default);
     }
 
     protected function getDefaultOptions(): array

@@ -21,7 +21,7 @@ class ComponentFactory implements ComponentFactoryInterface
         }
 
         $baseComponent = $this->registry->get($type);
-        return $this->configure($baseComponent->clone(), $config);
+        return $this->configure(clone $baseComponent, $config);
     }
 
     public function createFromSchema(array $schema): UIComponentSchema
@@ -35,11 +35,8 @@ class ComponentFactory implements ComponentFactoryInterface
 
     private function configure(UIComponentSchema $component, array $config): UIComponentSchema
     {
-        foreach ($config as $key => $value) {
-            $setter = 'set' . ucfirst($key);
-            if (method_exists($component, $setter)) {
-                $component->$setter($value);
-            }
+        foreach ($config as $name => $value) {
+            $component->setPropertyValue($name, $value);
         }
 
         return $component;

@@ -7,17 +7,16 @@ use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
 interface ComponentRegistryInterface
 {
     /**
-     * Register a component with the registry
+     * Register a UI component
      *
      * @param string $name
      * @param UIComponentSchema $component
      * @return void
-     * @throws ComponentAlreadyRegisteredException
      */
     public function register(string $name, UIComponentSchema $component): void;
 
     /**
-     * Get a component by name
+     * Get a registered component by name
      *
      * @param string $name
      * @return UIComponentSchema|null
@@ -25,7 +24,7 @@ interface ComponentRegistryInterface
     public function get(string $name): ?UIComponentSchema;
 
     /**
-     * Check if a component exists
+     * Check if a component is registered
      *
      * @param string $name
      * @return bool

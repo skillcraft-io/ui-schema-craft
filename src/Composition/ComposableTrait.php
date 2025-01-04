@@ -7,54 +7,32 @@ use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
 trait ComposableTrait
 {
     /**
-     * Child components organized by slots
+     * Child components organized by identifiers
      *
-     * @var array<string, array<UIComponentSchema>>
+     * @var array<string, UIComponentSchema>
      */
-    protected array $children = [
-        'default' => []
-    ];
+    protected array $children = [];
 
-    public function addChild(UIComponentSchema $component, ?string $slot = null): self
+    public function addChild(string $identifier, UIComponentSchema $component): self
     {
-        $slot = $slot ?? 'default';
-        
-        if (!isset($this->children[$slot])) {
-            $this->children[$slot] = [];
-        }
-
-        $this->children[$slot][] = $component;
+        $this->children[$identifier] = $component;
         return $this;
     }
 
-    public function getChildren(?string $slot = null): array
+    public function getChildren(): array
     {
-        if ($slot === null) {
-            return array_merge(...array_values($this->children));
-        }
-
-        return $this->children[$slot] ?? [];
+        return array_values($this->children);
     }
 
-    public function removeChild(UIComponentSchema $component): self
+    public function removeChild(string $identifier): self
     {
-        foreach ($this->children as $slot => $components) {
-            $this->children[$slot] = array_filter(
-                $components,
-                fn($child) => $child !== $component
-            );
-        }
-
+        unset($this->children[$identifier]);
         return $this;
     }
 
-    public function hasChildren(?string $slot = null): bool
+    public function hasChildren(): bool
     {
-        if ($slot === null) {
-            return !empty(array_merge(...array_values($this->children)));
-        }
-
-        return !empty($this->children[$slot] ?? []);
+        return !empty($this->children);
     }
 
     /**
@@ -65,13 +43,8 @@ trait ComposableTrait
     protected function getChildrenSchema(): array
     {
         $schema = [];
-        foreach ($this->children as $slot => $components) {
-            if (!empty($components)) {
-                $schema[$slot] = array_map(
-                    fn($component) => $component->toArray(),
-                    $components
-                );
-            }
+        foreach ($this->children as $identifier => $component) {
+            $schema[$identifier] = $component->toArray();
         }
         return $schema;
     }

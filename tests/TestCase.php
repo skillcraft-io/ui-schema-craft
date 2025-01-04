@@ -3,7 +3,7 @@
 namespace Skillcraft\UiSchemaCraft\Tests;
 
 use Orchestra\Testbench\TestCase as Orchestra;
-use Skillcraft\UiSchemaCraft\Providers\UiComponentServiceProvider;
+use Skillcraft\UiSchemaCraft\Providers\UiSchemaCraftServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -15,7 +15,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            UiComponentServiceProvider::class,
+            UiSchemaCraftServiceProvider::class,
         ];
     }
 

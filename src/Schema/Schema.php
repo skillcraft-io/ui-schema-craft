@@ -13,163 +13,107 @@ class Schema
     protected array $messages = [];
     protected array $attributes = [];
 
-    public function addProperty(PropertyBuilder $property): self
+    public function addProperty(Property|PropertyBuilder $property): self
     {
-        $schema = $property->build();
-        $this->properties[$schema['name']] = $schema;
+        $schema = $property instanceof PropertyBuilder ? $property->build() : [
+            'name' => $property->getName(),
+            'schema' => $property->toArray(),
+            'rules' => $property->getRules(),
+        ];
+
+        $this->properties[$schema['name']] = $schema['schema'];
         
         if (!empty($schema['rules'])) {
             $this->rules[$schema['name']] = $schema['rules'];
         }
 
-        // Handle dependent rules
-        if (!empty($schema['dependentRules'])) {
-            foreach ($schema['dependentRules'] as $dependent) {
-                $this->processRule($schema['name'], $dependent);
+        if (!empty($schema['schema']['conditionalRules'])) {
+            if (!isset($this->rules[$schema['name']])) {
+                $this->rules[$schema['name']] = [];
+            }
+
+            foreach ($schema['schema']['conditionalRules'] as $rule) {
+                if (isset($rule['type']) && $rule['type'] === 'closure') {
+                    $this->rules[$schema['name']][] = Rule::when(
+                        $rule['closure'],
+                        is_array($rule['rules']) ? $rule['rules'] : explode('|', $rule['rules'])
+                    );
+                } elseif (is_array($rule['field'])) {
+                    $this->rules[$schema['name']][] = Rule::when(
+                        fn($input) => collect($rule['field'])->every(
+                            fn($value, $field) => $input[$field] === $value
+                        ),
+                        is_array($rule['rules']) ? $rule['rules'] : explode('|', $rule['rules'])
+                    );
+                } elseif (isset($rule['value']['pattern'])) {
+                    $this->rules[$schema['name']][] = Rule::when(
+                        fn($input) => preg_match($rule['value']['pattern'], $input[$rule['field']]),
+                        is_array($rule['rules']) ? $rule['rules'] : explode('|', $rule['rules'])
+                    );
+                } elseif (isset($rule['value']['operator'])) {
+                    $this->rules[$schema['name']][] = Rule::when(
+                        fn($input) => $this->compareValues($input[$rule['field']], $rule['value']['operator'], $rule['value']['value']),
+                        is_array($rule['rules']) ? $rule['rules'] : explode('|', $rule['rules'])
+                    );
+                } else {
+                    $this->rules[$schema['name']][] = Rule::when(
+                        fn($input) => $input[$rule['field']] === $rule['value'],
+                        is_array($rule['rules']) ? $rule['rules'] : explode('|', $rule['rules'])
+                    );
+                }
             }
         }
 
         return $this;
     }
 
-    protected function processRule(string $field, array $rule): void
+    protected function compareValues($a, string $operator, $b): bool
     {
-        $type = $rule['type'] ?? 'field';
-        $rules = $rule['rules'];
-        $negate = $rule['negate'] ?? false;
-
-        switch ($type) {
-            case 'closure':
-                $this->processClosureRule($field, $rule['closure'], $rules, $negate);
-                break;
-
-            case 'array':
-                $this->processArrayRule($field, $rule['conditions'], $rules, $negate);
-                break;
-
-            case 'in_array':
-                $this->processInArrayRule($field, $rule['field'], $rule['values'], $rules, $negate);
-                break;
-
-            case 'pattern':
-                $this->processPatternRule($field, $rule['field'], $rule['pattern'], $rules, $negate);
-                break;
-
-            case 'compare':
-                $this->processCompareRule($field, $rule['field'], $rule['operator'], $rule['value'], $rules, $negate);
-                break;
-
-            default:
-                $this->processFieldRule($field, $rule['field'], $rule['value'], $rules, $negate);
-                break;
-        }
-    }
-
-    protected function processClosureRule(string $field, Closure $condition, array|string $rules, bool $negate): void
-    {
-        $this->rules[$field][] = Rule::when(
-            function($input) use ($condition, $negate) {
-                $result = $condition($input);
-                return $negate ? !$result : $result;
-            },
-            $rules
-        );
-    }
-
-    protected function processArrayRule(string $field, array $conditions, array|string $rules, bool $negate): void
-    {
-        $this->rules[$field][] = Rule::when(
-            function($input) use ($conditions, $negate) {
-                $matches = collect($conditions)->every(
-                    fn($value, $field) => $input[$field] === $value
-                );
-                return $negate ? !$matches : $matches;
-            },
-            $rules
-        );
-    }
-
-    protected function processInArrayRule(string $field, string $targetField, array $values, array|string $rules, bool $negate): void
-    {
-        $this->rules[$field][] = Rule::when(
-            function($input) use ($targetField, $values, $negate) {
-                $matches = in_array($input[$targetField], $values);
-                return $negate ? !$matches : $matches;
-            },
-            $rules
-        );
-    }
-
-    protected function processPatternRule(string $field, string $targetField, string $pattern, array|string $rules, bool $negate): void
-    {
-        $this->rules[$field][] = Rule::when(
-            function($input) use ($targetField, $pattern, $negate) {
-                $matches = preg_match($pattern, $input[$targetField]);
-                return $negate ? !$matches : $matches;
-            },
-            $rules
-        );
-    }
-
-    protected function processCompareRule(string $field, string $targetField, string $operator, mixed $value, array|string $rules, bool $negate): void
-    {
-        $this->rules[$field][] = Rule::when(
-            function($input) use ($targetField, $operator, $value, $negate) {
-                $fieldValue = $input[$targetField];
-                $result = match ($operator) {
-                    '=' => $fieldValue === $value,
-                    '!=' => $fieldValue !== $value,
-                    '>' => $fieldValue > $value,
-                    '>=' => $fieldValue >= $value,
-                    '<' => $fieldValue < $value,
-                    '<=' => $fieldValue <= $value,
-                    'contains' => str_contains($fieldValue, $value),
-                    'starts_with' => str_starts_with($fieldValue, $value),
-                    'ends_with' => str_ends_with($fieldValue, $value),
-                    default => false
-                };
-                return $negate ? !$result : $result;
-            },
-            $rules
-        );
-    }
-
-    protected function processFieldRule(string $field, string $targetField, mixed $value, array|string $rules, bool $negate): void
-    {
-        $this->rules[$field][] = Rule::when(
-            function($input) use ($targetField, $value, $negate) {
-                $matches = $input[$targetField] === $value;
-                return $negate ? !$matches : $matches;
-            },
-            $rules
-        );
+        return match($operator) {
+            '=' => $a === $b,
+            '!=' => $a !== $b,
+            '>' => $a > $b,
+            '>=' => $a >= $b,
+            '<' => $a < $b,
+            '<=' => $a <= $b,
+            default => false,
+        };
     }
 
     public function validate(array $data): array
     {
         $validator = Validator::make(
-            $data, 
-            $this->rules, 
+            $data,
+            $this->rules,
             $this->messages,
             $this->attributes
         );
 
         return [
             'valid' => !$validator->fails(),
-            'errors' => $validator->errors()->toArray()
+            'errors' => $validator->errors()->toArray(),
         ];
     }
 
-    public function withMessages(array $messages): self
+    public function setMessages(array $messages): self
     {
-        $this->messages = array_merge($this->messages, $messages);
+        $this->messages = $messages;
         return $this;
     }
 
-    public function withAttributes(array $attributes): self
+    public function setAttributes(array $attributes): self
     {
-        $this->attributes = array_merge($this->attributes, $attributes);
+        $this->attributes = $attributes;
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'type' => 'object',
+            'properties' => $this->properties,
+            'required' => array_keys(array_filter($this->properties, fn($prop) => ($prop['required'] ?? false) === true)),
+        ];
     }
 
     public function getProperties(): array
@@ -190,5 +134,17 @@ class Schema
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    public function withMessages(array $messages): self
+    {
+        $this->messages = array_merge($this->messages, $messages);
+        return $this;
+    }
+
+    public function withAttributes(array $attributes): self
+    {
+        $this->attributes = array_merge($this->attributes, $attributes);
+        return $this;
     }
 }
