@@ -1,6 +1,6 @@
 {
     "name": "skillcraft-io/ui-schema-craft",
-    "description": "UI Schema Craft for Laravel Applications",
+    "description": "A Laravel package for building dynamic UI components with schema-based validation",
     "type": "library",
     "keywords": [
         "laravel",
@@ -19,14 +19,15 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "illuminate/support": "^10.0",
-        "skillcraft-io/hook-flow": "@dev"
+        "php": "^8.3",
+        "illuminate/support": "^10.0|^11.0",
+        "illuminate/validation": "^10.0|^11.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.0",
+        "laravel/pint": "^1.19",
+        "mockery/mockery": "^1.5",
         "orchestra/testbench": "^8.0",
-        "mockery/mockery": "^1.5"
+        "phpunit/phpunit": "^10.0"
     },
     "autoload": {
         "psr-4": {
@@ -41,15 +42,22 @@
             "Skillcraft\\UiSchemaCraft\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
     "extra": {
         "laravel": {
             "providers": [
                 "Skillcraft\\UiSchemaCraft\\Providers\\UiSchemaCraftServiceProvider"
             ],
             "aliases": {
-                "PropertyBuilder": "Skillcraft\\UiSchemaCraft\\Facades\\PropertyBuilder"
+                "UiSchema": "Skillcraft\\UiSchemaCraft\\Facades\\UiSchema"
             }
         }
+    },
+    "suggest": {
+        "skillcraft-io/ui-schema-craft-blade": "Blade components for UI Schema Craft"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

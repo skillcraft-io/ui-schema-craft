@@ -3,6 +3,7 @@
 namespace Skillcraft\UiSchemaCraft\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder as CorePropertyBuilder;
 
 /**
  * @method static \Skillcraft\UiSchemaCraft\Schema\Property string(string $name, ?string $label = null) Create a string property
@@ -69,6 +70,6 @@ class PropertyBuilder extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'ui-schema-craft.property-builder';
+        return 'property-builder';
     }
 }

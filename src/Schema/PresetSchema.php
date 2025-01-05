@@ -6,39 +6,46 @@ class PresetSchema
 {
     public static function button(string $name, array $defaults = []): Property
     {
-        return Property::object($name)->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
+        $property = Property::object($name);
+        
+        // Set root-level default for text
+        if (isset($defaults['text'])) {
+            $property->setDefault($defaults['text']);
+        }
+        
+        return $property->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
             // Core properties
             $builder->string('text')
-                ->default($defaults['text'] ?? '')
+                ->setDefault(isset($defaults['text']) ? $defaults['text'] : '')
                 ->description('Button text content');
 
             $builder->string('type')
                 ->enum(['button', 'submit', 'reset'])
-                ->default($defaults['type'] ?? 'button')
+                ->setDefault(isset($defaults['type']) ? $defaults['type'] : 'button')
                 ->description('HTML button type');
 
             $builder->boolean('disabled')
-                ->default($defaults['disabled'] ?? false)
+                ->setDefault(isset($defaults['disabled']) ? $defaults['disabled'] : false)
                 ->description('Whether the button is disabled');
 
             // Variant presets
             $builder->string('variant')
                 ->enum(['primary', 'secondary', 'outline', 'text'])
-                ->default($defaults['variant'] ?? 'primary')
+                ->setDefault(isset($defaults['variant']) ? $defaults['variant'] : 'primary')
                 ->description('Button style variant');
 
             $builder->string('size')
                 ->enum(['sm', 'md', 'lg'])
-                ->default($defaults['size'] ?? 'md')
+                ->setDefault(isset($defaults['size']) ? $defaults['size'] : 'md')
                 ->description('Button size variant');
 
             // Icon support
             $builder->string('iconLeft')
-                ->default($defaults['iconLeft'] ?? '')
+                ->setDefault(isset($defaults['iconLeft']) ? $defaults['iconLeft'] : '')
                 ->description('Icon class to show before text');
 
             $builder->string('iconRight')
-                ->default($defaults['iconRight'] ?? '')
+                ->setDefault(isset($defaults['iconRight']) ? $defaults['iconRight'] : '')
                 ->description('Icon class to show after text');
 
             // UI customization
@@ -70,32 +77,32 @@ class PresetSchema
             // Core properties
             $builder->string('type')
                 ->enum(['text', 'email', 'password', 'number', 'tel', 'url'])
-                ->default($defaults['type'] ?? 'text')
+                ->setDefault(isset($defaults['type']) ? $defaults['type'] : 'text')
                 ->description('Input type');
 
             $builder->string('placeholder')
-                ->default($defaults['placeholder'] ?? '')
+                ->setDefault(isset($defaults['placeholder']) ? $defaults['placeholder'] : '')
                 ->description('Placeholder text');
 
             $builder->boolean('required')
-                ->default($defaults['required'] ?? false)
+                ->setDefault(isset($defaults['required']) ? $defaults['required'] : false)
                 ->description('Whether the input is required');
 
             $builder->boolean('disabled')
-                ->default($defaults['disabled'] ?? false)
+                ->setDefault(isset($defaults['disabled']) ? $defaults['disabled'] : false)
                 ->description('Whether the input is disabled');
 
             // Validation
             $builder->string('pattern')
-                ->default($defaults['pattern'] ?? '')
+                ->setDefault(isset($defaults['pattern']) ? $defaults['pattern'] : '')
                 ->description('HTML5 validation pattern');
 
             $builder->string('min')
-                ->default($defaults['min'] ?? '')
+                ->setDefault(isset($defaults['min']) ? $defaults['min'] : '')
                 ->description('Minimum value for number inputs');
 
             $builder->string('max')
-                ->default($defaults['max'] ?? '')
+                ->setDefault(isset($defaults['max']) ? $defaults['max'] : '')
                 ->description('Maximum value for number inputs');
 
             // UI customization
@@ -124,18 +131,25 @@ class PresetSchema
 
     public static function card(string $name, array $defaults = []): Property
     {
-        return Property::object($name)->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
+        $property = Property::object($name);
+        
+        // Set root-level default for title
+        if (isset($defaults['title'])) {
+            $property->setDefault($defaults['title']);
+        }
+        
+        return $property->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
             // Core properties
             $builder->string('title')
-                ->default($defaults['title'] ?? '')
+                ->setDefault(isset($defaults['title']) ? $defaults['title'] : '')
                 ->description('Card title');
 
             $builder->string('subtitle')
-                ->default($defaults['subtitle'] ?? '')
+                ->setDefault(isset($defaults['subtitle']) ? $defaults['subtitle'] : '')
                 ->description('Card subtitle');
 
             $builder->string('image')
-                ->default($defaults['image'] ?? '')
+                ->setDefault(isset($defaults['image']) ? $defaults['image'] : '')
                 ->description('Card image URL');
 
             // Layout customization
@@ -150,13 +164,13 @@ class PresetSchema
             ]));
 
             // Typography
-            $builder->add(SchemaUtils::tailwindTypography('title', [
+            $builder->add(SchemaUtils::tailwindTypography('titleStyles', [
                 'size' => 'text-lg',
                 'weight' => 'font-semibold',
                 'color' => 'text-gray-900',
             ]));
 
-            $builder->add(SchemaUtils::tailwindTypography('subtitle', [
+            $builder->add(SchemaUtils::tailwindTypography('subtitleStyles', [
                 'size' => 'text-sm',
                 'color' => 'text-gray-500',
             ]));
@@ -170,15 +184,22 @@ class PresetSchema
 
     public static function badge(string $name, array $defaults = []): Property
     {
-        return Property::object($name)->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
+        $property = Property::object($name);
+        
+        // Set root-level default for text
+        if (isset($defaults['text'])) {
+            $property->setDefault($defaults['text']);
+        }
+        
+        return $property->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
             // Core properties
             $builder->string('text')
-                ->default($defaults['text'] ?? '')
+                ->setDefault(isset($defaults['text']) ? $defaults['text'] : '')
                 ->description('Badge text');
 
             $builder->string('variant')
                 ->enum(['success', 'warning', 'error', 'info'])
-                ->default($defaults['variant'] ?? 'info')
+                ->setDefault(isset($defaults['variant']) ? $defaults['variant'] : 'info')
                 ->description('Badge style variant');
 
             // UI customization
@@ -201,23 +222,30 @@ class PresetSchema
 
     public static function alert(string $name, array $defaults = []): Property
     {
-        return Property::object($name)->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
+        $property = Property::object($name);
+        
+        // Set root-level default for title
+        if (isset($defaults['title'])) {
+            $property->setDefault($defaults['title']);
+        }
+        
+        return $property->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
             // Core properties
             $builder->string('title')
-                ->default($defaults['title'] ?? '')
+                ->setDefault(isset($defaults['title']) ? $defaults['title'] : '')
                 ->description('Alert title');
 
             $builder->string('message')
-                ->default($defaults['message'] ?? '')
+                ->setDefault(isset($defaults['message']) ? $defaults['message'] : '')
                 ->description('Alert message');
 
             $builder->string('type')
                 ->enum(['success', 'warning', 'error', 'info'])
-                ->default($defaults['type'] ?? 'info')
+                ->setDefault(isset($defaults['type']) ? $defaults['type'] : 'info')
                 ->description('Alert type');
 
             $builder->boolean('dismissible')
-                ->default($defaults['dismissible'] ?? true)
+                ->setDefault(isset($defaults['dismissible']) ? $defaults['dismissible'] : true)
                 ->description('Whether the alert can be dismissed');
 
             // UI customization
@@ -231,39 +259,47 @@ class PresetSchema
                 'padding' => 'p-4',
             ]));
 
-            $builder->add(SchemaUtils::tailwindTypography('title', [
+            $builder->add(SchemaUtils::tailwindTypography('titleStyles', [
                 'size' => 'text-sm',
                 'weight' => 'font-medium',
                 'color' => 'text-blue-800',
             ]));
 
-            $builder->add(SchemaUtils::tailwindTypography('message', [
+            // Add typography styles for message through a separate property
+            $builder->add(SchemaUtils::tailwindTypography('messageStyles', [
                 'size' => 'text-sm',
                 'color' => 'text-blue-700',
             ]));
 
             // Icon configuration
             $builder->string('icon')
-                ->default($defaults['icon'] ?? 'fas fa-info-circle')
+                ->setDefault(isset($defaults['icon']) ? $defaults['icon'] : 'fas fa-info-circle')
                 ->description('Alert icon class');
         });
     }
 
     public static function modal(string $name, array $defaults = []): Property
     {
-        return Property::object($name)->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
+        $property = Property::object($name);
+        
+        // Set root-level default for title
+        if (isset($defaults['title'])) {
+            $property->setDefault($defaults['title']);
+        }
+        
+        return $property->withBuilder(function (PropertyBuilder $builder) use ($defaults) {
             // Core properties
             $builder->string('title')
-                ->default($defaults['title'] ?? '')
+                ->setDefault(isset($defaults['title']) ? $defaults['title'] : '')
                 ->description('Modal title');
 
             $builder->boolean('open')
-                ->default($defaults['open'] ?? false)
+                ->setDefault(isset($defaults['open']) ? $defaults['open'] : false)
                 ->description('Whether the modal is open');
 
             $builder->string('size')
                 ->enum(['sm', 'md', 'lg', 'xl', 'full'])
-                ->default($defaults['size'] ?? 'md')
+                ->setDefault(isset($defaults['size']) ? $defaults['size'] : 'md')
                 ->description('Modal size');
 
             // UI customization
@@ -281,7 +317,7 @@ class PresetSchema
                 'padding' => 'p-6',
             ]));
 
-            $builder->add(SchemaUtils::tailwindTypography('title', [
+            $builder->add(SchemaUtils::tailwindTypography('titleStyles', [
                 'size' => 'text-lg',
                 'weight' => 'font-semibold',
                 'color' => 'text-gray-900',

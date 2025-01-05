@@ -2,8 +2,8 @@
 
 return [
     'schemas' => [],
-    'enable_examples' => env('UI_SCHEMA_CRAFT_ENABLE_EXAMPLES', true),
-    'dd_examples' => env('UI_SCHEMA_CRAFT_DD_EXAMPLES', true),
+    'enable_examples' => env('UI_SCHEMA_CRAFT_ENABLE_EXAMPLES', false),
+    'dd_examples' => env('UI_SCHEMA_CRAFT_DD_EXAMPLES', false),
     /*
     |--------------------------------------------------------------------------
     | Default Schema Settings
@@ -16,8 +16,19 @@ return [
     'defaults' => [
         'theme' => 'default',
         'size' => 'md',
-        'validation_mode' => 'onBlur',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | State Management
+    |--------------------------------------------------------------------------
+    |
+    | Configure state persistence settings
+    |
+    */
+
+    'state_ttl' => env('UI_SCHEMA_CRAFT_STATE_TTL', 3600),
+    'state_prefix' => env('UI_SCHEMA_CRAFT_STATE_PREFIX', 'ui_schema_state:'),
 
     /*
     |--------------------------------------------------------------------------
