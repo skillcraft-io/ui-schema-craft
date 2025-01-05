@@ -10,6 +10,7 @@ A powerful UI component schema generator for Laravel applications.
 - Example data generation for development
 - Type-safe property definitions
 - Component-based architecture
+- Inline example values for properties
 
 ## 📦 Installation
 
@@ -39,14 +40,6 @@ class UserProfileSchema extends UIComponentSchema
     // Define the component type (optional, defaults to 'component')
     protected string $type = 'form';
     
-    // Define example data for development
-    protected array $example = [
-        'firstName' => 'John',
-        'lastName' => 'Doe',
-        'email' => 'john@example.com',
-        'country' => 'us'
-    ];
-    
     // Define the UI component properties
     protected function properties(): array
     {
@@ -57,6 +50,7 @@ class UserProfileSchema extends UIComponentSchema
                 ->required()
                 ->minLength(2)
                 ->maxLength(50)
+                ->example('John')
                 ->toArray(),
                 
             PropertyBuilder::text('lastName')
@@ -65,12 +59,14 @@ class UserProfileSchema extends UIComponentSchema
                 ->required()
                 ->minLength(2)
                 ->maxLength(50)
+                ->example('Doe')
                 ->toArray(),
                 
             PropertyBuilder::email('email')
                 ->label('Email Address')
                 ->placeholder('Enter your email')
                 ->required()
+                ->example('john@example.com')
                 ->toArray(),
                 
             PropertyBuilder::select('country')
@@ -81,6 +77,7 @@ class UserProfileSchema extends UIComponentSchema
                     'uk' => 'United Kingdom'
                 ])
                 ->defaultValue('us')
+                ->example('us')
                 ->toArray(),
         ];
     }
@@ -101,7 +98,50 @@ class UserProfileSchema extends UIComponentSchema
 }
 ```
 
-### 2. Register Your Schema
+### 2. Example Data Generation
+
+UI Schema Craft now supports defining example values directly within property definitions. This makes it easier to maintain example data alongside the property configuration:
+
+```php
+class ContactFormSchema extends UIComponentSchema
+{
+    public function properties(): array
+    {
+        $builder = new PropertyBuilder();
+        
+        $builder->string('name', 'Full Name')
+            ->required()
+            ->maxLength(100)
+            ->example('John Doe');  // Define example value
+            
+        $builder->email('email', 'Email Address')
+            ->required()
+            ->example('john@example.com');  // Define example value
+            
+        $builder->text('message', 'Message')
+            ->required()
+            ->maxLength(1000)
+            ->example('Hello, I would like to inquire about your services.');  // Define example value
+            
+        return $builder->toArray();
+    }
+}
+```
+
+The example values will be automatically included in the schema output and can be used for:
+- Development and testing
+- Documentation generation
+- UI prototyping
+- API documentation
+
+Example values are accessible through the `getExampleData()` method:
+
+```php
+$schema = new ContactFormSchema();
+$exampleData = $schema->getExampleData();
+```
+
+### 3. Register Your Schema
 
 Register your schema through the HookFlow system in your service provider:
 
@@ -123,7 +163,7 @@ class AppServiceProvider extends ServiceProvider
 }
 ```
 
-### 3. Use in Your Frontend
+### 4. Use in Your Frontend
 
 #### Backend Controller
 ```php
