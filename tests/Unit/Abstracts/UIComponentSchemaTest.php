@@ -22,7 +22,7 @@ class TestUIComponent extends UIComponentSchema
         return [$property];
     }
 
-    protected function getExampleData(): array
+    public function getExampleData(): array
     {
         return [
             'name' => 'Test Component'
@@ -41,7 +41,7 @@ class EmptyUIComponent extends UIComponentSchema
         return [];
     }
 
-    protected function getExampleData(): array
+    public function getExampleData(): array
     {
         return [];
     }
@@ -58,7 +58,7 @@ class DefaultPropertiesUIComponent extends UIComponentSchema
         return [];
     }
 
-    protected function getExampleData(): array
+    public function getExampleData(): array
     {
         return [];
     }
@@ -189,7 +189,7 @@ class UIComponentSchemaTest extends TestCase
                 return [$this->property];
             }
             
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return [];
             }
@@ -222,7 +222,7 @@ class UIComponentSchemaTest extends TestCase
                 return [$this->property];
             }
             
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return [];
             }
@@ -248,7 +248,7 @@ class UIComponentSchemaTest extends TestCase
                 return [$property];
             }
             
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return [];
             }
@@ -288,7 +288,7 @@ class UIComponentSchemaTest extends TestCase
                 return [$this->property];
             }
             
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return [];
             }
@@ -453,7 +453,7 @@ class UIComponentSchemaTest extends TestCase
                 return [$property];
             }
 
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return ['number' => 42];
             }
@@ -484,7 +484,7 @@ class UIComponentSchemaTest extends TestCase
                 return [$property];
             }
 
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return ['field' => 'value'];
             }
@@ -516,7 +516,7 @@ class UIComponentSchemaTest extends TestCase
                 return [$property];
             }
 
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return ['email' => 'test@example.com'];
             }
@@ -556,7 +556,7 @@ class UIComponentSchemaTest extends TestCase
                 return [$requiredProp, $optionalProp];
             }
 
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return [
                     'required_field' => 'value',

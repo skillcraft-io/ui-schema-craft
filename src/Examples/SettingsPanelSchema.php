@@ -26,19 +26,23 @@ class SettingsPanelSchema extends UIComponentSchema
         
         $builder->boolean('notifications', 'Enable Notifications')
             ->default(true)
-            ->rules(['required']);
+            ->rules(['required'])
+            ->example(true);
             
         $builder->string('theme', 'Theme')
             ->default('system')
-            ->rules(['required', 'in:light,dark,system']);
+            ->rules(['required', 'in:light,dark,system'])
+            ->example('dark');
             
         $builder->string('language', 'Language')
             ->default('en')
-            ->rules(['required', 'in:en,es,fr,de']);
+            ->rules(['required', 'in:en,es,fr,de'])
+            ->example('en');
             
         $builder->boolean('autoSave', 'Enable Auto-Save')
             ->default(true)
-            ->rules(['required']);
+            ->rules(['required'])
+            ->example(true);
             
         return $builder->toArray();
     }

@@ -10,35 +10,29 @@ class ContactFormSchema extends UIComponentSchema
     protected string $type = 'contact-form';
     protected string $component = 'form-component';
 
-    public function getExampleData(): array
-    {
-        return [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'subject' => 'General Inquiry',
-            'message' => 'Hello, I would like to know more about your services.'
-        ];
-    }
-
     public function properties(): array
     {
         $builder = new PropertyBuilder();
         
         $builder->string('name', 'Full Name')
             ->default('')
-            ->rules(['required', 'max:100']);
+            ->rules(['required', 'max:100'])
+            ->example('John Doe');
             
         $builder->string('email', 'Email Address')
             ->default('')
-            ->rules(['required', 'email']);
+            ->rules(['required', 'email'])
+            ->example('john@example.com');
             
         $builder->string('subject', 'Subject')
             ->default('General Inquiry')
-            ->rules(['required', 'max:200']);
+            ->rules(['required', 'max:200'])
+            ->example('General Inquiry');
             
         $builder->string('message', 'Message')
             ->default('')
-            ->rules(['required', 'max:1000']);
+            ->rules(['required', 'max:1000'])
+            ->example('Hello, I would like to know more about your services.');
             
         return $builder->toArray();
     }

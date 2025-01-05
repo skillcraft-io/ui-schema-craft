@@ -20,7 +20,16 @@ abstract class UIComponentSchema
      *
      * @return array
      */
-    abstract protected function getExampleData(): array;
+    public function getExampleData(): array
+    {
+        $values = [];
+
+        foreach ($this->properties() as $key => $property) {
+            $values[$key] = data_get($property, 'example_data', null);
+        }
+
+        return array_merge($values, $this->propertyValues);
+    }
 
     /**
      * Get component identifier

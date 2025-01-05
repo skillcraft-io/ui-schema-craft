@@ -19,7 +19,7 @@ class ComponentRegisteredEventTest extends TestCase
                 return [];
             }
 
-            protected function getExampleData(): array
+            public function getExampleData(): array
             {
                 return [];
             }

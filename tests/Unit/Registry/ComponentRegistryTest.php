@@ -30,7 +30,7 @@ class ComponentRegistryTest extends TestCase
             protected string $type = 'test';
             protected string $component = 'test-component';
             public function properties(): array { return []; }
-            protected function getExampleData(): array { return []; }
+            public function getExampleData(): array { return []; }
         };
     }
 
@@ -73,7 +73,7 @@ class ComponentRegistryTest extends TestCase
             protected string $type = 'another';
             protected string $component = 'another-component';
             public function properties(): array { return []; }
-            protected function getExampleData(): array { return []; }
+            public function getExampleData(): array { return []; }
         };
 
         $this->registry->register($name, $anotherComponent);
@@ -105,19 +105,19 @@ class ComponentRegistryTest extends TestCase
                 protected string $type = 'type1';
                 protected string $component = 'component1';
                 public function properties(): array { return []; }
-                protected function getExampleData(): array { return []; }
+                public function getExampleData(): array { return []; }
             },
             'component2' => new class extends UIComponentSchema {
                 protected string $type = 'type2';
                 protected string $component = 'component2';
                 public function properties(): array { return []; }
-                protected function getExampleData(): array { return []; }
+                public function getExampleData(): array { return []; }
             },
             'component3' => new class extends UIComponentSchema {
                 protected string $type = 'type3';
                 protected string $component = 'component3';
                 public function properties(): array { return []; }
-                protected function getExampleData(): array { return []; }
+                public function getExampleData(): array { return []; }
             },
         ];
 

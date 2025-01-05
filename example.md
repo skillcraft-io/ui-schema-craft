@@ -24,7 +24,7 @@ class ContactFormSchema extends UIComponentSchema
     protected string $type = 'contact-form';
     protected string $component = 'form-component';
 
-    protected function getExampleData(): array
+    public function getExampleData(): array
     {
         return [
             'name' => 'John Doe',
@@ -69,7 +69,7 @@ class SettingsPanelSchema extends UIComponentSchema
     protected string $type = 'settings-panel';
     protected string $component = 'panel-component';
 
-    protected function getExampleData(): array
+    public function getExampleData(): array
     {
         return [
             'notifications' => true,
@@ -110,7 +110,7 @@ class AnalyticsCardSchema extends UIComponentSchema
     protected string $type = 'analytics-card';
     protected string $component = 'card-component';
 
-    protected function getExampleData(): array
+    public function getExampleData(): array
     {
         return [
             'timeRange' => [

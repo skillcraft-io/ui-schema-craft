@@ -31,7 +31,7 @@ class TestComponent extends UIComponentSchema
         ];
     }
 
-    protected function getExampleData(): array
+    public function getExampleData(): array
     {
         return [
             'label' => 'Example Label',

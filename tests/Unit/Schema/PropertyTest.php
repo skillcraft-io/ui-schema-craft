@@ -1600,77 +1600,167 @@ class PropertyTest extends TestCase
     }
 
     #[Test]
-    public function it_handles_time_properties()
+    public function it_can_set_and_get_example()
     {
-        // Test time range property
+        $property = new Property('test', 'string');
+        
+        // Test setting example via example() method
+        $property->example('test value');
+        $this->assertEquals('test value', $property->getExample());
+        
+        // Test setting example via setExample() method
+        $property->setExample('new test value');
+        $this->assertEquals('new test value', $property->getExample());
+        
+        // Test fluent interface
+        $this->assertInstanceOf(Property::class, $property->example('another value'));
+        $this->assertInstanceOf(Property::class, $property->setExample('yet another value'));
+        
+        // Test null example
+        $property = new Property('test', 'string');
+        $this->assertNull($property->getExample());
+    }
+
+    #[Test]
+    public function it_includes_example_in_array_output()
+    {
+        $property = Property::string('test');
+        $property->example('test value');
+        
+        $array = $property->toArray();
+        $this->assertArrayHasKey('example_data', $array);
+        $this->assertEquals('test value', $array['example_data']);
+        
+        // Test that example_data is not included when example is null
+        $property = Property::string('test');
+        $array = $property->toArray();
+        $this->assertArrayNotHasKey('example_data', $array);
+    }
+
+    #[Test]
+    public function it_creates_time_range_property()
+    {
         $timeRange = Property::timeRange('meeting_time', 'Meeting Time Range');
         $array = $timeRange->toArray();
+        
+        // Test basic structure
         $this->assertEquals(['object', 'null'], $array['type']);
         $this->assertEquals('Meeting Time Range', $array['description']);
         $this->assertArrayHasKey('properties', $array);
-        $this->assertEquals(['type' => 'string', 'format' => 'date-time'], $array['properties']['start']);
-        $this->assertEquals(['type' => 'string', 'format' => 'date-time'], $array['properties']['end']);
+        
+        // Test start and end properties
+        $properties = $array['properties'];
+        $this->assertArrayHasKey('start', $properties);
+        $this->assertArrayHasKey('end', $properties);
+        
+        // Test start property
+        $this->assertEquals('string', $properties['start']['type']);
+        $this->assertEquals('date-time', $properties['start']['format']);
+        
+        // Test end property
+        $this->assertEquals('string', $properties['end']['type']);
+        $this->assertEquals('date-time', $properties['end']['format']);
+        
+        // Test with default description
+        $defaultTimeRange = Property::timeRange('meeting_time');
+        $this->assertEquals('Meeting Time Range', $defaultTimeRange->toArray()['description']);
+    }
 
-        // Test time property
+    #[Test]
+    public function it_creates_time_property()
+    {
         $time = Property::time('start_time', 'Start Time');
         $array = $time->toArray();
+        
+        // Test basic structure
         $this->assertEquals('string', $array['type']);
         $this->assertEquals('Start Time', $array['description']);
         $this->assertEquals('time', $array['format']);
+        
+        // Test with default description
+        $defaultTime = Property::time('start_time');
+        $this->assertEquals('Start Time', $defaultTime->toArray()['description']);
+        
+        // Test with rules
+        $timeWithRules = Property::time('start_time')->addRule('required');
+        $array = $timeWithRules->toArray();
+        $this->assertContains('required', $array['rules']);
+    }
 
-        // Test time property with default description
-        $time = Property::time('start_time');
-        $array = $time->toArray();
-        $this->assertEquals('Start Time', $array['description']);
-
-        // Test duration property
+    #[Test]
+    public function it_creates_duration_property()
+    {
         $duration = Property::duration('event_duration', 'Event Duration');
         $array = $duration->toArray();
+        
+        // Test basic structure
         $this->assertEquals('object', $array['type']);
         $this->assertEquals('Event Duration', $array['description']);
         $this->assertArrayHasKey('properties', $array);
-        $this->assertEquals(['type' => 'number'], $array['properties']['value']);
+        
+        // Test value property
+        $properties = $array['properties'];
+        $this->assertArrayHasKey('value', $properties);
+        $this->assertEquals('number', $properties['value']['type']);
+        
+        // Test unit property
+        $this->assertArrayHasKey('unit', $properties);
+        $this->assertEquals('string', $properties['unit']['type']);
         $this->assertEquals(
-            ['type' => 'string', 'enum' => ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years']], 
-            $array['properties']['unit']
+            ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'],
+            $properties['unit']['enum']
         );
+        
+        // Test with default description
+        $defaultDuration = Property::duration('event_duration');
+        $this->assertEquals('Event Duration', $defaultDuration->toArray()['description']);
+    }
 
-        // Test duration property with default description
-        $duration = Property::duration('event_duration');
-        $array = $duration->toArray();
-        $this->assertEquals('Event Duration', $array['description']);
-
-        // Test date range property
+    #[Test]
+    public function it_creates_date_range_property()
+    {
         $dateRange = Property::dateRange('booking_period', 'Booking Period');
         $array = $dateRange->toArray();
+        
+        // Test basic structure
         $this->assertEquals('object', $array['type']);
         $this->assertEquals('Booking Period', $array['description']);
-        
-        // Check start and end properties
         $this->assertArrayHasKey('properties', $array);
+        
+        // Test start and end properties
         $properties = $array['properties'];
+        $this->assertArrayHasKey('start', $properties);
+        $this->assertArrayHasKey('end', $properties);
+        
+        // Test start property
         $this->assertEquals('string', $properties['start']['type']);
         $this->assertEquals('date', $properties['start']['format']);
         $this->assertEquals('Start date', $properties['start']['description']);
+        
+        // Test end property
         $this->assertEquals('string', $properties['end']['type']);
         $this->assertEquals('date', $properties['end']['format']);
         $this->assertEquals('End date', $properties['end']['description']);
-
-        // Check options property
+        
+        // Test options property
         $this->assertArrayHasKey('options', $properties);
         $options = $properties['options']['properties'];
+        
+        // Test all option properties
         $this->assertEquals(['type' => 'string', 'format' => 'date'], $options['minDate']);
         $this->assertEquals(['type' => 'string', 'format' => 'date'], $options['maxDate']);
-        $this->assertEquals(['type' => 'array', 'items' => ['type' => 'string', 'format' => 'date']], $options['disabledDates']);
+        $this->assertEquals(
+            ['type' => 'array', 'items' => ['type' => 'string', 'format' => 'date']], 
+            $options['disabledDates']
+        );
         $this->assertEquals(['type' => 'string', 'default' => 'YYYY-MM-DD'], $options['format']);
         $this->assertEquals(['type' => 'boolean', 'default' => true], $options['shortcuts']);
         $this->assertEquals(['type' => 'boolean', 'default' => false], $options['weekNumbers']);
         $this->assertEquals(['type' => 'boolean', 'default' => true], $options['monthSelector']);
         $this->assertEquals(['type' => 'boolean', 'default' => true], $options['yearSelector']);
-
-        // Test date range property with default description
-        $dateRange = Property::dateRange('booking_period');
-        $array = $dateRange->toArray();
-        $this->assertEquals('Booking Period', $array['description']);
+        
+        // Test with default description
+        $defaultDateRange = Property::dateRange('booking_period');
+        $this->assertEquals('Booking Period', $defaultDateRange->toArray()['description']);
     }
 }

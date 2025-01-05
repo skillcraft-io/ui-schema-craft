@@ -12,6 +12,7 @@ class Property
     protected string|array $type;
     protected ?string $description;
     protected mixed $default = null;
+    protected mixed $example = null;
     protected array $rules = [];
     protected array $attributes = [];
     protected array $properties = [];
@@ -65,6 +66,23 @@ class Property
     public function getDefault(): mixed
     {
         return $this->default;
+    }
+
+    public function example(mixed $example): self
+    {
+        return $this->setExample($example);
+    }
+
+
+    public function setExample(mixed $example): self
+    {
+        $this->example = $example;
+        return $this;
+    }
+
+    public function getExample(): mixed
+    {
+        return $this->example;
     }
 
     public function addRule(string $rule): self
@@ -420,11 +438,9 @@ class Property
         if (!empty($this->properties)) {
             $array['properties'] = [];
             foreach ($this->properties as $name => $property) {
-                if ($property instanceof Property) {
-                    $array['properties'][$name] = $property->toArray();
-                } else {
-                    $array['properties'][$name] = $property;
-                }
+                $array['properties'][$name] = $property instanceof Property
+                    ? $property->toArray()
+                    : $property;
             }
         }
 
@@ -434,6 +450,10 @@ class Property
 
         if (!empty($this->conditionalRules)) {
             $array['conditionalRules'] = $this->conditionalRules;
+        }
+
+        if ($this->example !== null) {
+            $array['example_data'] = $this->example;
         }
 
         $array['required'] = $this->isRequired;
