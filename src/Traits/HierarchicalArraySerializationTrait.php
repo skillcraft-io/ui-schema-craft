@@ -157,11 +157,19 @@ trait HierarchicalArraySerializationTrait
         $basicConfig = [];
         
         // Extract common property attributes that should be included
-        $attributes = ['default', 'description', 'example', 'format', 'enum'];
+        $attributes = ['default', 'description', 'example', 'format', 'enum', 'required'];
         
         foreach ($attributes as $attr) {
             if (isset($config[$attr])) {
                 $basicConfig[$attr] = $config[$attr];
+            }
+        }
+        
+        // Copy any other properties from the original configuration that should be preserved
+        $preserveKeys = ['title', 'minimum', 'maximum', 'pattern', 'minLength', 'maxLength'];
+        foreach ($preserveKeys as $key) {
+            if (isset($config[$key])) {
+                $basicConfig[$key] = $config[$key];
             }
         }
         

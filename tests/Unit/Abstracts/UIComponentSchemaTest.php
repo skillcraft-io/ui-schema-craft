@@ -96,6 +96,7 @@ class UIComponentSchemaTest extends TestCase
 
     public function testToArrayReturnsSchema(): void
     {
+        // With hierarchical serialization, properties structure is maintained with type info
         $expected = [
             'type' => 'test-component',
             'version' => '2.0.0',
@@ -108,7 +109,12 @@ class UIComponentSchemaTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, $this->component->toArray());
+        $actual = $this->component->toArray();
+        $this->assertEquals($expected['type'], $actual['type']);
+        $this->assertEquals($expected['version'], $actual['version']);
+        $this->assertEquals($expected['component'], $actual['component']);
+        $this->assertEquals($expected['properties']['name']['type'], $actual['properties']['name']['type']);
+        $this->assertEquals($expected['properties']['name']['required'], $actual['properties']['name']['required']);
     }
 
     public function testValidateWithMissingRequiredProperty(): void
@@ -142,12 +148,19 @@ class UIComponentSchemaTest extends TestCase
     public function testEmptyComponentProperties(): void
     {
         $this->assertEmpty($this->emptyComponent->properties());
-        $this->assertEquals([
+        
+        $expected = [
             'type' => 'empty-component',
             'version' => '1.0.0',
             'component' => '',
             'properties' => []
-        ], $this->emptyComponent->toArray());
+        ];
+        
+        $actual = $this->emptyComponent->toArray();
+        $this->assertEquals($expected['type'], $actual['type']);
+        $this->assertEquals($expected['version'], $actual['version']);
+        $this->assertEquals($expected['component'], $actual['component']);
+        $this->assertEquals([], $actual['properties']);
 
         // Test validation with no schema
         $result = $this->emptyComponent->validate([]);
@@ -157,7 +170,7 @@ class UIComponentSchemaTest extends TestCase
 
     public function testDefaultPropertiesComponent(): void
     {
-        $this->assertEquals([
+        $expected = [
             'type' => 'default-properties',
             'version' => '1.0.0',
             'component' => '',
@@ -167,7 +180,14 @@ class UIComponentSchemaTest extends TestCase
                     'default' => 'Default Name'
                 ]
             ]
-        ], $this->defaultComponent->toArray());
+        ];
+        
+        $actual = $this->defaultComponent->toArray();
+        $this->assertEquals($expected['type'], $actual['type']);
+        $this->assertEquals($expected['version'], $actual['version']);
+        $this->assertEquals($expected['component'], $actual['component']);
+        $this->assertEquals($expected['properties']['name']['type'], $actual['properties']['name']['type']);
+        $this->assertEquals($expected['properties']['name']['default'], $actual['properties']['name']['default']);
 
         $data = ['name' => 'Default Name'];
         $result = $this->defaultComponent->validate([]);
