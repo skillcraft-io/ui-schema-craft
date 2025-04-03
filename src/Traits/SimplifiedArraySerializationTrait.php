@@ -7,6 +7,9 @@ use Skillcraft\UiSchemaCraft\Interfaces\ComposableInterface;
 /**
  * Trait for simplified array serialization
  * 
+ * @deprecated This trait is deprecated and will be removed in a future version. 
+ * Use HierarchicalArraySerializationTrait instead for improved structure.
+ * 
  * This trait provides a standardized implementation of toArray() that outputs
  * a simplified array structure suitable for frontend frameworks like Vueform.
  * It combines schema definition with actual property values.
