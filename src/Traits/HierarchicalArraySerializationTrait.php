@@ -3,6 +3,7 @@
 namespace Skillcraft\UiSchemaCraft\Traits;
 
 use Skillcraft\UiSchemaCraft\Interfaces\ComposableInterface;
+use Skillcraft\UiSchemaCraft\Schema\Property;
 
 /**
  * Trait for hierarchical array serialization
@@ -95,6 +96,12 @@ trait HierarchicalArraySerializationTrait
                 continue;
             }
             
+            // Handle Property objects directly
+            if ($config instanceof Property) {
+                $result[$key] = $this->convertPropertyToArray($config);
+                continue;
+            }
+            
             // Handle object properties - these have nested properties
             if (isset($config['type']) && $config['type'] === 'object' && isset($config['properties'])) {
                 $result[$key] = [
@@ -110,30 +117,37 @@ trait HierarchicalArraySerializationTrait
             } 
             // Handle array properties with object items
             elseif (isset($config['type']) && $config['type'] === 'array' && 
-                    isset($config['items']) && isset($config['items']['type']) && 
-                    $config['items']['type'] === 'object') {
-                
+                    isset($config['items'])) {
+                    
                 $result[$key] = [
                     'type' => 'array',
                 ];
                 
-                // Process items property
-                $itemsConfig = $config['items'];
-                $itemProperties = $itemsConfig['properties'] ?? [];
+                // Process items - handle Property objects too
+                $items = $config['items'];
+                
+                // Handle Property objects in items
+                if ($items instanceof Property) {
+                    $items = $this->convertPropertyToArray($items);
+                }
+                
+                // For object items with properties
+                if (is_array($items) && isset($items['type']) && $items['type'] === 'object' && isset($items['properties'])) {
+                    $itemProperties = $items['properties'];
+                    
+                    $items = array_merge(
+                        ['type' => $items['type']],
+                        $this->extractBasicConfig($items),
+                        ['properties' => $this->transformPropertiesStructure($itemProperties)]
+                    );
+                }
                 
                 $result[$key] = array_merge(
                     $result[$key],
                     $this->extractBasicConfig($config),
-                    [
-                        'items' => array_merge(
-                            ['type' => $itemsConfig['type']],
-                            isset($itemsConfig['properties']) 
-                                ? ['properties' => $this->transformPropertiesStructure($itemProperties)]
-                                : []
-                        )
-                    ]
+                    ['items' => $items]
                 );
-            } 
+            }
             // Basic property types
             else {
                 $result[$key] = array_merge(
@@ -174,6 +188,36 @@ trait HierarchicalArraySerializationTrait
         }
         
         return $basicConfig;
+    }
+    
+    /**
+     * Convert a Property object to array and ensure nested properties are converted too
+     *
+     * @param Property $property Property object to convert
+     * @return array Fully converted property array
+     */
+    protected function convertPropertyToArray(Property $property): array
+    {
+        $data = $property->toArray();
+        
+        // We don't need the name in the result since it's used as the array key
+        unset($data['name']);
+        
+        // Recursively process nested properties
+        if (isset($data['properties']) && is_array($data['properties'])) {
+            $data['properties'] = $this->transformPropertiesStructure($data['properties']);
+        }
+        
+        // Handle items that might contain Property objects
+        if (isset($data['items'])) {
+            if ($data['items'] instanceof Property) {
+                $data['items'] = $this->convertPropertyToArray($data['items']);
+            } elseif (is_array($data['items']) && isset($data['items']['properties'])) {
+                $data['items']['properties'] = $this->transformPropertiesStructure($data['items']['properties']);
+            }
+        }
+        
+        return $data;
     }
     
     /**
