@@ -93,6 +93,55 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
             'errors' => $valid ? null : new \Illuminate\Support\MessageBag(['validation' => ['Validation failed']])
         ];
     }
+    
+    /**
+     * Get example data for the component
+     *
+     * This default implementation extracts example data from property definitions,
+     * looking for 'example' or 'example_data' keys in the property definitions.
+     * Components can override this method to provide custom example data.
+     *
+     * @return array Example data for this component
+     */
+    public function getExampleData(): array
+    {
+        $exampleData = [
+            'type' => $this->getType(),
+            'component' => $this->getComponent(),
+        ];
+        
+        // Process the properties to extract example values
+        $properties = $this->properties();
+        $propertyValues = [];
+        
+        foreach ($properties as $propertyName => $propertyConfig) {
+            // Skip any property that doesn't have a structure we recognize
+            if (!is_array($propertyConfig)) {
+                continue;
+            }
+            
+            // First try the 'example' key (used by PropertyBuilder)
+            if (isset($propertyConfig['example'])) {
+                $propertyValues[$propertyName] = $propertyConfig['example'];
+            }
+            // Then fall back to 'example_data' key (may be used in some components)
+            elseif (isset($propertyConfig['example_data'])) {
+                $propertyValues[$propertyName] = $propertyConfig['example_data'];
+            }
+            // Use default value as a last resort
+            elseif (isset($propertyConfig['default'])) {
+                $propertyValues[$propertyName] = $propertyConfig['default'];
+            }
+        }
+        
+        if (!empty($propertyValues)) {
+            $exampleData['properties'] = $propertyValues;
+        }
+        
+        return $exampleData;
+    }
+
+
 
     /**
      * Get validation schema
