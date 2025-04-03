@@ -21,10 +21,36 @@ class LoginSchema extends UIComponentSchema
         'form_text',
         'form_config'
     ];
+    
+    /**
+     * Optional validation schema - only used if validation is enabled
+     */
+    protected ?array $validationSchema = [
+        'username' => 'required|string|min:3',
+        'password' => 'required|string|min:8',
+    ];
 
-    public function __construct(ValidatorInterface $validator) 
+    /**
+     * Constructor with optional validator support
+     * 
+     * @param ValidatorInterface|null $validator Optional validator instance
+     */
+    public function __construct(?ValidatorInterface $validator = null) 
     {
         parent::__construct($validator);
+    }
+    
+    /**
+     * Get example data for this component
+     * 
+     * @return array Example data
+     */
+    public function getExampleData(): array
+    {
+        return [
+            'username' => 'john_doe',
+            'password' => 'secure_password',
+        ];
     }
 
     /**
