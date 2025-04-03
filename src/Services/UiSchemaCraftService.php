@@ -6,16 +6,25 @@ use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
 use Skillcraft\SchemaState\Contracts\StateManagerInterface;
 use Skillcraft\UiSchemaCraft\ComponentResolver;
 use Skillcraft\SchemaValidation\Contracts\ValidatorInterface;
+use Skillcraft\UiSchemaCraft\Adapters\ValidatorInterfaceAdapter;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
 use Mockery;
 
 class UiSchemaCraftService
 {
+    /**
+     * Validator adapter for handling interface mismatches
+     */
+    protected ValidatorInterfaceAdapter $validatorAdapter;
+
     public function __construct(
-        private readonly StateManagerInterface $stateManager,
-        private readonly ComponentResolver $resolver,
-        private readonly ValidatorInterface $validator
-    ) {}
+        protected readonly StateManagerInterface $stateManager,
+        protected readonly ComponentResolver $resolver = new ComponentResolver(),
+        protected readonly ValidatorInterface $validator
+    ) {
+        $this->validatorAdapter = new ValidatorInterfaceAdapter(app(), $validator);
+    }
 
     /**
      * Register a component class
@@ -226,8 +235,12 @@ class UiSchemaCraftService
         if (!$class) {
             throw new \InvalidArgumentException("Component type '{$type}' not found");
         }
-
-        return new $class($this->validator);
+        
+        // Use the validator adapter to handle any interface differences
+        $adaptedValidator = $this->validatorAdapter->adapt($class);
+        
+        // Instantiate the component with the appropriate validator
+        return new $class($adaptedValidator);
     }
 
     /**
