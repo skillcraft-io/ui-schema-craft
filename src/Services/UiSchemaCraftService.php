@@ -229,4 +229,59 @@ class UiSchemaCraftService
 
         return new $class($this->validator);
     }
+
+    /**
+     * Get example data from all available components
+     *
+     * This method maps all registered components and retrieves their example data
+     * if they implement a getExampleData method
+     *
+     * @return array Associative array of component types and their example data
+     */
+    public function getAllExampleData(): array
+    {
+        $examples = [];
+        $types = $this->resolver->getTypes();
+
+        foreach ($types as $type) {
+            try {
+                $component = $this->resolveComponent($type);
+                
+                // Check if the component has an example data method
+                if (method_exists($component, 'getExampleData')) {
+                    $examples[$type] = $component->getExampleData();
+                }
+            } catch (\Exception $e) {
+                // Skip components that can't be resolved
+                continue;
+            }
+        }
+
+        return $examples;
+    }
+
+    /**
+     * Get schemas for all registered components
+     *
+     * This method maps all registered components and retrieves their schema structures
+     *
+     * @return array Associative array of component types and their schemas
+     */
+    public function getAllSchemas(): array
+    {
+        $schemas = [];
+        $types = $this->resolver->getTypes();
+
+        foreach ($types as $type) {
+            try {
+                $component = $this->resolveComponent($type);
+                $schemas[$type] = $component->toArray();
+            } catch (\Exception $e) {
+                // Skip components that can't be resolved
+                continue;
+            }
+        }
+
+        return $schemas;
+    }
 }
