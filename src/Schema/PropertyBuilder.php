@@ -39,6 +39,7 @@ class PropertyBuilder
 
     public function __construct()
     {
+        $this->properties = [];
     }
 
     public function new(): static

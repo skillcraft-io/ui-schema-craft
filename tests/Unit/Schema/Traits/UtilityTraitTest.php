@@ -2,194 +2,233 @@
 
 namespace Skillcraft\UiSchemaCraft\Tests\Unit\Schema\Traits;
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Skillcraft\UiSchemaCraft\Tests\TestCase;
+use Skillcraft\UiSchemaCraft\Schema\Property;
 use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
 use Skillcraft\UiSchemaCraft\Schema\Traits\UtilityTrait;
 
-#[CoversClass(UtilityTrait::class)]
 class UtilityTraitTest extends TestCase
 {
-    protected PropertyBuilder $builder;
+    /**
+     * Test class that uses the UtilityTrait
+     */
+    private $traitUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->builder = new PropertyBuilder();
+        
+        // Create a test class that uses the trait
+        $this->traitUser = new class {
+            use UtilityTrait;
+        };
     }
 
-    #[Test]
-    public function it_creates_group_property()
+    public function testGroupProperty(): void
     {
-        $property = $this->builder->group('address', function ($builder) {
-            $builder->string('street')->description('Street address');
-            $builder->string('city')->description('City name');
-            $builder->string('state')->description('State/Province');
-            $builder->string('zip')->description('ZIP/Postal code');
-        }, 'Address Information');
-
-        $schema = $property->toArray();
-
-        $this->assertEquals('address', $schema['name']);
-        $this->assertEquals('Address Information', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'personalInfo';
+        $description = 'Personal Information';
         
-        // Check properties
-        $properties = $schema['properties'];
+        $property = $this->traitUser->group($propertyName, function(PropertyBuilder $builder) {
+            $builder->string('firstName')->required();
+            $builder->string('lastName')->required();
+            $builder->string('email')->format('email');
+        }, $description);
         
-        // Check street
-        $this->assertArrayHasKey('street', $properties);
-        $street = $properties['street'];
-        $this->assertEquals('string', $street['type']);
-        $this->assertEquals('Street address', $street['description']);
-        
-        // Check city
-        $this->assertArrayHasKey('city', $properties);
-        $city = $properties['city'];
-        $this->assertEquals('string', $city['type']);
-        $this->assertEquals('City name', $city['description']);
-        
-        // Check state
-        $this->assertArrayHasKey('state', $properties);
-        $state = $properties['state'];
-        $this->assertEquals('string', $state['type']);
-        $this->assertEquals('State/Province', $state['description']);
-        
-        // Check zip
-        $this->assertArrayHasKey('zip', $properties);
-        $zip = $properties['zip'];
-        $this->assertEquals('string', $zip['type']);
-        $this->assertEquals('ZIP/Postal code', $zip['description']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($description, $property->getDescription());
     }
-
-    #[Test]
-    public function it_creates_group_with_default_label()
+    
+    public function testGroupPropertyWithAutoDescription(): void
     {
-        $property = $this->builder->group('shipping_details', function ($builder) {
-            $builder->string('carrier');
-            $builder->string('tracking_number');
+        $propertyName = 'contact_details';
+        
+        $property = $this->traitUser->group($propertyName, function(PropertyBuilder $builder) {
+            $builder->string('phone')->required();
+            $builder->string('address')->required();
         });
-
-        $schema = $property->toArray();
-
-        $this->assertEquals('shipping_details', $schema['name']);
-        $this->assertEquals('Shipping Details', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals('Contact Details', $property->getDescription());
     }
-
-    #[Test]
-    public function it_creates_list_property()
+    
+    public function testGroupHasCorrectStructure(): void
     {
-        $property = $this->builder->list('phone_numbers', function ($builder) {
-            $builder->string('type')->description('Phone type');
-            $builder->string('number')->description('Phone number');
-            $builder->boolean('primary')->description('Is primary');
-        }, 'Contact Numbers');
-
-        $schema = $property->toArray();
-
-        $this->assertEquals('phone_numbers', $schema['name']);
-        $this->assertEquals('Contact Numbers', $schema['description']);
-        $this->assertEquals('array', $schema['type']);
+        $propertyName = 'address';
+        $description = 'Address Information';
         
-        // Check items
-        $this->assertArrayHasKey('items', $schema);
-        $items = $schema['items'];
+        $property = $this->traitUser->group($propertyName, function(PropertyBuilder $builder) {
+            $builder->string('street')->required();
+            $builder->string('city')->required();
+            $builder->string('state')->required();
+            $builder->string('zip')->required();
+        }, $description);
+        
+        $attributes = $property->toArray();
+        
+        // Check if properties is defined
+        $this->assertArrayHasKey('properties', $attributes);
+        $properties = $attributes['properties'];
+        
+        // Check required properties
+        $this->assertArrayHasKey('street', $properties);
+        $this->assertArrayHasKey('city', $properties);
+        $this->assertArrayHasKey('state', $properties);
+        $this->assertArrayHasKey('zip', $properties);
+        
+        // Check types
+        $this->assertEquals('string', $properties['street']['type']);
+        $this->assertEquals('string', $properties['city']['type']);
+        $this->assertEquals('string', $properties['state']['type']);
+        $this->assertEquals('string', $properties['zip']['type']);
+    }
+    
+    public function testListProperty(): void
+    {
+        $propertyName = 'todoItems';
+        $description = 'Todo List Items';
+        
+        $property = $this->traitUser->list($propertyName, function(PropertyBuilder $builder) {
+            $builder->string('title')->required();
+            $builder->string('description');
+            $builder->boolean('completed')->default(false);
+        }, $description);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('array', $property->getType());
+        $this->assertEquals($description, $property->getDescription());
+    }
+    
+    public function testListPropertyWithAutoDescription(): void
+    {
+        $propertyName = 'cart_items';
+        
+        $property = $this->traitUser->list($propertyName, function(PropertyBuilder $builder) {
+            $builder->string('product')->required();
+            $builder->number('quantity')->required()->min(1);
+            $builder->number('price')->required();
+        });
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('array', $property->getType());
+        $this->assertEquals('Cart Items', $property->getDescription());
+    }
+    
+    public function testListHasCorrectStructure(): void
+    {
+        $propertyName = 'employees';
+        $description = 'Employee List';
+        
+        $property = $this->traitUser->list($propertyName, function(PropertyBuilder $builder) {
+            $builder->string('name')->required();
+            $builder->string('position')->required();
+            $builder->number('salary')->required();
+        }, $description);
+        
+        $attributes = $property->toArray();
+        
+        // Check if items is defined
+        $this->assertArrayHasKey('items', $attributes);
+        $items = $attributes['items'];
+        
+        // Check items structure
         $this->assertEquals('object', $items['type']);
+        $this->assertArrayHasKey('properties', $items);
         
-        // Check item properties
         $properties = $items['properties'];
         
-        // Check type
-        $this->assertArrayHasKey('type', $properties);
-        $type = $properties['type'];
-        $this->assertEquals('string', $type['type']);
-        $this->assertEquals('Phone type', $type['description']);
+        // Check required properties
+        $this->assertArrayHasKey('name', $properties);
+        $this->assertArrayHasKey('position', $properties);
+        $this->assertArrayHasKey('salary', $properties);
         
-        // Check number
-        $this->assertArrayHasKey('number', $properties);
-        $number = $properties['number'];
-        $this->assertEquals('string', $number['type']);
-        $this->assertEquals('Phone number', $number['description']);
-        
-        // Check primary
-        $this->assertArrayHasKey('primary', $properties);
-        $primary = $properties['primary'];
-        $this->assertEquals('boolean', $primary['type']);
-        $this->assertEquals('Is primary', $primary['description']);
+        // Check types
+        $this->assertEquals('string', $properties['name']['type']);
+        $this->assertEquals('string', $properties['position']['type']);
+        $this->assertEquals('number', $properties['salary']['type']);
     }
-
-    #[Test]
-    public function it_creates_list_with_default_label()
+    
+    public function testConditionalProperty(): void
     {
-        $property = $this->builder->list('email_addresses', function ($builder) {
-            $builder->string('email');
-            $builder->boolean('verified');
-        });
-
-        $schema = $property->toArray();
-
-        $this->assertEquals('email_addresses', $schema['name']);
-        $this->assertEquals('Email Addresses', $schema['description']);
-        $this->assertEquals('array', $schema['type']);
-    }
-
-    #[Test]
-    public function it_creates_conditional_property()
-    {
+        $propertyName = 'shippingInfo';
+        $description = 'Shipping Information';
         $conditions = [
-            'if' => ['type' => ['value' => 'business']],
-            'then' => ['required' => ['company', 'vat_number']]
+            'field' => 'needsShipping',
+            'operator' => '==',
+            'value' => true
         ];
-
-        $property = $this->builder->conditional('business_info', $conditions, function ($builder) {
-            $builder->string('company')->description('Company name');
-            $builder->string('vat_number')->description('VAT number');
-        }, 'Business Information');
-
-        $schema = $property->toArray();
-
-        $this->assertEquals('business_info', $schema['name']);
-        $this->assertEquals('Business Information', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        
+        $property = $this->traitUser->conditional($propertyName, $conditions, function(PropertyBuilder $builder) {
+            $builder->string('address')->required();
+            $builder->string('city')->required();
+            $builder->string('state')->required();
+            $builder->string('zip')->required();
+        }, $description);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($description, $property->getDescription());
+    }
+    
+    public function testConditionalPropertyWithAutoDescription(): void
+    {
+        $propertyName = 'payment_details';
+        $conditions = [
+            'field' => 'paymentMethod',
+            'operator' => '==',
+            'value' => 'credit_card'
+        ];
+        
+        $property = $this->traitUser->conditional($propertyName, $conditions, function(PropertyBuilder $builder) {
+            $builder->string('cardNumber')->required();
+            $builder->string('expiryDate')->required();
+            $builder->string('cvv')->required();
+        });
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals('Payment Details', $property->getDescription());
+    }
+    
+    public function testConditionalHasCorrectStructure(): void
+    {
+        $propertyName = 'additionalInfo';
+        $description = 'Additional Information';
+        $conditions = [
+            'field' => 'hasMore',
+            'operator' => '==',
+            'value' => true
+        ];
+        
+        $property = $this->traitUser->conditional($propertyName, $conditions, function(PropertyBuilder $builder) {
+            $builder->string('details')->required();
+            $builder->string('notes');
+        }, $description);
+        
+        $attributes = $property->toArray();
+        
+        // Check if properties is defined
+        $this->assertArrayHasKey('properties', $attributes);
+        $properties = $attributes['properties'];
+        
+        // Check required properties
+        $this->assertArrayHasKey('details', $properties);
+        $this->assertArrayHasKey('notes', $properties);
+        
+        // Check types
+        $this->assertEquals('string', $properties['details']['type']);
+        $this->assertEquals('string', $properties['notes']['type']);
         
         // Check conditions
-        $this->assertArrayHasKey('conditions', $schema);
-        $this->assertEquals($conditions, $schema['conditions']);
-        
-        // Check properties
-        $properties = $schema['properties'];
-        
-        // Check company
-        $this->assertArrayHasKey('company', $properties);
-        $company = $properties['company'];
-        $this->assertEquals('string', $company['type']);
-        $this->assertEquals('Company name', $company['description']);
-        
-        // Check vat number
-        $this->assertArrayHasKey('vat_number', $properties);
-        $vat = $properties['vat_number'];
-        $this->assertEquals('string', $vat['type']);
-        $this->assertEquals('VAT number', $vat['description']);
-    }
-
-    #[Test]
-    public function it_creates_conditional_with_default_label()
-    {
-        $conditions = [
-            'if' => ['status' => ['value' => 'active']],
-            'then' => ['required' => ['expiry_date']]
-        ];
-
-        $property = $this->builder->conditional('subscription_details', $conditions, function ($builder) {
-            $builder->string('expiry_date');
-        });
-
-        $schema = $property->toArray();
-
-        $this->assertEquals('subscription_details', $schema['name']);
-        $this->assertEquals('Subscription Details', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $this->assertArrayHasKey('conditions', $attributes);
+        $this->assertEquals($conditions, $attributes['conditions']);
     }
 }

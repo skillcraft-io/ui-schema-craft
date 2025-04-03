@@ -7,7 +7,7 @@ use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
 class ComponentRegisteredEvent
 {
     public function __construct(
-        public readonly string $name,
+        public readonly string $type,
         public readonly UIComponentSchema $component
     ) {}
 }

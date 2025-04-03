@@ -2,202 +2,127 @@
 
 namespace Skillcraft\UiSchemaCraft\Tests\Unit\Schema\Traits;
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Skillcraft\UiSchemaCraft\Tests\TestCase;
-use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
 use Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait;
 
-#[CoversClass(TimeTrait::class)]
 class TimeTraitTest extends TestCase
 {
-    protected PropertyBuilder $builder;
+    private $traitUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->builder = new PropertyBuilder();
+        
+        // Create a test class that uses the trait
+        $this->traitUser = new class('test') {
+            use TimeTrait;
+            
+            private string $name;
+            private array $rules = [];
+            
+            public function __construct(string $name)
+            {
+                $this->name = $name;
+            }
+            
+            public function rule(string $rule): self
+            {
+                $this->rules[] = $rule;
+                return $this;
+            }
+            
+            public function getRules(): array
+            {
+                return $this->rules;
+            }
+        };
     }
 
-    #[Test]
-    public function it_creates_time_range_property()
+    public function testTimeRange(): void
     {
-        $property = $this->builder->timeRange('schedule', 'Schedule');
-        $schema = $property->toArray();
-
-        $this->assertEquals('schedule', $schema['name']);
-        $this->assertEquals('Schedule', $schema['description']);
-        $this->assertEquals(['object', 'null'], $schema['type']);
+        $result = $this->traitUser->timeRange('08:00', '17:00');
         
-        // Check properties
-        $properties = $schema['properties'];
+        $this->assertSame($this->traitUser, $result);
+        $this->assertContains('time_range:08:00,17:00', $this->traitUser->getRules());
+    }
+    
+    public function testTimeRangeWithDefaultValues(): void
+    {
+        $result = $this->traitUser->timeRange();
         
-        // Check start time
-        $this->assertArrayHasKey('start', $properties);
-        $start = $properties['start'];
-        $this->assertEquals('string', $start['type']);
-        $this->assertEquals('date-time', $start['format']);
-        
-        // Check end time
-        $this->assertArrayHasKey('end', $properties);
-        $end = $properties['end'];
-        $this->assertEquals('string', $end['type']);
-        $this->assertEquals('date-time', $end['format']);
+        $this->assertSame($this->traitUser, $result);
+        $this->assertContains('time_range:00:00,23:59', $this->traitUser->getRules());
     }
 
-    #[Test]
-    public function it_creates_time_range_with_default_label()
+    public function testDateRange(): void
     {
-        $property = $this->builder->timeRange('meeting_time');
-        $schema = $property->toArray();
-
-        $this->assertEquals('meeting_time', $schema['name']);
-        $this->assertEquals('Meeting Time', $schema['description']);
-        $this->assertEquals(['object', 'null'], $schema['type']);
+        $result = $this->traitUser->dateRange('2023-01-01', '2023-12-31');
+        
+        $this->assertSame($this->traitUser, $result);
+        $this->assertContains('date_range:2023-01-01,2023-12-31', $this->traitUser->getRules());
+    }
+    
+    public function testDateRangeWithOnlyMinValue(): void
+    {
+        $result = $this->traitUser->dateRange('2023-01-01');
+        
+        $this->assertSame($this->traitUser, $result);
+        $this->assertContains('date_range:2023-01-01', $this->traitUser->getRules());
+    }
+    
+    public function testDateRangeWithOnlyMaxValue(): void
+    {
+        $result = $this->traitUser->dateRange(null, '2023-12-31');
+        
+        $this->assertSame($this->traitUser, $result);
+        $this->assertContains('date_range:2023-12-31', $this->traitUser->getRules());
     }
 
-    #[Test]
-    public function it_creates_date_range_property()
+    public function testTime(): void
     {
-        $property = $this->builder->dateRange('availability', 'Availability Period');
-        $schema = $property->toArray();
-
-        $this->assertEquals('availability', $schema['name']);
-        $this->assertEquals('Availability Period', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $result = $this->traitUser->time('H:i:s');
         
-        // Check properties
-        $properties = $schema['properties'];
+        $this->assertSame($this->traitUser, $result);
+        $this->assertContains('time:H:i:s', $this->traitUser->getRules());
+    }
+    
+    public function testTimeWithDefaultFormat(): void
+    {
+        $result = $this->traitUser->time();
         
-        // Check start date
-        $this->assertArrayHasKey('start', $properties);
-        $start = $properties['start'];
-        $this->assertEquals('string', $start['type']);
-        $this->assertEquals('date', $start['format']);
-        $this->assertEquals('Start date', $start['description']);
-        
-        // Check end date
-        $this->assertArrayHasKey('end', $properties);
-        $end = $properties['end'];
-        $this->assertEquals('string', $end['type']);
-        $this->assertEquals('date', $end['format']);
-        $this->assertEquals('End date', $end['description']);
-        
-        // Check options
-        $this->assertArrayHasKey('options', $properties);
-        $options = $properties['options'];
-        $this->assertEquals('object', $options['type']);
-        
-        // Check option properties
-        $optionProps = $options['properties'];
-        
-        // Date constraints
-        $this->assertArrayHasKey('minDate', $optionProps);
-        $this->assertEquals('string', $optionProps['minDate']['type']);
-        $this->assertEquals('date', $optionProps['minDate']['format']);
-        
-        $this->assertArrayHasKey('maxDate', $optionProps);
-        $this->assertEquals('string', $optionProps['maxDate']['type']);
-        $this->assertEquals('date', $optionProps['maxDate']['format']);
-        
-        $this->assertArrayHasKey('disabledDates', $optionProps);
-        $this->assertEquals('array', $optionProps['disabledDates']['type']);
-        $this->assertEquals('string', $optionProps['disabledDates']['items']['type']);
-        $this->assertEquals('date', $optionProps['disabledDates']['items']['format']);
-        
-        // Display options
-        $this->assertArrayHasKey('format', $optionProps);
-        $this->assertEquals('string', $optionProps['format']['type']);
-        $this->assertEquals('YYYY-MM-DD', $optionProps['format']['default']);
-        
-        $this->assertArrayHasKey('shortcuts', $optionProps);
-        $this->assertEquals('boolean', $optionProps['shortcuts']['type']);
-        $this->assertTrue($optionProps['shortcuts']['default']);
-        
-        $this->assertArrayHasKey('weekNumbers', $optionProps);
-        $this->assertEquals('boolean', $optionProps['weekNumbers']['type']);
-        $this->assertFalse($optionProps['weekNumbers']['default']);
-        
-        $this->assertArrayHasKey('monthSelector', $optionProps);
-        $this->assertEquals('boolean', $optionProps['monthSelector']['type']);
-        $this->assertTrue($optionProps['monthSelector']['default']);
-        
-        $this->assertArrayHasKey('yearSelector', $optionProps);
-        $this->assertEquals('boolean', $optionProps['yearSelector']['type']);
-        $this->assertTrue($optionProps['yearSelector']['default']);
+        $this->assertSame($this->traitUser, $result);
+        $this->assertContains('time:H:i', $this->traitUser->getRules());
     }
 
-    #[Test]
-    public function it_creates_date_range_with_default_label()
+    public function testDuration(): void
     {
-        $property = $this->builder->dateRange('booking_period');
-        $schema = $property->toArray();
-
-        $this->assertEquals('booking_period', $schema['name']);
-        $this->assertEquals('Booking Period', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
-    }
-
-    #[Test]
-    public function it_creates_duration_property()
-    {
-        $property = $this->builder->duration('event_duration', 'Event Duration');
-        $schema = $property->toArray();
-
-        $this->assertEquals('event_duration', $schema['name']);
-        $this->assertEquals('Event Duration', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $result = $this->traitUser->duration();
         
-        // Check properties
-        $properties = $schema['properties'];
-        
-        // Check value
-        $this->assertArrayHasKey('value', $properties);
-        $value = $properties['value'];
-        $this->assertEquals('number', $value['type']);
-        
-        // Check unit
-        $this->assertArrayHasKey('unit', $properties);
-        $unit = $properties['unit'];
-        $this->assertEquals('string', $unit['type']);
-        $this->assertEquals(
-            ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'],
-            $unit['enum']
-        );
+        $this->assertSame($this->traitUser, $result);
+        $this->assertContains('duration', $this->traitUser->getRules());
     }
 
-    #[Test]
-    public function it_creates_duration_with_default_label()
+    public function testTimeRangeStatic(): void
     {
-        $property = $this->builder->duration('processing_time');
-        $schema = $property->toArray();
-
-        $this->assertEquals('processing_time', $schema['name']);
-        $this->assertEquals('Processing Time', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $object = $this->traitUser::timeRangeStatic('test-name', '09:00', '18:00');
+        $this->assertContains('time_range:09:00,18:00', $object->getRules());
     }
 
-    #[Test]
-    public function it_creates_time_property()
+    public function testDateRangeStatic(): void
     {
-        $property = $this->builder->time('start_time', 'Start Time');
-        $schema = $property->toArray();
-
-        $this->assertEquals('start_time', $schema['name']);
-        $this->assertEquals('Start Time', $schema['description']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('time', $schema['format']);
+        $object = $this->traitUser::dateRangeStatic('test-name', '2023-01-01', '2023-12-31');
+        $this->assertContains('date_range:2023-01-01,2023-12-31', $object->getRules());
     }
 
-    #[Test]
-    public function it_creates_time_with_default_label()
+    public function testTimeStatic(): void
     {
-        $property = $this->builder->time('end_time');
-        $schema = $property->toArray();
+        $object = $this->traitUser::timeStatic('test-name', 'H:i:s');
+        $this->assertContains('time:H:i:s', $object->getRules());
+    }
 
-        $this->assertEquals('end_time', $schema['name']);
-        $this->assertEquals('End Time', $schema['description']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('time', $schema['format']);
+    public function testDurationStatic(): void
+    {
+        $object = $this->traitUser::durationStatic('test-name');
+        $this->assertContains('duration', $object->getRules());
     }
 }

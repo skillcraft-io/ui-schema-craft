@@ -2,155 +2,121 @@
 
 namespace Skillcraft\UiSchemaCraft\Schema\Traits;
 
-use Skillcraft\UiSchemaCraft\Schema\Property;
-
 trait ValidationTrait
 {
-    /**
-     * Add a conditional validation rule.
-     */
-    public function when(string|array|\Closure $field, mixed $value = null, array|string $rules = []): static
-    {
-        if (!isset($this->attributes['conditionalRules'])) {
-            $this->attributes['conditionalRules'] = [];
-        }
+    protected array $rules = [];
+    protected array $messages = [];
 
+    /**
+     * Add a validation rule
+     */
+    public function rule(string $rule): self
+    {
+        $this->rules[] = $rule;
+        return $this;
+    }
+
+    /**
+     * Add multiple validation rules
+     */
+    public function rules(array $rules): self
+    {
+        $this->rules = array_merge($this->rules, $rules);
+        return $this;
+    }
+
+    /**
+     * Add a validation message
+     */
+    public function message(string $rule, string $message): self
+    {
+        $this->messages[$rule] = $message;
+        return $this;
+    }
+
+    /**
+     * Add multiple validation messages
+     */
+    public function messages(array $messages): self
+    {
+        $this->messages = array_merge($this->messages, $messages);
+        return $this;
+    }
+
+    /**
+     * Add a required rule
+     */
+    public function required(): self
+    {
+        return $this->rule('required');
+    }
+
+    /**
+     * Add a nullable rule
+     */
+    public function nullable(): self
+    {
+        return $this->rule('nullable');
+    }
+
+    /**
+     * Add a conditional validation rule
+     */
+    public function when(string|array|\Closure $field, mixed $value = null, array|string $rules = []): self
+    {
         if ($field instanceof \Closure) {
-            $this->attributes['conditionalRules'][] = [
-                'type' => 'closure',
-                'closure' => $field,
-                'rules' => is_array($value) ? $value : [$value]
-            ];
-        } elseif (is_array($field)) {
-            $this->attributes['conditionalRules'][] = [
-                'type' => 'array',
-                'field' => $field,
-                'rules' => is_array($value) ? $value : [$value]
-            ];
+            $this->rules[] = ['when' => $field, 'rules' => $rules];
         } else {
-            $this->attributes['conditionalRules'][] = [
-                'type' => 'field',
-                'field' => $field,
-                'value' => $value,
-                'rules' => is_array($rules) ? $rules : [$rules]
-            ];
+            $this->rules[] = ['when' => [$field => $value], 'rules' => $rules];
         }
-
         return $this;
     }
 
     /**
-     * Add a pattern-based conditional validation rule.
+     * Add a required with validation rule
      */
-    public function whenMatches(string $field, string $pattern, array|string $rules): static
+    public function requiredWith(array $fields): self
     {
-        if (!isset($this->attributes['conditionalRules'])) {
-            $this->attributes['conditionalRules'] = [];
-        }
-
-        $this->attributes['conditionalRules'][] = [
-            'type' => 'pattern',
-            'field' => $field,
-            'value' => ['pattern' => $pattern],
-            'rules' => is_array($rules) ? $rules : [$rules]
-        ];
-
-        return $this;
+        return $this->rule('required_with:' . implode(',', $fields));
     }
 
     /**
-     * Add a comparison-based conditional validation rule.
+     * Add a required without validation rule
      */
-    public function whenCompare(string $field, string $operator, mixed $value, array|string $rules): static
+    public function requiredWithout(array $fields): self
     {
-        if (!isset($this->attributes['conditionalRules'])) {
-            $this->attributes['conditionalRules'] = [];
-        }
-
-        $this->attributes['conditionalRules'][] = [
-            'type' => 'comparison',
-            'field' => $field,
-            'value' => [
-                'operator' => $operator,
-                'value' => $value
-            ],
-            'rules' => is_array($rules) ? $rules : [$rules]
-        ];
-
-        return $this;
+        return $this->rule('required_without:' . implode(',', $fields));
     }
 
     /**
-     * Add a required with validation rule.
+     * Add a required if validation rule
      */
-    public function requiredWith(array $fields): static
+    public function requiredIf(string $field, mixed $value): self
     {
-        if (!isset($this->attributes['conditionalRules'])) {
-            $this->attributes['conditionalRules'] = [];
-        }
-
-        $this->attributes['conditionalRules'][] = [
-            'type' => 'requiredWith',
-            'field' => $fields,
-            'rules' => ['required']
-        ];
-
-        return $this;
+        return $this->rule("required_if:$field,$value");
     }
 
     /**
-     * Add a required without validation rule.
+     * Add a prohibited if validation rule
      */
-    public function requiredWithout(array $fields): static
+    public function prohibitedIf(string $field, mixed $value): self
     {
-        if (!isset($this->attributes['conditionalRules'])) {
-            $this->attributes['conditionalRules'] = [];
-        }
-
-        $this->attributes['conditionalRules'][] = [
-            'type' => 'requiredWithout',
-            'field' => $fields,
-            'rules' => ['required']
-        ];
-
-        return $this;
+        return $this->rule("prohibited_if:$field,$value");
     }
 
     /**
-     * Add a required if validation rule.
+     * Get all validation rules
      */
-    public function requiredIf(string $field, mixed $value): static
+    public function getRules(): array
     {
-        if (!isset($this->attributes['conditionalRules'])) {
-            $this->attributes['conditionalRules'] = [];
-        }
-
-        $this->attributes['conditionalRules'][] = [
-            'type' => 'field',
-            'field' => $field,
-            'value' => $value,
-            'rules' => ['required']
-        ];
-
-        return $this;
+        return $this->rules;
     }
 
     /**
-     * Add a prohibited if validation rule.
+     * Get all validation messages
      */
-    public function prohibitedIf(string $field, mixed $value): static
+    public function getMessages(): array
     {
-        if (!isset($this->attributes['conditionalRules'])) {
-            $this->attributes['conditionalRules'] = [];
-        }
-
-        $this->attributes['conditionalRules'][] = [
-            'type' => 'field',
-            'field' => $field,
-            'value' => $value,
-            'rules' => ['prohibited']
-        ];
-
-        return $this;
+        return $this->messages;
     }
 }

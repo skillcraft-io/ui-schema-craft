@@ -2,384 +2,428 @@
 
 namespace Skillcraft\UiSchemaCraft\Tests\Unit\Schema\Traits;
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Skillcraft\UiSchemaCraft\Tests\TestCase;
+use Skillcraft\UiSchemaCraft\Schema\Property;
 use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
 use Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait;
 
-#[CoversClass(LayoutTrait::class)]
 class LayoutTraitTest extends TestCase
 {
-    protected PropertyBuilder $builder;
+    /**
+     * Test class that uses the LayoutTrait
+     */
+    private $traitUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->builder = new PropertyBuilder();
+        
+        // Create a test class that uses the trait
+        $this->traitUser = new class {
+            use LayoutTrait;
+            
+            public function new(): PropertyBuilder
+            {
+                return new PropertyBuilder();
+            }
+            
+            // For testing callback functionality
+            public function callTraitMethod(string $method, string $name, callable $callback, array $options = []): Property
+            {
+                return $this->$method($name, $callback, $options);
+            }
+        };
     }
 
-    #[Test]
-    public function it_creates_grid_layout_property()
+    public function testGridProperty(): void
     {
-        $property = $this->builder->grid('gallery', 'Image Gallery', [
+        $propertyName = 'mainGrid';
+        $propertyLabel = 'Main Grid Layout';
+        
+        $property = $this->traitUser->grid($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check properties structure
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties
+        $expectedProperties = ['cols', 'gap', 'items', 'style'];
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
+        
+        // Check default values
+        $this->assertEquals('grid-cols-1 md:grid-cols-2 lg:grid-cols-3', $attributes['properties']['cols']['default']);
+        $this->assertEquals('gap-4', $attributes['properties']['gap']['default']);
+    }
+    
+    public function testGridPropertyWithOptions(): void
+    {
+        $propertyName = 'customGrid';
+        $options = [
             'cols' => 'grid-cols-2',
-            'gap' => 'gap-6'
-        ]);
-        $schema = $property->toArray();
-
-        $this->assertEquals('gallery', $schema['name']);
-        $this->assertEquals('Image Gallery', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+            'gap' => 'gap-8'
+        ];
         
-        // Check grid properties
-        $this->assertArrayHasKey('cols', $schema['properties']);
-        $this->assertArrayHasKey('gap', $schema['properties']);
-        $this->assertArrayHasKey('items', $schema['properties']);
-        $this->assertArrayHasKey('style', $schema['properties']);
+        $property = $this->traitUser->grid($propertyName, null, $options);
         
-        // Check default values
-        $this->assertEquals('grid-cols-2', $schema['properties']['cols']['default']);
-        $this->assertEquals('gap-6', $schema['properties']['gap']['default']);
+        $attributes = $property->toArray();
+        
+        // Check custom options were applied
+        $this->assertEquals('grid-cols-2', $attributes['properties']['cols']['default']);
+        $this->assertEquals('gap-8', $attributes['properties']['gap']['default']);
     }
-
-    #[Test]
-    public function it_creates_grid_with_default_values()
+    
+    public function testGridPropertyWithCallback(): void
     {
-        $property = $this->builder->grid('gallery');
-        $schema = $property->toArray();
-
-        $this->assertEquals('gallery', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'callbackGrid';
         
-        // Check default values
-        $this->assertEquals('grid-cols-1 md:grid-cols-2 lg:grid-cols-3', $schema['properties']['cols']['default']);
-        $this->assertEquals('gap-4', $schema['properties']['gap']['default']);
-    }
-
-    #[Test]
-    public function it_creates_grid_with_callback()
-    {
-        $property = $this->builder->grid('gallery', function (PropertyBuilder $builder) {
-            $builder->string('title');
-            $builder->string('imageUrl');
+        $property = $this->traitUser->callTraitMethod('grid', $propertyName, function($builder) {
+            $builder->string('customField')
+                ->description('A custom field');
         });
-        $schema = $property->toArray();
-
-        $this->assertEquals('gallery', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
         
-        // Check builder properties
-        $this->assertArrayHasKey('title', $schema['properties']);
-        $this->assertArrayHasKey('imageUrl', $schema['properties']);
+        $attributes = $property->toArray();
+        
+        // Check if callback added properties
+        $this->assertArrayHasKey('customField', $attributes['properties']);
+        $this->assertEquals('A custom field', $attributes['properties']['customField']['description']);
     }
 
-    #[Test]
-    public function it_creates_flex_layout_property()
+    public function testFlexProperty(): void
     {
-        $property = $this->builder->flex('toolbar', 'Action Buttons', [
-            'justify' => 'end',
+        $propertyName = 'mainFlex';
+        $propertyLabel = 'Main Flex Layout';
+        
+        $property = $this->traitUser->flex($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check properties structure
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties
+        $expectedProperties = ['justify', 'align', 'direction', 'wrap', 'spacing', 'items', 'style'];
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
+        
+        // Check default values
+        $this->assertEquals('start', $attributes['properties']['justify']['default']);
+        $this->assertEquals('start', $attributes['properties']['align']['default']);
+        $this->assertEquals('row', $attributes['properties']['direction']['default']);
+        $this->assertEquals(false, $attributes['properties']['wrap']['default']);
+        $this->assertEquals('space-x-4', $attributes['properties']['spacing']['default']);
+    }
+    
+    public function testFlexPropertyWithOptions(): void
+    {
+        $propertyName = 'customFlex';
+        $options = [
+            'justify' => 'center',
             'align' => 'center',
-            'direction' => 'row',
+            'direction' => 'column',
             'wrap' => true,
-            'spacing' => 'space-x-6'
-        ]);
-        $schema = $property->toArray();
-
-        $this->assertEquals('toolbar', $schema['name']);
-        $this->assertEquals('Action Buttons', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+            'spacing' => 'space-y-8'
+        ];
         
-        // Check flex properties
-        $this->assertArrayHasKey('justify', $schema['properties']);
-        $this->assertArrayHasKey('align', $schema['properties']);
-        $this->assertArrayHasKey('direction', $schema['properties']);
-        $this->assertArrayHasKey('wrap', $schema['properties']);
-        $this->assertArrayHasKey('spacing', $schema['properties']);
-        $this->assertArrayHasKey('items', $schema['properties']);
-        $this->assertArrayHasKey('style', $schema['properties']);
+        $property = $this->traitUser->flex($propertyName, null, $options);
         
-        // Check default values
-        $this->assertEquals('end', $schema['properties']['justify']['default']);
-        $this->assertEquals('center', $schema['properties']['align']['default']);
-        $this->assertEquals('row', $schema['properties']['direction']['default']);
-        $this->assertTrue($schema['properties']['wrap']['default']);
-        $this->assertEquals('space-x-6', $schema['properties']['spacing']['default']);
+        $attributes = $property->toArray();
+        
+        // Check custom options were applied
+        $this->assertEquals('center', $attributes['properties']['justify']['default']);
+        $this->assertEquals('center', $attributes['properties']['align']['default']);
+        $this->assertEquals('column', $attributes['properties']['direction']['default']);
+        $this->assertEquals(true, $attributes['properties']['wrap']['default']);
+        $this->assertEquals('space-y-8', $attributes['properties']['spacing']['default']);
     }
-
-    #[Test]
-    public function it_creates_flex_with_default_values()
+    
+    public function testFlexPropertyWithCallback(): void
     {
-        $property = $this->builder->flex('toolbar');
-        $schema = $property->toArray();
-
-        $this->assertEquals('toolbar', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'callbackFlex';
         
-        // Check default values
-        $this->assertEquals('start', $schema['properties']['justify']['default']);
-        $this->assertEquals('start', $schema['properties']['align']['default']);
-        $this->assertEquals('row', $schema['properties']['direction']['default']);
-        $this->assertFalse($schema['properties']['wrap']['default']);
-        $this->assertEquals('space-x-4', $schema['properties']['spacing']['default']);
-    }
-
-    #[Test]
-    public function it_creates_flex_with_callback()
-    {
-        $property = $this->builder->flex('toolbar', function (PropertyBuilder $builder) {
-            $builder->string('title');
-            $builder->boolean('disabled');
+        $property = $this->traitUser->callTraitMethod('flex', $propertyName, function($builder) {
+            $builder->string('customField')
+                ->description('A custom field');
         });
-        $schema = $property->toArray();
-
-        $this->assertEquals('toolbar', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
         
-        // Check builder properties
-        $this->assertArrayHasKey('title', $schema['properties']);
-        $this->assertArrayHasKey('disabled', $schema['properties']);
+        $attributes = $property->toArray();
+        
+        // Check if callback added properties
+        $this->assertArrayHasKey('customField', $attributes['properties']);
+        $this->assertEquals('A custom field', $attributes['properties']['customField']['description']);
     }
 
-    #[Test]
-    public function it_creates_container_layout_property()
+    public function testContainerProperty(): void
     {
-        $property = $this->builder->container('main', 'Main Content', [
-            'maxWidth' => 'max-w-5xl',
-            'padding' => 'px-6',
-            'margin' => 'my-8',
-            'background' => 'bg-gray-50'
-        ]);
-        $schema = $property->toArray();
-
-        $this->assertEquals('main', $schema['name']);
-        $this->assertEquals('Main Content', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'mainContainer';
+        $propertyLabel = 'Main Container Layout';
         
-        // Check container properties
-        $this->assertArrayHasKey('maxWidth', $schema['properties']);
-        $this->assertArrayHasKey('padding', $schema['properties']);
-        $this->assertArrayHasKey('margin', $schema['properties']);
-        $this->assertArrayHasKey('background', $schema['properties']);
-        $this->assertArrayHasKey('items', $schema['properties']);
-        $this->assertArrayHasKey('style', $schema['properties']);
+        $property = $this->traitUser->container($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check properties structure
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties
+        $expectedProperties = ['maxWidth', 'padding', 'margin', 'background', 'items', 'style'];
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
         
         // Check default values
-        $this->assertEquals('max-w-5xl', $schema['properties']['maxWidth']['default']);
-        $this->assertEquals('px-6', $schema['properties']['padding']['default']);
-        $this->assertEquals('my-8', $schema['properties']['margin']['default']);
-        $this->assertEquals('bg-gray-50', $schema['properties']['background']['default']);
+        $this->assertEquals('max-w-7xl', $attributes['properties']['maxWidth']['default']);
+        $this->assertEquals('px-4 sm:px-6 lg:px-8', $attributes['properties']['padding']['default']);
+        $this->assertEquals('mx-auto', $attributes['properties']['margin']['default']);
+        $this->assertEquals('bg-white', $attributes['properties']['background']['default']);
     }
-
-    #[Test]
-    public function it_creates_container_with_default_values()
+    
+    public function testContainerPropertyWithOptions(): void
     {
-        $property = $this->builder->container('main');
-        $schema = $property->toArray();
-
-        $this->assertEquals('main', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'customContainer';
+        $options = [
+            'maxWidth' => 'max-w-full',
+            'padding' => 'p-8',
+            'margin' => 'm-4',
+            'background' => 'bg-gray-100'
+        ];
         
-        // Check default values
-        $this->assertEquals('max-w-7xl', $schema['properties']['maxWidth']['default']);
-        $this->assertEquals('px-4 sm:px-6 lg:px-8', $schema['properties']['padding']['default']);
-        $this->assertEquals('mx-auto', $schema['properties']['margin']['default']);
-        $this->assertEquals('bg-white', $schema['properties']['background']['default']);
+        $property = $this->traitUser->container($propertyName, null, $options);
+        
+        $attributes = $property->toArray();
+        
+        // Check custom options were applied
+        $this->assertEquals('max-w-full', $attributes['properties']['maxWidth']['default']);
+        $this->assertEquals('p-8', $attributes['properties']['padding']['default']);
+        $this->assertEquals('m-4', $attributes['properties']['margin']['default']);
+        $this->assertEquals('bg-gray-100', $attributes['properties']['background']['default']);
     }
-
-    #[Test]
-    public function it_creates_container_with_callback()
+    
+    public function testContainerPropertyWithCallback(): void
     {
-        $property = $this->builder->container('main', function (PropertyBuilder $builder) {
-            $builder->string('header');
-            $builder->string('footer');
+        $propertyName = 'callbackContainer';
+        
+        $property = $this->traitUser->callTraitMethod('container', $propertyName, function($builder) {
+            $builder->string('customField')
+                ->description('A custom field');
         });
-        $schema = $property->toArray();
-
-        $this->assertEquals('main', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
         
-        // Check builder properties
-        $this->assertArrayHasKey('header', $schema['properties']);
-        $this->assertArrayHasKey('footer', $schema['properties']);
+        $attributes = $property->toArray();
+        
+        // Check if callback added properties
+        $this->assertArrayHasKey('customField', $attributes['properties']);
+        $this->assertEquals('A custom field', $attributes['properties']['customField']['description']);
     }
 
-    #[Test]
-    public function it_creates_tabs_layout_property()
+    public function testTabsProperty(): void
     {
-        $property = $this->builder->tabs('content_tabs', 'Content Sections', [
-            'type' => 'card',
-            'active' => 'tab1'
-        ]);
-        $schema = $property->toArray();
-
-        $this->assertEquals('content_tabs', $schema['name']);
-        $this->assertEquals('Content Sections', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'mainTabs';
+        $propertyLabel = 'Main Tabs Layout';
         
-        // Check tabs properties
-        $this->assertArrayHasKey('type', $schema['properties']);
-        $this->assertArrayHasKey('active', $schema['properties']);
-        $this->assertArrayHasKey('items', $schema['properties']);
-        $this->assertArrayHasKey('style', $schema['properties']);
+        $property = $this->traitUser->tabs($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check properties structure
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties
+        $expectedProperties = ['type', 'active', 'items', 'style'];
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
         
         // Check default values
-        $this->assertEquals('card', $schema['properties']['type']['default']);
-        $this->assertEquals('tab1', $schema['properties']['active']['default']);
+        $this->assertEquals('line', $attributes['properties']['type']['default']);
+        $this->assertEquals('', $attributes['properties']['active']['default']);
         
         // Check items structure
-        $items = $schema['properties']['items'];
-        $this->assertEquals('array', $items['type']);
-        $this->assertArrayHasKey('title', $items['items']['properties']);
-        $this->assertArrayHasKey('content', $items['items']['properties']);
+        $this->assertArrayHasKey('properties', $attributes['properties']['items']['items']);
+        $this->assertArrayHasKey('title', $attributes['properties']['items']['items']['properties']);
+        $this->assertArrayHasKey('content', $attributes['properties']['items']['items']['properties']);
+    }
+    
+    public function testTabsPropertyWithOptions(): void
+    {
+        $propertyName = 'customTabs';
+        $options = [
+            'type' => 'card',
+            'active' => 'tab1'
+        ];
+        
+        $property = $this->traitUser->tabs($propertyName, null, $options);
+        
+        $attributes = $property->toArray();
+        
+        // Check custom options were applied
+        $this->assertEquals('card', $attributes['properties']['type']['default']);
+        $this->assertEquals('tab1', $attributes['properties']['active']['default']);
+    }
+    
+    public function testTabsPropertyWithCallback(): void
+    {
+        $propertyName = 'callbackTabs';
+        
+        $property = $this->traitUser->callTraitMethod('tabs', $propertyName, function($builder) {
+            $builder->string('customField')
+                ->description('A custom field');
+        });
+        
+        $attributes = $property->toArray();
+        
+        // Check if callback added properties
+        $this->assertArrayHasKey('customField', $attributes['properties']);
+        $this->assertEquals('A custom field', $attributes['properties']['customField']['description']);
     }
 
-    #[Test]
-    public function it_creates_tabs_with_default_values()
+    public function testStackProperty(): void
     {
-        $property = $this->builder->tabs('content_tabs');
-        $schema = $property->toArray();
-
-        $this->assertEquals('content_tabs', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'mainStack';
+        $propertyLabel = 'Main Stack Layout';
+        
+        $property = $this->traitUser->stack($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check properties structure
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties
+        $expectedProperties = ['align', 'direction', 'items', 'style'];
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
         
         // Check default values
-        $this->assertEquals('line', $schema['properties']['type']['default']);
-        $this->assertEquals('', $schema['properties']['active']['default']);
-    }
-
-    #[Test]
-    public function it_creates_tabs_with_callback()
-    {
-        $property = $this->builder->tabs('content_tabs', function (PropertyBuilder $builder) {
-            $builder->string('icon');
-            $builder->string('badge');
-        });
-        $schema = $property->toArray();
-
-        $this->assertEquals('content_tabs', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
+        $this->assertEquals('start', $attributes['properties']['align']['default']);
+        $this->assertEquals('vertical', $attributes['properties']['direction']['default']);
         
-        // Check builder properties
-        $this->assertArrayHasKey('icon', $schema['properties']);
-        $this->assertArrayHasKey('badge', $schema['properties']);
+        // Check spacing attribute
+        $this->assertArrayHasKey('spacing', $attributes);
+        $this->assertEquals('space-y-4', $attributes['spacing']);
     }
-
-    #[Test]
-    public function it_creates_stack_layout_property()
+    
+    public function testStackPropertyWithOptions(): void
     {
-        $property = $this->builder->stack('form_section', 'Form Fields', [
-            'spacing' => 'space-y-6',
+        $propertyName = 'customStack';
+        $options = [
             'align' => 'center',
-            'direction' => 'vertical'
-        ]);
-        $schema = $property->toArray();
-
-        $this->assertEquals('form_section', $schema['name']);
-        $this->assertEquals('Form Fields', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
-        $this->assertEquals('space-y-6', $schema['spacing']);
+            'direction' => 'horizontal',
+            'spacing' => 'space-x-8'
+        ];
         
-        // Check stack properties
-        $this->assertArrayHasKey('align', $schema['properties']);
-        $this->assertArrayHasKey('direction', $schema['properties']);
-        $this->assertArrayHasKey('items', $schema['properties']);
-        $this->assertArrayHasKey('style', $schema['properties']);
+        $property = $this->traitUser->stack($propertyName, null, $options);
         
-        // Check default values
-        $this->assertEquals('center', $schema['properties']['align']['default']);
-        $this->assertEquals('vertical', $schema['properties']['direction']['default']);
+        $attributes = $property->toArray();
+        
+        // Check custom options were applied
+        $this->assertEquals('center', $attributes['properties']['align']['default']);
+        $this->assertEquals('horizontal', $attributes['properties']['direction']['default']);
+        $this->assertEquals('space-x-8', $attributes['spacing']);
     }
-
-    #[Test]
-    public function it_creates_stack_with_default_values()
+    
+    public function testStackPropertyWithCallback(): void
     {
-        $property = $this->builder->stack('form_section');
-        $schema = $property->toArray();
-
-        $this->assertEquals('form_section', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
-        $this->assertEquals('space-y-4', $schema['spacing']);
+        $propertyName = 'callbackStack';
         
-        // Check default values
-        $this->assertEquals('start', $schema['properties']['align']['default']);
-        $this->assertEquals('vertical', $schema['properties']['direction']['default']);
-    }
-
-    #[Test]
-    public function it_creates_stack_with_callback()
-    {
-        $property = $this->builder->stack('form_section', function (PropertyBuilder $builder) {
-            $builder->string('label');
-            $builder->boolean('required');
+        $property = $this->traitUser->callTraitMethod('stack', $propertyName, function($builder) {
+            $builder->string('customField')
+                ->description('A custom field');
         });
-        $schema = $property->toArray();
-
-        $this->assertEquals('form_section', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
         
-        // Check builder properties
-        $this->assertArrayHasKey('label', $schema['properties']);
-        $this->assertArrayHasKey('required', $schema['properties']);
+        $attributes = $property->toArray();
+        
+        // Check if callback added properties
+        $this->assertArrayHasKey('customField', $attributes['properties']);
+        $this->assertEquals('A custom field', $attributes['properties']['customField']['description']);
     }
 
-    #[Test]
-    public function it_creates_section_layout_property()
+    public function testSectionProperty(): void
     {
-        $property = $this->builder->section('user_section', 'User Information', [
-            'title' => 'Personal Details',
+        $propertyName = 'mainSection';
+        $propertyLabel = 'Main Section Layout';
+        
+        $property = $this->traitUser->section($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check properties structure
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties
+        $expectedProperties = ['title', 'content', 'collapsible', 'items', 'style'];
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
+        
+        // Check default values
+        $this->assertEquals('', $attributes['properties']['title']['default']);
+        $this->assertEquals(false, $attributes['properties']['collapsible']['default']);
+        
+        // Check class attribute
+        $this->assertArrayHasKey('class', $attributes);
+        $this->assertEquals('', $attributes['class']);
+    }
+    
+    public function testSectionPropertyWithOptions(): void
+    {
+        $propertyName = 'customSection';
+        $options = [
+            'title' => 'Configuration',
             'collapsible' => true,
-            'class' => 'bg-gray-100'
-        ]);
-        $schema = $property->toArray();
-
-        $this->assertEquals('user_section', $schema['name']);
-        $this->assertEquals('User Information', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
-        $this->assertEquals('bg-gray-100', $schema['class']);
+            'class' => 'border rounded p-4'
+        ];
         
-        // Check section properties
-        $this->assertArrayHasKey('title', $schema['properties']);
-        $this->assertArrayHasKey('content', $schema['properties']);
-        $this->assertArrayHasKey('collapsible', $schema['properties']);
-        $this->assertArrayHasKey('items', $schema['properties']);
-        $this->assertArrayHasKey('style', $schema['properties']);
+        $property = $this->traitUser->section($propertyName, null, $options);
         
-        // Check default values
-        $this->assertEquals('Personal Details', $schema['properties']['title']['default']);
-        $this->assertTrue($schema['properties']['collapsible']['default']);
+        $attributes = $property->toArray();
+        
+        // Check custom options were applied
+        $this->assertEquals('Configuration', $attributes['properties']['title']['default']);
+        $this->assertEquals(true, $attributes['properties']['collapsible']['default']);
+        $this->assertEquals('border rounded p-4', $attributes['class']);
     }
-
-    #[Test]
-    public function it_creates_section_with_default_values()
+    
+    public function testSectionPropertyWithCallback(): void
     {
-        $property = $this->builder->section('user_section');
-        $schema = $property->toArray();
-
-        $this->assertEquals('user_section', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
-        $this->assertEquals('', $schema['class']);
+        $propertyName = 'callbackSection';
         
-        // Check default values
-        $this->assertEquals('', $schema['properties']['title']['default']);
-        $this->assertNull($schema['properties']['content']['default']);
-        $this->assertFalse($schema['properties']['collapsible']['default']);
-    }
-
-    #[Test]
-    public function it_creates_section_with_callback()
-    {
-        $property = $this->builder->section('user_section', function (PropertyBuilder $builder) {
-            $builder->string('subtitle');
-            $builder->boolean('expanded');
+        $property = $this->traitUser->callTraitMethod('section', $propertyName, function($builder) {
+            $builder->string('customField')
+                ->description('A custom field');
         });
-        $schema = $property->toArray();
-
-        $this->assertEquals('user_section', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
         
-        // Check builder properties
-        $this->assertArrayHasKey('subtitle', $schema['properties']);
-        $this->assertArrayHasKey('expanded', $schema['properties']);
+        $attributes = $property->toArray();
+        
+        // Check if callback added properties
+        $this->assertArrayHasKey('customField', $attributes['properties']);
+        $this->assertEquals('A custom field', $attributes['properties']['customField']['description']);
     }
 }

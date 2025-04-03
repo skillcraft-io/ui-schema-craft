@@ -1,609 +1,718 @@
 # UI Schema Craft
 
-A powerful UI component schema generator for Laravel applications.
+A flexible and extensible UI schema system for Laravel applications.
 
-## 🌟 Features
+## Overview
 
-- Define UI components using a fluent schema builder
-- Generate consistent UI structures across your application
-- Support for dynamic data loading
-- Example data generation for development
-- Type-safe property definitions
-- Component-based architecture
-- Inline example values for properties
+UI Schema Craft provides a robust foundation for building dynamic UI components with:
+- Type-safe component definitions
+- Flexible validation (via `validation-craft`)
+- State management (via `state-craft`)
+- Component discovery across packages
+- Component composition and nesting
 
-## 📦 Installation
-
-You can install the package via composer:
+## Installation
 
 ```bash
-composer require skillcraft-io/ui-schema-craft
+composer require skillcraft/ui-schema-craft
 ```
 
-## 🚀 Quick Start
+This will also install the required packages:
+- `skillcraft/validation-craft`: For validation
+- `skillcraft/state-craft`: For state management
 
-### 1. Define Your UI Component Schema
+## Basic Usage
 
-Create a new schema by extending `UIComponentSchema`:
-
-```php
-namespace App\Schemas;
-
-use UiSchemaCraft\Abstracts\UIComponentSchema;
-use UiSchemaCraft\Facades\PropertyBuilder;
-
-class UserProfileSchema extends UIComponentSchema
-{
-    // Define the unique component identifier
-    protected string $component = 'user-profile-form';
-    
-    // Define the component type (optional, defaults to 'component')
-    protected string $type = 'form';
-    
-    // Define the UI component properties
-    protected function properties(): array
-    {
-        return [
-            PropertyBuilder::text('firstName')
-                ->label('First Name')
-                ->placeholder('Enter your first name')
-                ->required()
-                ->minLength(2)
-                ->maxLength(50)
-                ->example('John')
-                ->toArray(),
-                
-            PropertyBuilder::text('lastName')
-                ->label('Last Name')
-                ->placeholder('Enter your last name')
-                ->required()
-                ->minLength(2)
-                ->maxLength(50)
-                ->example('Doe')
-                ->toArray(),
-                
-            PropertyBuilder::email('email')
-                ->label('Email Address')
-                ->placeholder('Enter your email')
-                ->required()
-                ->example('john@example.com')
-                ->toArray(),
-                
-            PropertyBuilder::select('country')
-                ->label('Country')
-                ->options([
-                    'us' => 'United States',
-                    'ca' => 'Canada',
-                    'uk' => 'United Kingdom'
-                ])
-                ->defaultValue('us')
-                ->example('us')
-                ->toArray(),
-        ];
-    }
-    
-    // Define how to fetch live data for this component
-    public function getLiveData(): array
-    {
-        // Fetch from your data source
-        $user = auth()->user();
-        
-        return [
-            'firstName' => $user->first_name,
-            'lastName' => $user->last_name,
-            'email' => $user->email,
-            'country' => $user->country
-        ];
-    }
-}
-```
-
-### 2. Example Data Generation
-
-UI Schema Craft now supports defining example values directly within property definitions. This makes it easier to maintain example data alongside the property configuration:
+### 1. Create a Component Schema
 
 ```php
-class ContactFormSchema extends UIComponentSchema
+namespace App\UiSchemas;
+
+use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
+use Skillcraft\ValidationCraft\ValidationSchema;
+
+class TextInputSchema extends UIComponentSchema
 {
+    protected string $version = '1.0.0';
+    
     public function properties(): array
     {
-        $builder = new PropertyBuilder();
-        
-        $builder->string('name', 'Full Name')
-            ->required()
-            ->maxLength(100)
-            ->example('John Doe');  // Define example value
-            
-        $builder->email('email', 'Email Address')
-            ->required()
-            ->example('john@example.com');  // Define example value
-            
-        $builder->text('message', 'Message')
-            ->required()
-            ->maxLength(1000)
-            ->example('Hello, I would like to inquire about your services.');  // Define example value
-            
-        return $builder->toArray();
+        return [
+            'label' => 'Text Input',
+            'placeholder' => 'Enter text...',
+            'required' => false
+        ];
     }
-}
-```
 
-The example values will be automatically included in the schema output and can be used for:
-- Development and testing
-- Documentation generation
-- UI prototyping
-- API documentation
-
-Example values are accessible through the `getExampleData()` method:
-
-```php
-$schema = new ContactFormSchema();
-$exampleData = $schema->getExampleData();
-```
-
-### 3. Register Your Schema
-
-Register your schema through the HookFlow system in your service provider:
-
-```php
-use Skillcraft\HookFlow\Facades\Hook;
-use App\Schemas\UserProfileSchema;
-
-class AppServiceProvider extends ServiceProvider
-{
-    public function boot()
+    protected function getValidationSchema(): ValidationSchema
     {
-        Hook::execute(AddUiComponentHook::class, [
-            'value' => null,
-            'schema' => [
-                UserProfileSchema::class
-            ]
-        ]);
+        return ValidationSchema::make()
+            ->string('value')
+            ->when('required', true, fn($schema) => $schema->required());
     }
 }
 ```
 
-### 4. Use in Your Frontend
+### 2. Register Components
 
-#### Backend Controller
-```php
-use UiSchemaCraft\Services\UiSchemaCraftService;
-use Inertia\Inertia;
-
-class ComponentController extends Controller 
-{
-    public function getUserProfile(UiSchemaCraftService $service) 
-    {
-        // Get the schema including live data
-        $schema = $service->getSchema('user-profile-form');
-        
-        return Inertia::render('UserProfile/Form', [
-            'schema' => $schema
-        ]);
-    }
-}
-```
-
-#### Vue.js Implementation
-```vue
-<template>
-  <form @submit.prevent="submit" class="space-y-6">
-    <template v-for="(field, name) in schema.props.config.properties" :key="name">
-      <!-- Text & Email Input -->
-      <div v-if="['text', 'email'].includes(field.type)" class="form-group">
-        <label :for="name" class="block text-sm font-medium text-gray-700">
-          {{ field.label }}
-        </label>
-        <input
-          :id="name"
-          :type="field.type"
-          :name="name"
-          v-model="form[name]"
-          :placeholder="field.placeholder"
-          :required="field.required"
-          :minlength="field.minLength"
-          :maxlength="field.maxLength"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-          :class="{ 'border-red-500': form.errors[name] }"
-        />
-        <p v-if="form.errors[name]" class="mt-1 text-sm text-red-600">
-          {{ form.errors[name] }}
-        </p>
-      </div>
-
-      <!-- Select Input -->
-      <div v-else-if="field.type === 'select'" class="form-group">
-        <label :for="name" class="block text-sm font-medium text-gray-700">
-          {{ field.label }}
-        </label>
-        <select
-          :id="name"
-          :name="name"
-          v-model="form[name]"
-          :required="field.required"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-          :class="{ 'border-red-500': form.errors[name] }"
-        >
-          <option v-for="(label, value) in field.options" :key="value" :value="value">
-            {{ label }}
-          </option>
-        </select>
-        <p v-if="form.errors[name]" class="mt-1 text-sm text-red-600">
-          {{ form.errors[name] }}
-        </p>
-      </div>
-    </template>
-
-    <div class="flex justify-end">
-      <button
-        type="submit"
-        class="inline-flex justify-center rounded-md border border-transparent bg-primary-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-        :disabled="form.processing"
-      >
-        Save Changes
-      </button>
-    </div>
-  </form>
-</template>
-
-<script>
-import { useForm } from '@inertiajs/vue3'
-
-export default {
-  props: {
-    schema: {
-      type: Object,
-      required: true
-    }
-  },
-
-  setup(props) {
-    // Initialize form with live data or example data
-    const form = useForm({
-      ...props.schema.data || props.schema.example
-    })
-
-    const submit = () => {
-      form.post(route('user-profile.update'))
-    }
-
-    return {
-      form,
-      submit
-    }
-  }
-}
-</script>
-```
-
-## ⚙️ Configuration
-
-After installation, publish the configuration file:
-
-```bash
-php artisan vendor:publish --provider="Skillcraft\UiSchemaCraft\UiSchemaCraftServiceProvider" --tag="config"
-```
-
-This will create `config/ui-schema-craft.php` with these options:
+You can register components in several ways:
 
 ```php
+// In a service provider:
+
+// 1. Register a namespace
+$uiSchema->registerNamespace('App\\UiSchemas');
+
+// 2. Register individual components
+$uiSchema->registerComponent(TextInputSchema::class);
+
+// 3. Configure default namespace in config/ui-schema-craft.php
 return [
-    // Register schemas that should be available by default
-    'schemas' => [
-        // Example:
-        // App\Schemas\ButtonSchema::class,
-        // App\Schemas\InputSchema::class,
-    ],
-
-    // Enable example schemas in local environment
-    'enable_examples' => env('UI_SCHEMA_CRAFT_ENABLE_EXAMPLES', true),
-    
-    // Dump registered schemas for debugging
-    'dd_examples' => env('UI_SCHEMA_CRAFT_DD_EXAMPLES', true),
+    'components_namespace' => 'App\\UiSchemas'
 ];
 ```
 
-### Registering Schemas
+### 3. Use Components
 
-You have two ways to register schemas:
-
-1. Via configuration (recommended for app-wide schemas):
 ```php
-// config/ui-schema-craft.php
-return [
-    'schemas' => [
-        App\Schemas\ButtonSchema::class,
-        App\Schemas\InputSchema::class,
-    ],
-];
-```
+use Skillcraft\UiSchemaCraft\Facades\UiSchema;
 
-2. Via HookFlow (recommended for dynamic/plugin schemas):
-```php
-use Skillcraft\HookFlow\Facades\Hook;
-use App\Schemas\CustomSchema;
+// Get component schema
+$schema = UiSchema::getComponent('text-input');
 
-Hook::execute(AddUiComponentHook::class, [
-    'schema' => CustomSchema::class,
+// With state
+$schema = UiSchema::getComponent('text-input', $stateId);
+
+// Save state
+$stateId = UiSchema::saveState('text-input', [
+    'value' => 'Hello World'
 ]);
 ```
 
-### Debugging Registered Schemas
+## Component Composition
 
-To view all registered schemas:
+UI Schema Craft supports component composition, allowing you to build complex UIs by nesting components:
 
-1. Set in your `.env`:
+### 1. Create a Composable Component
+
+```php
+namespace App\UiSchemas;
+
+use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
+use Skillcraft\UiSchemaCraft\Composition\ComposableInterface;
+use Skillcraft\UiSchemaCraft\Composition\ComposableTrait;
+
+class FormSchema extends UIComponentSchema implements ComposableInterface
+{
+    use ComposableTrait;
+
+    // You can define component metadata that will be included in the output schema
+    protected string $title = 'Contact Form';
+    protected string $description = 'A contact form with multiple inputs';
+    
+    public function properties(): array
+    {
+        // The properties() method should return the base properties for this component
+        $props = [
+            'submitText' => 'Send Message',
+        ];
+        
+        // When your component has a title or description, include them in properties
+        if (isset($this->title)) {
+            $props['title'] = $this->title;
+        }
+        
+        if (isset($this->description)) {
+            $props['description'] = $this->description;
+        }
+        
+        // For composable components, include children
+        $props['children'] = $this->getChildrenSchema();
+        
+        return $props;
+    }
+}
 ```
-UI_SCHEMA_CRAFT_DD_EXAMPLES=true
+
+### 2. Create Child Components
+
+```php
+namespace App\UiSchemas;
+
+use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
+use Skillcraft\ValidationCraft\ValidationSchema;
+
+class EmailInputSchema extends UIComponentSchema
+{
+    protected string $title = 'Email Input';
+    protected string $description = 'An input field for email addresses';
+    
+    public function properties(): array
+    {
+        // Include component properties
+        $props = [
+            'type' => 'email',
+            'label' => 'Email Address',
+            'placeholder' => 'Enter your email'
+        ];
+        
+        // Include metadata properties
+        if (isset($this->title)) {
+            $props['title'] = $this->title;
+        }
+        
+        if (isset($this->description)) {
+            $props['description'] = $this->description;
+        }
+        
+        return $props;
+    }
+    
+    protected function getValidationSchema(): ValidationSchema
+    {
+        return ValidationSchema::make()
+            ->string('value')
+            ->email()
+            ->required()
+            ->message('The email address is required and must be valid');
+    }
+}
+
+class MessageInputSchema extends UIComponentSchema
+{
+    protected string $title = 'Message Input';
+    protected string $description = 'A textarea for message content';
+    
+    public function properties(): array
+    {
+        $props = [
+            'type' => 'textarea',
+            'label' => 'Message',
+            'rows' => 4
+        ];
+        
+        if (isset($this->title)) {
+            $props['title'] = $this->title;
+        }
+        
+        if (isset($this->description)) {
+            $props['description'] = $this->description;
+        }
+        
+        return $props;
+    }
+    
+    protected function getValidationSchema(): ValidationSchema
+    {
+        return ValidationSchema::make()
+            ->string('value')
+            ->min(10)
+            ->max(500)
+            ->required()
+            ->message('Please provide a message between 10 and 500 characters');
+    }
+}
 ```
 
-2. Or use the service:
+### 3. Compose Components
+
+```php
+use Skillcraft\UiSchemaCraft\Facades\UiSchema;
+
+// Create components using the service
+$form = UiSchema::createComponent('form');
+$emailInput = UiSchema::createComponent('email-input');
+$messageInput = UiSchema::createComponent('message-input');
+
+// Add child components with location identifiers
+$form->addChild($emailInput, 'main')
+     ->addChild($messageInput, 'main');
+
+// Get complete schema
+$schema = $form->toArray();
+
+// You can also check for the existence of children
+$hasChildren = $form->hasChildren();         // true
+$hasChildrenInMain = $form->hasChildren('main');  // true
+$childCount = count($form->getChildren());   // 2
+
+// And remove children when needed
+$form->removeChild($emailInput);
+```
+
+### 4. Example Output
+
+```json
+{
+    "type": "form",
+    "version": "1.0.0",
+    "component": "",
+    "properties": {
+        "submitText": "Send Message",
+        "title": "Contact Form",
+        "description": "A contact form with multiple inputs",
+        "children": [
+            {
+                "type": "email-input",
+                "version": "1.0.0",
+                "component": "",
+                "properties": {
+                    "type": "email",
+                    "label": "Email Address",
+                    "placeholder": "Enter your email",
+                    "title": "Email Input",
+                    "description": "An input field for email addresses"
+                },
+                "title": "Email Input",
+                "description": "An input field for email addresses"
+            },
+            {
+                "type": "message-input",
+                "version": "1.0.0",
+                "component": "",
+                "properties": {
+                    "type": "textarea",
+                    "label": "Message",
+                    "rows": 4,
+                    "title": "Message Input",
+                    "description": "A textarea for message content"
+                },
+                "title": "Message Input",
+                "description": "A textarea for message content"
+            }
+        ]
+    },
+    "title": "Contact Form",
+    "description": "A contact form with multiple inputs",
+    "children": [
+        {
+            "type": "email-input",
+            "version": "1.0.0",
+            "component": "",
+            "properties": {
+                "type": "email",
+                "label": "Email Address",
+                "placeholder": "Enter your email",
+                "title": "Email Input",
+                "description": "An input field for email addresses"
+            },
+            "title": "Email Input",
+            "description": "An input field for email addresses"
+        },
+        {
+            "type": "message-input",
+            "version": "1.0.0",
+            "component": "",
+            "properties": {
+                "type": "textarea",
+                "label": "Message",
+                "rows": 4,
+                "title": "Message Input",
+                "description": "A textarea for message content"
+            },
+            "title": "Message Input",
+            "description": "A textarea for message content"
+        }
+    ]
+}
+```
+
+### 5. Using with State and Validation
+
+One of UI Schema Craft's most powerful features is the combination of component composition, state management, and validation. Here's how they work together:
+
+```php
+use Skillcraft\UiSchemaCraft\Facades\UiSchema;
+
+// 1. Create a form with child components
+$form = UiSchema::createComponent('form');
+$emailInput = UiSchema::createComponent('email-input');
+$messageInput = UiSchema::createComponent('message-input');
+
+$form->addChild($emailInput, 'form-body')
+     ->addChild($messageInput, 'form-body');
+
+// 2. Save initial state
+$stateId = UiSchema::saveState('form', [
+    'email' => '',
+    'message' => ''
+]);
+
+// 3. Retrieve form with the saved state
+$form = UiSchema::getComponent('form', $stateId);
+
+// 4. Validate the component against its validation schema
+$validationResult = $form->validate([
+    'email' => 'invalid-email',
+    'message' => 'Too short'
+]);
+
+// 5. Check validation result
+if (!$validationResult['valid']) {
+    // Handle validation errors
+    $errors = $validationResult['errors'];
+    // $errors will contain validation failures for both email and message components
+}
+
+// 6. Update state with valid data
+$validData = [
+    'email' => 'user@example.com',
+    'message' => 'This is a message that meets the requirements!'
+];
+
+$form->validate($validData); // Will return ['valid' => true, 'errors' => null]
+
+// 7. Update state
+UiSchema::saveState('form', $validData, $stateId);
+```
+
+### 6. Advanced Component Discovery
+
+UI Schema Craft allows components to be discovered from various sources:
+
+```php
+// Register components from a namespace
+UiSchema::registerNamespace('App\UiSchemas\Forms');
+UiSchema::registerNamespace('App\UiSchemas\Layouts');
+
+// Register components from a package
+UiSchema::registerNamespace('VendorName\Package\UiSchemas');
+
+// Register individual components
+UiSchema::registerComponent(CustomButtonSchema::class);
+
+// Discover available components
+$availableComponents = UiSchema::getAvailableComponents();
+
+// Check if a component type exists
+$exists = UiSchema::hasComponent('custom-button');
+```
+
+### 7. Testing UI Components
+
+UI Schema Craft is designed to be testable. Here are examples of how to test your component schemas:
+
 ```php
 use Skillcraft\UiSchemaCraft\Services\UiSchemaCraftService;
+use Skillcraft\SchemaState\Contracts\StateManagerInterface;
+use Skillcraft\UiSchemaCraft\ComponentResolver;
+use Skillcraft\ValidationCraft\Contracts\ValidatorInterface;
+use Mockery;
 
-$service = app(UiSchemaCraftService::class);
-dd($service->getAllSchemas());
-```
-
-## 🧰 Available Property Types
-
-### 📝 Basic Types
-- `string()` - Text input 📄
-- `number()` - Numeric input 🔢
-- `boolean()` - True/false toggle ✅
-- `array()` - List of items 📋
-- `object()` - Nested properties 🌳
-
-### 🎯 Selection Fields
-- `treeSelect()` - Hierarchical selection 🌲
-- `multiSelect()` - Multiple item selection ✨
-- `combobox()` - Combo box with search 🔍
-
-### 📚 Rich Content
-- `markdown()` - Markdown editor ✍️
-- `codeEditor()` - Code editor 👨‍💻
-- `jsonEditor()` - JSON editor 🔧
-
-### 🖼️ Media
-- `imageUpload()` - Image upload with preview 🖼️
-- `mediaGallery()` - Media gallery manager 🎬
-- `avatar()` - Profile picture upload 👤
-
-### 📊 Analytics
-- `timeRange()` - Date/time range picker 📅
-- `duration()` - Duration input ⏱️
-- `currency()` - Currency input 💰
-- `percentage()` - Percentage input 📈
-
-### 📋 Forms
-- `dynamicForm()` - Dynamic form builder 🔄
-- `wizard()` - Multi-step form 🧙‍♂️
-- `matrix()` - Grid/matrix input 📊
-
-### 🔒 Security
-- `mfa()` - Multi-factor authentication 🔐
-- `otp()` - One-time password 🔑
-- `captcha()` - CAPTCHA verification 🤖
-
-## 🛠️ Property Configuration
-
-Properties can be configured using a fluent interface:
-
-```php
-PropertyBuilder::string('field_name')
-    ->description('Field description')    // Add description 📝
-    ->required()                         // Make field required ❗
-    ->nullable()                         // Allow null values 🆕
-    ->default('default value')           // Set default value ⭐
-    ->enum(['option1', 'option2'])       // Set allowed values 📋
-```
-
-For object properties, you can nest other properties:
-
-```php
-PropertyBuilder::object('settings')
-    ->description('User settings')
-    ->properties([
-        PropertyBuilder::boolean('notifications')->default(true),
-        PropertyBuilder::string('theme')->enum(['light', 'dark']),
-    ])
-    ->required()
-```
-
-## 📚 Example Schemas
-
-The package includes several example schemas that demonstrate best practices and common patterns:
-
-- 📊 `AnalyticsDashboardSchema` - Analytics dashboard configuration
-- 📝 `BlogPostSchema` - Blog post editor
-- 🛍️ `ProductConfigurationSchema` - Product management
-- 👤 `UserProfileSchema` - User profile settings
-
-## 🎨 Using Preset Components
-
-UI Schema Craft comes with pre-built schema definitions for common UI components. These presets include styling, variants, and common properties out of the box.
-
-### Button Component
-
-```php
-use Skillcraft\UiSchemaCraft\Schema\PresetSchema;
-use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
-
-class ButtonSchema extends UIComponentSchema
+class UiSchemaCraftTest extends TestCase
 {
-    protected string $component = 'primary-button';
-    
-    protected function properties(): array
+    protected UiSchemaCraftService $service;
+    protected ComponentResolver $resolver;
+    protected StateManagerInterface $stateManager;
+    protected ValidatorInterface $validator;
+
+    protected function setUp(): void
     {
-        return [
-            PresetSchema::button('submit')
-                ->withDefaults([
-                    'text' => 'Save Changes',
-                    'type' => 'submit',
-                    'variant' => 'primary',
-                    'size' => 'lg',
-                    'iconRight' => 'heroicon-o-arrow-right'
-                ])
-                ->toArray()
-        ];
+        parent::setUp();
+        
+        // Setup mocks
+        $this->resolver = Mockery::mock(ComponentResolver::class);
+        $this->stateManager = Mockery::mock(StateManagerInterface::class);
+        $this->validator = Mockery::mock(ValidatorInterface::class);
+        
+        // Create service with mocks
+        $this->service = new UiSchemaCraftService(
+            $this->resolver,
+            $this->stateManager,
+            $this->validator
+        );
     }
     
-    public function getLiveData(): array
+    /** @test */
+    public function testCreateComponent()
     {
-        return [];
+        // Setup component class mock
+        $componentClass = YourComponentSchema::class;
+        $componentInstance = new $componentClass();
+        
+        // Setup resolver expectations
+        $this->resolver->shouldReceive('resolve')
+            ->with('your-component')
+            ->once()
+            ->andReturn($componentClass);
+            
+        // Create component
+        $component = $this->service->createComponent('your-component');
+        
+        // Assert component type
+        $this->assertEquals('your-component', $component->getType());
+    }
+    
+    /** @test */
+    public function testComponentValidation()
+    {
+        // Setup mock expectations
+        $this->resolver->shouldReceive('resolve')
+            ->andReturn(YourComponentSchema::class);
+            
+        $this->validator->shouldReceive('validate')
+            ->once()
+            ->andReturn(true);
+        
+        // Create component
+        $component = $this->service->createComponent('your-component');
+        
+        // Test validation
+        $result = $component->validate(['field' => 'value']);
+        
+        // Assert validation passed
+        $this->assertTrue($result['valid']);
+    }
+    
+    /** @test */
+    public function testComponentComposition()
+    {
+        // Create parent component
+        $parentComponent = new ComposableTestComponent();
+        $parentComponent->setTitle('Parent Container');
+        $parentComponent->setDescription('A container component with children');
+        
+        // Create child components
+        $childComponent1 = new TestComponent();
+        $childComponent1->setTitle('First Child');
+        
+        $childComponent2 = new TestComponent();
+        $childComponent2->setTitle('Second Child');
+        
+        // Add children
+        $parentComponent->addChild($childComponent1, 'main');
+        $parentComponent->addChild($childComponent2, 'sidebar');
+        
+        // Verify parent has children
+        $this->assertTrue($parentComponent->hasChildren());
+        $this->assertEquals(2, count($parentComponent->getChildren()));
+        
+        // Get schema
+        $schema = $parentComponent->toArray();
+        
+        // Verify structure
+        $this->assertEquals('Parent Container', $schema['title']);
+        $this->assertCount(2, $schema['children']);
+        
+        // Verify child titles are present
+        $childNames = array_map(function($child) {
+            return $child['title'] ?? null;
+        }, $schema['children']);
+        
+        $this->assertContains('First Child', $childNames);
+        $this->assertContains('Second Child', $childNames);
+    }
+    
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 }
 ```
 
-This will generate a schema with:
-- Button text and type
-- Size variants (sm, md, lg)
-- Style variants (primary, secondary, outline, text)
-- Icon support (before/after text)
-- Tailwind CSS classes for styling
-- Interactive states (hover, focus, disabled)
+### 8. Integration with Laravel Applications
 
-### Form Input Component
+You can easily integrate UI Schema Craft with your Laravel application's frontend:
 
 ```php
-class InputSchema extends UIComponentSchema
+// In your controller
+public function getForm()
 {
-    protected string $component = 'text-input';
+    // Create form with state
+    $stateId = UiSchema::saveState('form', [
+        'email' => '',
+        'message' => ''
+    ]);
     
-    protected function properties(): array
-    {
-        return [
-            PresetSchema::input('email')
-                ->withDefaults([
-                    'type' => 'email',
-                    'placeholder' => 'Enter your email',
-                    'required' => true,
-                    'pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
-                ])
-                ->toArray()
-        ];
+    $form = UiSchema::getComponent('form', $stateId);
+    
+    return response()->json([
+        'schema' => $form->toArray(),
+        'stateId' => $stateId
+    ]);
+}
+
+// In your API endpoint for form submission
+public function submitForm(Request $request)
+{
+    $stateId = $request->input('stateId');
+    $formData = $request->input('data');
+    
+    // Get form with state
+    $form = UiSchema::getComponent('form', $stateId);
+    
+    // Validate submission
+    $validationResult = $form->validate($formData);
+    
+    if (!$validationResult['valid']) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validationResult['errors']
+        ], 422);
     }
     
-    public function getLiveData(): array
-    {
-        return [
-            'email' => auth()->user()->email ?? ''
-        ];
-    }
+    // Process valid form data
+    // ...
+    
+    // Update state
+    UiSchema::saveState('form', $formData, $stateId);
+    
+    return response()->json([
+        'success' => true
+    ]);
 }
 ```
 
-The input preset includes:
-- Common input types (text, email, password, etc.)
-- Validation attributes (required, pattern, min, max)
-- Placeholder text
-- Disabled state
-- Tailwind styling and states
+### 9. Frontend Integration Example
 
-### Using in Vue.js
-
-```vue
-<template>
-  <div>
-    <!-- Button Component -->
-    <button
-      :type="schema.props.config.properties.submit.type"
-      :disabled="schema.props.config.properties.submit.disabled"
-      :class="[
-        // Base classes
-        schema.props.config.properties.submit.container.background,
-        schema.props.config.properties.submit.container.rounded,
-        schema.props.config.properties.submit.spacing.padding,
-        // Typography
-        schema.props.config.properties.submit.text.color,
-        schema.props.config.properties.submit.text.weight,
-        // Interactive states
-        schema.props.config.properties.submit.states.hover,
-        schema.props.config.properties.submit.states.focus,
-        schema.props.config.properties.submit.disabled ? schema.props.config.properties.submit.states.disabled : ''
-      ]"
-    >
-      <i v-if="schema.props.config.properties.submit.iconLeft" 
-         :class="schema.props.config.properties.submit.iconLeft" 
-         class="mr-2" />
-      {{ schema.props.config.properties.submit.text }}
-      <i v-if="schema.props.config.properties.submit.iconRight" 
-         :class="schema.props.config.properties.submit.iconRight" 
-         class="ml-2" />
-    </button>
-
-    <!-- Input Component -->
-    <input
-      :type="schema.props.config.properties.email.type"
-      :placeholder="schema.props.config.properties.email.placeholder"
-      :required="schema.props.config.properties.email.required"
-      :pattern="schema.props.config.properties.email.pattern"
-      :disabled="schema.props.config.properties.email.disabled"
-      v-model="form.email"
-      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-    />
-  </div>
-</template>
-
-<script>
-import { useForm } from '@inertiajs/vue3'
-
+```javascript
+// Vue.js example
 export default {
-  props: {
-    schema: {
-      type: Object,
-      required: true
+  data() {
+    return {
+      schema: {},
+      stateId: null,
+      formData: {}
     }
   },
-
-  setup(props) {
-    const form = useForm({
-      email: props.schema.data?.email || ''
-    })
-
-    return { form }
+  
+  async mounted() {
+    // Fetch schema from backend
+    const response = await fetch('/api/form-schema');
+    const data = await response.json();
+    
+    this.schema = data.schema;
+    this.stateId = data.stateId;
+    this.initializeFormData();
+  },
+  
+  methods: {
+    initializeFormData() {
+      // Extract initial values from schema
+      this.formData = {
+        email: '',
+        message: ''
+      };
+    },
+    
+    async submitForm() {
+      try {
+        const response = await fetch('/api/submit-form', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            stateId: this.stateId,
+            data: this.formData
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          // Handle validation errors
+          this.errors = result.errors;
+          return;
+        }
+        
+        // Handle success
+        this.resetForm();
+      } catch (error) {
+        console.error('Form submission error:', error);
+      }
+    },
+    
+    resetForm() {
+      this.formData = {
+        email: '',
+        message: ''
+      };
+      this.errors = {};
+    }
   }
 }
-</script>
 ```
 
-### Available Presets
+## Conclusion
 
-UI Schema Craft includes these preset components:
-- `PresetSchema::button()` - Buttons with variants and icons
-- `PresetSchema::input()` - Form inputs with validation
-- `PresetSchema::card()` - Content cards with header/body/footer
-- `PresetSchema::badge()` - Status badges and labels
-- `PresetSchema::alert()` - Notification alerts
-- `PresetSchema::modal()` - Modal dialogs
+UI Schema Craft provides a robust foundation for building dynamic, composable UI components in Laravel applications. By combining powerful validation, state management, and component composition capabilities, it enables you to create complex, interactive interfaces with clean, maintainable code.
 
-Each preset comes with:
-- Sensible defaults
-- Tailwind CSS styling
-- Interactive states
-- Accessibility attributes
-- Common variants
-- Icon support (where applicable)
+Key benefits:
 
-## 🧪 Testing
+- **Type-safe Component Definitions**: Define component schemas with proper type definitions
+- **Flexible Validation**: Validate component state against defined schemas
+- **Stateful Components**: Manage and persist component state
+- **Composable Architecture**: Build complex UIs from simple, reusable components
+- **Package Discovery**: Seamlessly integrate components from multiple packages
+- **Testing Support**: Comprehensive testing utilities for your components
 
-```bash
-composer test
+## Creating Component Packages
+
+You can create packages with reusable components:
+
+1. Create your package structure:
+```
+my-components/
+├── src/
+│   ├── Components/
+│   │   ├── CustomInputSchema.php
+│   │   └── CustomSelectSchema.php
+│   └── MyComponentsServiceProvider.php
+└── composer.json
 ```
 
-## 🤝 Contributing
+2. Register components in your service provider:
+```php
+namespace MyVendor\MyComponents;
+
+use Illuminate\Support\ServiceProvider;
+use Skillcraft\UiSchemaCraft\Services\UiSchemaCraftService;
+
+class MyComponentsServiceProvider extends ServiceProvider
+{
+    public function boot(UiSchemaCraftService $uiSchema): void
+    {
+        $uiSchema->registerNamespace('MyVendor\\MyComponents\\Components');
+    }
+}
+```
+
+## Available Components
+
+To list all available components:
+
+```php
+$types = UiSchema::getAvailableTypes();
+```
+
+## State Management
+
+State is handled by the `state-craft` package:
+
+```php
+// Save state
+$stateId = UiSchema::saveState('text-input', ['value' => 'Hello']);
+
+// Get state
+$schema = UiSchema::getComponent('text-input', $stateId);
+
+// Delete state
+UiSchema::deleteState($stateId);
+
+// Get all states for a type
+$states = UiSchema::getStates('text-input');
+```
+
+## Validation
+
+Validation is handled by the `validation-craft` package. See the [validation-craft documentation](../validation-craft/README.md) for more details.
+
+## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## 🔒 Security
-
-If you discover any security related issues, please email skillcraft.opensource@pm.me instead of using the issue tracker.
-
-## 👥 Credits
-
-- [William Troiano](https://williamtroiano.com)
-- [All Contributors](../../contributors)
-
-## 📄 License
+## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

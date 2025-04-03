@@ -4,6 +4,8 @@ namespace Skillcraft\UiSchemaCraft\Tests;
 
 use Orchestra\Testbench\TestCase as Orchestra;
 use Skillcraft\UiSchemaCraft\Providers\UiSchemaCraftServiceProvider;
+use Skillcraft\SchemaValidation\Providers\SchemaValidationServiceProvider;
+use Skillcraft\SchemaState\Providers\SchemaStateServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -12,10 +14,12 @@ class TestCase extends Orchestra
         parent::setUp();
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             UiSchemaCraftServiceProvider::class,
+            SchemaStateServiceProvider::class,
+            SchemaValidationServiceProvider::class,
         ];
     }
 
