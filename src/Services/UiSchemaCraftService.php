@@ -13,11 +13,19 @@ use Illuminate\Support\Str;
 
 class UiSchemaCraftService
 {
+    /**
+     * @var bool Whether validation is enabled
+     */
+    protected bool $validationEnabled = true;
+    
     public function __construct(
         protected readonly StateManagerInterface $stateManager,
         protected readonly ComponentResolver $resolver = new ComponentResolver(),
-        protected readonly ValidatorInterface $validator
-    ) {}
+        protected readonly ?ValidatorInterface $validator = null
+    ) {
+        // Validation is disabled if no validator is provided
+        $this->validationEnabled = $validator !== null;
+    }
 
     /**
      * Register a component class
@@ -225,14 +233,20 @@ class UiSchemaCraftService
             throw new \InvalidArgumentException("Component type '{$type}' not found");
         }
         
-        // Use Laravel's container to make the component with the right validator
-        // This leverages Laravel's interface binding capability so the component will
-        // receive the right validator implementation for its interface requirement
-        return app()->makeWith($class, [
-            // This will use the bindings in FixValidatorBindingServiceProvider
-            // to ensure the right validator interface is resolved
-            'validator' => $this->validator
-        ]);
+        // Conditionally pass the validator based on validation being enabled
+        if ($this->validationEnabled && $this->validator !== null) {
+            // Attempt to instantiate via container for better interface handling
+            try {
+                return app()->makeWith($class, ['validator' => $this->validator]);
+            } catch (\Exception $e) {
+                // If that fails, try direct instantiation as a fallback
+                return new $class($this->validator);
+            }
+        } else {
+            // When validation is disabled, instantiate without a validator
+            // The component needs to handle a null validator in this case
+            return app()->makeWith($class, ['validator' => null]);
+        }
     }
 
     /**

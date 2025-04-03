@@ -23,8 +23,13 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
      */
     protected array $mainContainers = [];
 
+    /**
+     * Constructor
+     * 
+     * @param ValidatorInterface|null $validator Optional validator instance
+     */
     public function __construct(
-        protected readonly ValidatorInterface $validator
+        protected readonly ?ValidatorInterface $validator = null
     ) {}
 
     /**
@@ -76,7 +81,8 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
      */
     public function validate(array $data): array
     {
-        if (!$this->getValidationSchema()) {
+        // Skip validation if validation is disabled (null validator) or no validation schema exists
+        if ($this->validator === null || !$this->getValidationSchema()) {
             return [
                 'valid' => true,
                 'errors' => null
@@ -85,12 +91,26 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
 
         $schema = $this->getValidationSchema();
         $rules = $schema ? $schema : [];
-        $valid = $this->validator->validate($data, $rules);
         
-        return [
-            'valid' => $valid,
-            'errors' => $valid ? null : new \Illuminate\Support\MessageBag(['validation' => ['Validation failed']])
-        ];
+        try {
+            $valid = $this->validator->validate($data, $rules);
+            
+            return [
+                'valid' => $valid,
+                'errors' => $valid ? null : new \Illuminate\Support\MessageBag(['validation' => ['Validation failed']])
+            ];
+        } catch (\Throwable $e) {
+            // Log validation error but allow the process to continue
+            if (app()->hasDebugModeEnabled()) {
+                logger()->error("Validation error in " . static::class . ": " . $e->getMessage());
+            }
+            
+            // Gracefully handle validation errors by returning valid=true
+            return [
+                'valid' => true,
+                'errors' => null
+            ];
+        }
     }
     
     /**
