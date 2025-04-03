@@ -99,39 +99,22 @@ trait HierarchicalArraySerializationTrait
      */
     protected function extractHierarchicalStructure(array $properties): array
     {
-        // Get only two primary container objects - strictly hierarchical approach
-        $mainContainers = ['form_text', 'form_config'];
         $hierarchical = [];
         
-        // Only include the main container objects
-        foreach ($mainContainers as $containerKey) {
-            if (isset($properties[$containerKey])) {
-                // Skip hidden properties
-                if (in_array($containerKey, $this->hiddenProperties)) {
-                    continue;
-                }
-                
-                $hierarchical[$containerKey] = $properties[$containerKey];
+        // Automatically detect and include all container objects
+        foreach ($properties as $key => $config) {
+            // Skip hidden properties
+            if (in_array($key, $this->hiddenProperties)) {
+                continue;
             }
-        }
-        
-        // If neither of the main containers exists, look for any other container objects
-        if (empty($hierarchical)) {
-            foreach ($properties as $key => $config) {
-                // Skip hidden properties
-                if (in_array($key, $this->hiddenProperties)) {
-                    continue;
-                }
+            
+            // Check if this is an object with nested properties
+            $isObjectWithProperties = 
+                (is_array($config) && isset($config['type']) && $config['type'] === 'object' && isset($config['properties'])) ||
+                ($config instanceof Property && $config->getType() === 'object' && !empty($config->getProperties()));
                 
-                // Only include object properties with nested structure
-                $isObjectWithProperties = 
-                    (is_array($config) && isset($config['type']) && $config['type'] === 'object' && isset($config['properties'])) ||
-                    ($config instanceof Property && $config->getType() === 'object' && !empty($config->getProperties()));
-                    
-                if ($isObjectWithProperties) {
-                    $hierarchical[$key] = $config;
-                    break; // Only include one container as fallback
-                }
+            if ($isObjectWithProperties) {
+                $hierarchical[$key] = $config;
             }
         }
         
