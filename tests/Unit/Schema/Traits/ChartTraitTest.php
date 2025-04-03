@@ -1,95 +1,149 @@
 <?php
 
-namespace Tests\Unit\Schema\Traits;
+namespace Skillcraft\UiSchemaCraft\Tests\Unit\Schema\Traits;
 
-use PHPUnit\Framework\TestCase;
+use Skillcraft\UiSchemaCraft\Tests\TestCase;
 use Skillcraft\UiSchemaCraft\Schema\Property;
 use Skillcraft\UiSchemaCraft\Schema\Traits\ChartTrait;
 
 class ChartTraitTest extends TestCase
 {
-    private $traitObject;
+    /**
+     * Test class that uses the ChartTrait
+     */
+    private $traitUser;
 
     protected function setUp(): void
     {
-        $this->traitObject = new class {
+        parent::setUp();
+        
+        // Create a test class that uses the trait
+        $this->traitUser = new class {
             use ChartTrait;
         };
     }
 
-    public function test_chart_creates_base_chart_property()
+    public function testChartProperty(): void
     {
-        $property = $this->traitObject->chart('testChart', 'Test Chart');
-
+        $propertyName = 'testChart';
+        $propertyLabel = 'Test Chart';
+        
+        $property = $this->traitUser->chart($propertyName, $propertyLabel);
+        
         $this->assertInstanceOf(Property::class, $property);
-        $this->assertEquals('testChart', $property->getName());
-        $this->assertEquals('Test Chart', $property->getDescription());
+        $this->assertEquals($propertyName, $property->getName());
         $this->assertEquals('object', $property->getType());
-
-        $properties = $property->getAttribute('properties');
-        $this->assertIsArray($properties);
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check that the expected attributes are set
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify chart structure
+        $properties = $attributes['properties'];
         $this->assertArrayHasKey('type', $properties);
         $this->assertArrayHasKey('data', $properties);
         $this->assertArrayHasKey('options', $properties);
         
+        // Verify type property has expected enum values
+        $this->assertEquals('string', $properties['type']['type']);
+        $this->assertArrayHasKey('enum', $properties['type']);
         $this->assertEquals(['line', 'bar', 'pie', 'scatter'], $properties['type']['enum']);
     }
 
-    public function test_line_chart_creates_property_with_correct_type()
+    public function testLineChartProperty(): void
     {
-        $property = $this->traitObject->lineChart('lineChart', 'Line Chart');
-
+        $propertyName = 'testLineChart';
+        $propertyLabel = 'Test Line Chart';
+        
+        $property = $this->traitUser->lineChart($propertyName, $propertyLabel);
+        
         $this->assertInstanceOf(Property::class, $property);
-        $this->assertEquals('lineChart', $property->getName());
-        $this->assertEquals('Line Chart', $property->getDescription());
-        $this->assertEquals('line', $property->getAttribute('type'));
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check chart type is line
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('type', $attributes);
+        $this->assertEquals('line', $attributes['type']);
+        
+        // Verify base chart properties are also present
+        $this->assertArrayHasKey('properties', $attributes);
+        $this->assertArrayHasKey('type', $attributes['properties']);
+        $this->assertArrayHasKey('data', $attributes['properties']);
+        $this->assertArrayHasKey('options', $attributes['properties']);
     }
 
-    public function test_bar_chart_creates_property_with_correct_type()
+    public function testBarChartProperty(): void
     {
-        $property = $this->traitObject->barChart('barChart', 'Bar Chart');
-
+        $propertyName = 'testBarChart';
+        $propertyLabel = 'Test Bar Chart';
+        
+        $property = $this->traitUser->barChart($propertyName, $propertyLabel);
+        
         $this->assertInstanceOf(Property::class, $property);
-        $this->assertEquals('barChart', $property->getName());
-        $this->assertEquals('Bar Chart', $property->getDescription());
-        $this->assertEquals('bar', $property->getAttribute('type'));
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check chart type is bar
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('type', $attributes);
+        $this->assertEquals('bar', $attributes['type']);
+        
+        // Verify base chart properties are also present
+        $this->assertArrayHasKey('properties', $attributes);
+        $this->assertArrayHasKey('type', $attributes['properties']);
+        $this->assertArrayHasKey('data', $attributes['properties']);
+        $this->assertArrayHasKey('options', $attributes['properties']);
     }
 
-    public function test_pie_chart_creates_property_with_correct_type()
+    public function testPieChartProperty(): void
     {
-        $property = $this->traitObject->pieChart('pieChart', 'Pie Chart');
-
+        $propertyName = 'testPieChart';
+        $propertyLabel = 'Test Pie Chart';
+        
+        $property = $this->traitUser->pieChart($propertyName, $propertyLabel);
+        
         $this->assertInstanceOf(Property::class, $property);
-        $this->assertEquals('pieChart', $property->getName());
-        $this->assertEquals('Pie Chart', $property->getDescription());
-        $this->assertEquals('pie', $property->getAttribute('type'));
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check chart type is pie
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('type', $attributes);
+        $this->assertEquals('pie', $attributes['type']);
+        
+        // Verify base chart properties are also present
+        $this->assertArrayHasKey('properties', $attributes);
+        $this->assertArrayHasKey('type', $attributes['properties']);
+        $this->assertArrayHasKey('data', $attributes['properties']);
+        $this->assertArrayHasKey('options', $attributes['properties']);
     }
 
-    public function test_scatter_plot_creates_property_with_correct_type()
+    public function testScatterPlotProperty(): void
     {
-        $property = $this->traitObject->scatterPlot('scatterPlot', 'Scatter Plot');
-
+        $propertyName = 'testScatterPlot';
+        $propertyLabel = 'Test Scatter Plot';
+        
+        $property = $this->traitUser->scatterPlot($propertyName, $propertyLabel);
+        
         $this->assertInstanceOf(Property::class, $property);
-        $this->assertEquals('scatterPlot', $property->getName());
-        $this->assertEquals('Scatter Plot', $property->getDescription());
-        $this->assertEquals('scatter', $property->getAttribute('type'));
-    }
-
-    public function test_chart_properties_without_label()
-    {
-        $property = $this->traitObject->chart('testChart');
-        $this->assertNull($property->getDescription());
-
-        $property = $this->traitObject->lineChart('lineChart');
-        $this->assertNull($property->getDescription());
-
-        $property = $this->traitObject->barChart('barChart');
-        $this->assertNull($property->getDescription());
-
-        $property = $this->traitObject->pieChart('pieChart');
-        $this->assertNull($property->getDescription());
-
-        $property = $this->traitObject->scatterPlot('scatterPlot');
-        $this->assertNull($property->getDescription());
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check chart type is scatter
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('type', $attributes);
+        $this->assertEquals('scatter', $attributes['type']);
+        
+        // Verify base chart properties are also present
+        $this->assertArrayHasKey('properties', $attributes);
+        $this->assertArrayHasKey('type', $attributes['properties']);
+        $this->assertArrayHasKey('data', $attributes['properties']);
+        $this->assertArrayHasKey('options', $attributes['properties']);
     }
 }

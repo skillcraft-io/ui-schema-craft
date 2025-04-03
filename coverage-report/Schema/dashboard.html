@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /var/www/html/src/Schema</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../_css/bootstrap.min.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/nv.d3.min.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/style.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../index.html">/var/www/html/src</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Schema</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="PresetSchema.php.html#5">Skillcraft\UiSchemaCraft\Schema\PresetSchema</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#7">Skillcraft\UiSchemaCraft\Schema\Property</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#21">Skillcraft\UiSchemaCraft\Schema\PropertyBuilder</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#9">Skillcraft\UiSchemaCraft\Schema\Schema</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#10">Skillcraft\UiSchemaCraft\Schema\SchemaUtils</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/AuthenticationTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\AuthenticationTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/BasicTypesTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\BasicTypesTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ChartTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\ChartTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/EditorTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\EditorTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LocationTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\LocationTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/MediaTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\MediaTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/NumericTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\NumericTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/SelectionTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\SelectionTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#5">Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/UtilityTrait.php.html#8">Skillcraft\UiSchemaCraft\Schema\Traits\UtilityTrait</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#5">Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Property.php.html#7">Skillcraft\UiSchemaCraft\Schema\Property</a></td><td class="text-right">22952</td></tr>
+       <tr><td><a href="Schema.php.html#9">Skillcraft\UiSchemaCraft\Schema\Schema</a></td><td class="text-right">4032</td></tr>
+       <tr><td><a href="PresetSchema.php.html#5">Skillcraft\UiSchemaCraft\Schema\PresetSchema</a></td><td class="text-right">1806</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#10">Skillcraft\UiSchemaCraft\Schema\SchemaUtils</a></td><td class="text-right">380</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait</a></td><td class="text-right">342</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#5">Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait</a></td><td class="text-right">210</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#21">Skillcraft\UiSchemaCraft\Schema\PropertyBuilder</a></td><td class="text-right">182</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#7">Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait</a></td><td class="text-right">90</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="PresetSchema.php.html#7"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::button">button</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PresetSchema.php.html#74"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::input">input</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PresetSchema.php.html#132"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::card">card</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PresetSchema.php.html#185"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::badge">badge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PresetSchema.php.html#223"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::alert">alert</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PresetSchema.php.html#283"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::modal">modal</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#28"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#35"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getName">getName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#40"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getType">getType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#45"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getPrimaryType">getPrimaryType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#50"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getDescription">getDescription</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#55"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::default">default</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#60"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::setDefault">setDefault</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#66"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getDefault">getDefault</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#71"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::example">example</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#77"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::setExample">setExample</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#83"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getExample">getExample</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#88"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::addRule">addRule</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#99"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getRules">getRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#104"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#117"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::addAttribute">addAttribute</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#123"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getAttributes">getAttributes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#128"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getAttribute">getAttribute</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#133"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::addProperty">addProperty</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#139"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getProperties">getProperties</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#144"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::properties">properties</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#160"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::items">items</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#169"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getItems">getItems</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#174"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::format">format</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#180"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getFormat">getFormat</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#185"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::min">min</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#191"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::minimum">minimum</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#196"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::max">max</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#202"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::maximum">maximum</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#207"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::pattern">pattern</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#213"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getPattern">getPattern</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#218"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::reference">reference</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#224"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getReference">getReference</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#229"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::requiredWith">requiredWith</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#245"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::requiredWithout">requiredWithout</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#261"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::requiredIf">requiredIf</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#274"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::prohibitedIf">prohibitedIf</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#286"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::validateRequiredWithoutFields">validateRequiredWithoutFields</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#298"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::validateRequiredWithFields">validateRequiredWithFields</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#310"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::isEmptyValue">isEmptyValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#315"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::validate">validate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#384"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getValidationMessage">getValidationMessage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#392"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#464"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::required">required</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#476"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::isNullable">isNullable</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#481"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::nullable">nullable</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#495"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::enum">enum</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#501"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::description">description</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#507"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::withBuilder">withBuilder</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#519"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::when">when</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#553"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::whenMatches">whenMatches</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#569"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::whenCompare">whenCompare</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#588"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::setName">setName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#594"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::string">string</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#599"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::number">number</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#604"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::boolean">boolean</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#609"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::object">object</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#614"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::array">array</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#619"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::timeRange">timeRange</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#661"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::dateRange">dateRange</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#697"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::time">time</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Property.php.html#713"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::duration">duration</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#40"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#45"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::new">new</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#50"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::add">add</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#56"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#77"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::merge">merge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#86"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::prefix">prefix</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#100"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::getProperties">getProperties</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#108"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::validate">validate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#52"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::addProperty">addProperty</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#67"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::buildRulesFromProperty">buildRulesFromProperty</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#92"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::getProperties">getProperties</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#104"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::addRule">addRule</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#116"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::addRules">addRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#127"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::getRules">getRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#140"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::addMessage">addMessage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#152"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::withMessages">withMessages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#164"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::setMessages">setMessages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#175"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::getMessages">getMessages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#186"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::withAttributes">withAttributes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#198"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::setAttributes">setAttributes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#209"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::getAttributes">getAttributes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#220"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::validate">validate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#276"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::processConditionalRules">processConditionalRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#418"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Schema.php.html#439"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::toJson">toJson</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#19"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindColor">tailwindColor</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#72"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindSpacing">tailwindSpacing</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#116"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindTypography">tailwindTypography</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#208"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindContainer">tailwindContainer</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#282"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindFlex">tailwindFlex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#340"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindGrid">tailwindGrid</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#408"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindResponsive">tailwindResponsive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#461"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindAnimation">tailwindAnimation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#512"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindInteractive">tailwindInteractive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/AuthenticationTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\AuthenticationTrait::mfa">mfa</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/AuthenticationTrait.php.html#35"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\AuthenticationTrait::otp">otp</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/AuthenticationTrait.php.html#45"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\AuthenticationTrait::captcha">captcha</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/AuthenticationTrait.php.html#58"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\AuthenticationTrait::roleTransfer">roleTransfer</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/BasicTypesTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\BasicTypesTrait::string">string</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/BasicTypesTrait.php.html#22"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\BasicTypesTrait::number">number</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/BasicTypesTrait.php.html#32"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\BasicTypesTrait::boolean">boolean</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/BasicTypesTrait.php.html#42"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\BasicTypesTrait::object">object</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/BasicTypesTrait.php.html#52"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\BasicTypesTrait::array">array</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ChartTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ChartTrait::chart">chart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ChartTrait.php.html#26"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ChartTrait::lineChart">lineChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ChartTrait.php.html#36"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ChartTrait::barChart">barChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ChartTrait.php.html#46"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ChartTrait::pieChart">pieChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ChartTrait.php.html#56"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ChartTrait::scatterPlot">scatterPlot</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::id">id</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#22"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::foreignKey">foreignKey</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#32"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::timestamp">timestamp</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#42"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::slug">slug</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#52"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::json">json</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#62"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::transfer">transfer</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#79"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::table">table</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#93"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::dynamicForm">dynamicForm</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/DataHandlingTrait.php.html#106"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait::matrix">matrix</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/EditorTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\EditorTrait::codeEditor">codeEditor</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/EditorTrait.php.html#30"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\EditorTrait::markdown">markdown</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/EditorTrait.php.html#56"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\EditorTrait::jsonEditor">jsonEditor</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/EditorTrait.php.html#72"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\EditorTrait::mask">mask</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::textField">textField</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#34"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::email">email</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#44"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::password">password</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#54"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::phone">phone</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#64"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::url">url</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#79"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::color">color</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#106"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::file">file</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#123"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::richText">richText</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::grid">grid</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#41"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::flex">flex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#73"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::container">container</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#104"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::tabs">tabs</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#136"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::stack">stack</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#166"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::section">section</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LocationTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LocationTrait::coordinates">coordinates</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LocationTrait.php.html#40"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LocationTrait::map">map</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/LocationTrait.php.html#79"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LocationTrait::cascader">cascader</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/MediaTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\MediaTrait::imageUpload">imageUpload</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/MediaTrait.php.html#46"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\MediaTrait::mediaGallery">mediaGallery</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/MediaTrait.php.html#78"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\MediaTrait::avatar">avatar</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/NumericTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\NumericTrait::range">range</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/NumericTrait.php.html#46"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\NumericTrait::rating">rating</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/NumericTrait.php.html#87"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\NumericTrait::currency">currency</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/NumericTrait.php.html#112"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\NumericTrait::percentage">percentage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/SelectionTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\SelectionTrait::multiSelect">multiSelect</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/SelectionTrait.php.html#50"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\SelectionTrait::treeSelect">treeSelect</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/SelectionTrait.php.html#93"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\SelectionTrait::combobox">combobox</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/SelectionTrait.php.html#135"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\SelectionTrait::autocomplete">autocomplete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#10"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait::timeRange">timeRange</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#19"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait::dateRange">dateRange</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#29"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait::time">time</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#38"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait::duration">duration</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#47"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait::timeRangeStatic">timeRangeStatic</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#52"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait::dateRangeStatic">dateRangeStatic</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#57"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait::timeStatic">timeStatic</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/TimeTrait.php.html#62"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait::durationStatic">durationStatic</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/UtilityTrait.php.html#13"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\UtilityTrait::group">group</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/UtilityTrait.php.html#26"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\UtilityTrait::list">list</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/UtilityTrait.php.html#42"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\UtilityTrait::conditional">conditional</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#13"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::rule">rule</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#22"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#31"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::message">message</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#40"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::messages">messages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#49"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::required">required</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#57"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::nullable">nullable</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#65"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::when">when</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#78"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::requiredWith">requiredWith</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#86"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::requiredWithout">requiredWithout</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#94"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::requiredIf">requiredIf</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#102"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::prohibitedIf">prohibitedIf</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#110"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::getRules">getRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#118"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::getMessages">getMessages</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Schema.php.html#276"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::processConditionalRules">processConditionalRules</abbr></a></td><td class="text-right">1482</td></tr>
+       <tr><td><a href="Property.php.html#315"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::validate">validate</abbr></a></td><td class="text-right">1190</td></tr>
+       <tr><td><a href="Property.php.html#392"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::toArray">toArray</abbr></a></td><td class="text-right">342</td></tr>
+       <tr><td><a href="PresetSchema.php.html#223"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::alert">alert</abbr></a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="PresetSchema.php.html#7"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::button">button</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="PresetSchema.php.html#74"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::input">input</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Property.php.html#519"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::when">when</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Schema.php.html#220"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::validate">validate</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="PresetSchema.php.html#132"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::card">card</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="PresetSchema.php.html#283"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::modal">modal</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Property.php.html#286"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::validateRequiredWithoutFields">validateRequiredWithoutFields</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Property.php.html#298"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::validateRequiredWithFields">validateRequiredWithFields</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="PresetSchema.php.html#185"><abbr title="Skillcraft\UiSchemaCraft\Schema\PresetSchema::badge">badge</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Property.php.html#144"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::properties">properties</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Property.php.html#619"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::timeRange">timeRange</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Property.php.html#88"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::addRule">addRule</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Property.php.html#104"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::rules">rules</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Property.php.html#481"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::nullable">nullable</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Property.php.html#553"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::whenMatches">whenMatches</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Property.php.html#569"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::whenCompare">whenCompare</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#56"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::toArray">toArray</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Schema.php.html#67"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::buildRulesFromProperty">buildRulesFromProperty</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#19"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindColor">tailwindColor</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#116"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindTypography">tailwindTypography</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#340"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindGrid">tailwindGrid</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#408"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindResponsive">tailwindResponsive</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::grid">grid</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#41"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::flex">flex</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#73"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::container">container</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#104"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::tabs">tabs</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#136"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::stack">stack</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Traits/LayoutTrait.php.html#166"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\LayoutTrait::section">section</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Property.php.html#28"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::__construct">__construct</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#45"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getPrimaryType">getPrimaryType</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#160"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::items">items</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#229"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::requiredWith">requiredWith</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#245"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::requiredWithout">requiredWithout</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#310"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::isEmptyValue">isEmptyValue</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#384"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::getValidationMessage">getValidationMessage</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#464"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::required">required</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#507"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::withBuilder">withBuilder</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Property.php.html#697"><abbr title="Skillcraft\UiSchemaCraft\Schema\Property::time">time</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#77"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::merge">merge</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#86"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::prefix">prefix</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="PropertyBuilder.php.html#108"><abbr title="Skillcraft\UiSchemaCraft\Schema\PropertyBuilder::validate">validate</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Schema.php.html#418"><abbr title="Skillcraft\UiSchemaCraft\Schema\Schema::toArray">toArray</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#72"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindSpacing">tailwindSpacing</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="SchemaUtils.php.html#461"><abbr title="Skillcraft\UiSchemaCraft\Schema\SchemaUtils::tailwindAnimation">tailwindAnimation</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Traits/FormFieldsTrait.php.html#12"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\FormFieldsTrait::textField">textField</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Traits/ValidationTrait.php.html#65"><abbr title="Skillcraft\UiSchemaCraft\Schema\Traits\ValidationTrait::when">when</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 10.1.16</a> using <a href="https://www.php.net/" target="_top">PHP 8.3.17</a> and <a href="https://phpunit.de/">PHPUnit 10.5.45</a> at Thu Apr 3 12:05:57 EDT 2025.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../_js/jquery.min.js?v=10.1.16" type="text/javascript"></script>
+  <script src="../_js/d3.min.js?v=10.1.16" type="text/javascript"></script>
+  <script src="../_js/nv.d3.min.js?v=10.1.16" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([19,0,0,0,0,0,0,0,0,0,0,0], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([180,0,0,0,0,0,0,0,0,0,0,0], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,42,"<a href=\"PresetSchema.php.html#5\">Skillcraft\\UiSchemaCraft\\Schema\\PresetSchema<\/a>"],[0,151,"<a href=\"Property.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Property<\/a>"],[0,13,"<a href=\"PropertyBuilder.php.html#21\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder<\/a>"],[0,63,"<a href=\"Schema.php.html#9\">Skillcraft\\UiSchemaCraft\\Schema\\Schema<\/a>"],[0,19,"<a href=\"SchemaUtils.php.html#10\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils<\/a>"],[0,4,"<a href=\"Traits\/AuthenticationTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\AuthenticationTrait<\/a>"],[0,5,"<a href=\"Traits\/BasicTypesTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\BasicTypesTrait<\/a>"],[0,5,"<a href=\"Traits\/ChartTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ChartTrait<\/a>"],[0,9,"<a href=\"Traits\/DataHandlingTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait<\/a>"],[0,4,"<a href=\"Traits\/EditorTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\EditorTrait<\/a>"],[0,9,"<a href=\"Traits\/FormFieldsTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait<\/a>"],[0,18,"<a href=\"Traits\/LayoutTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LayoutTrait<\/a>"],[0,3,"<a href=\"Traits\/LocationTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LocationTrait<\/a>"],[0,3,"<a href=\"Traits\/MediaTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\MediaTrait<\/a>"],[0,4,"<a href=\"Traits\/NumericTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\NumericTrait<\/a>"],[0,4,"<a href=\"Traits\/SelectionTrait.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\SelectionTrait<\/a>"],[0,8,"<a href=\"Traits\/TimeTrait.php.html#5\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait<\/a>"],[0,3,"<a href=\"Traits\/UtilityTrait.php.html#8\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\UtilityTrait<\/a>"],[0,14,"<a href=\"Traits\/ValidationTrait.php.html#5\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,9,"<a href=\"PresetSchema.php.html#7\">Skillcraft\\UiSchemaCraft\\Schema\\PresetSchema::button<\/a>"],[0,8,"<a href=\"PresetSchema.php.html#74\">Skillcraft\\UiSchemaCraft\\Schema\\PresetSchema::input<\/a>"],[0,5,"<a href=\"PresetSchema.php.html#132\">Skillcraft\\UiSchemaCraft\\Schema\\PresetSchema::card<\/a>"],[0,4,"<a href=\"PresetSchema.php.html#185\">Skillcraft\\UiSchemaCraft\\Schema\\PresetSchema::badge<\/a>"],[0,11,"<a href=\"PresetSchema.php.html#223\">Skillcraft\\UiSchemaCraft\\Schema\\PresetSchema::alert<\/a>"],[0,5,"<a href=\"PresetSchema.php.html#283\">Skillcraft\\UiSchemaCraft\\Schema\\PresetSchema::modal<\/a>"],[0,2,"<a href=\"Property.php.html#28\">Skillcraft\\UiSchemaCraft\\Schema\\Property::__construct<\/a>"],[0,1,"<a href=\"Property.php.html#35\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getName<\/a>"],[0,1,"<a href=\"Property.php.html#40\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getType<\/a>"],[0,2,"<a href=\"Property.php.html#45\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getPrimaryType<\/a>"],[0,1,"<a href=\"Property.php.html#50\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getDescription<\/a>"],[0,1,"<a href=\"Property.php.html#55\">Skillcraft\\UiSchemaCraft\\Schema\\Property::default<\/a>"],[0,1,"<a href=\"Property.php.html#60\">Skillcraft\\UiSchemaCraft\\Schema\\Property::setDefault<\/a>"],[0,1,"<a href=\"Property.php.html#66\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getDefault<\/a>"],[0,1,"<a href=\"Property.php.html#71\">Skillcraft\\UiSchemaCraft\\Schema\\Property::example<\/a>"],[0,1,"<a href=\"Property.php.html#77\">Skillcraft\\UiSchemaCraft\\Schema\\Property::setExample<\/a>"],[0,1,"<a href=\"Property.php.html#83\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getExample<\/a>"],[0,3,"<a href=\"Property.php.html#88\">Skillcraft\\UiSchemaCraft\\Schema\\Property::addRule<\/a>"],[0,1,"<a href=\"Property.php.html#99\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getRules<\/a>"],[0,3,"<a href=\"Property.php.html#104\">Skillcraft\\UiSchemaCraft\\Schema\\Property::rules<\/a>"],[0,1,"<a href=\"Property.php.html#117\">Skillcraft\\UiSchemaCraft\\Schema\\Property::addAttribute<\/a>"],[0,1,"<a href=\"Property.php.html#123\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getAttributes<\/a>"],[0,1,"<a href=\"Property.php.html#128\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getAttribute<\/a>"],[0,1,"<a href=\"Property.php.html#133\">Skillcraft\\UiSchemaCraft\\Schema\\Property::addProperty<\/a>"],[0,1,"<a href=\"Property.php.html#139\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getProperties<\/a>"],[0,4,"<a href=\"Property.php.html#144\">Skillcraft\\UiSchemaCraft\\Schema\\Property::properties<\/a>"],[0,2,"<a href=\"Property.php.html#160\">Skillcraft\\UiSchemaCraft\\Schema\\Property::items<\/a>"],[0,1,"<a href=\"Property.php.html#169\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getItems<\/a>"],[0,1,"<a href=\"Property.php.html#174\">Skillcraft\\UiSchemaCraft\\Schema\\Property::format<\/a>"],[0,1,"<a href=\"Property.php.html#180\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getFormat<\/a>"],[0,1,"<a href=\"Property.php.html#185\">Skillcraft\\UiSchemaCraft\\Schema\\Property::min<\/a>"],[0,1,"<a href=\"Property.php.html#191\">Skillcraft\\UiSchemaCraft\\Schema\\Property::minimum<\/a>"],[0,1,"<a href=\"Property.php.html#196\">Skillcraft\\UiSchemaCraft\\Schema\\Property::max<\/a>"],[0,1,"<a href=\"Property.php.html#202\">Skillcraft\\UiSchemaCraft\\Schema\\Property::maximum<\/a>"],[0,1,"<a href=\"Property.php.html#207\">Skillcraft\\UiSchemaCraft\\Schema\\Property::pattern<\/a>"],[0,1,"<a href=\"Property.php.html#213\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getPattern<\/a>"],[0,1,"<a href=\"Property.php.html#218\">Skillcraft\\UiSchemaCraft\\Schema\\Property::reference<\/a>"],[0,1,"<a href=\"Property.php.html#224\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getReference<\/a>"],[0,2,"<a href=\"Property.php.html#229\">Skillcraft\\UiSchemaCraft\\Schema\\Property::requiredWith<\/a>"],[0,2,"<a href=\"Property.php.html#245\">Skillcraft\\UiSchemaCraft\\Schema\\Property::requiredWithout<\/a>"],[0,1,"<a href=\"Property.php.html#261\">Skillcraft\\UiSchemaCraft\\Schema\\Property::requiredIf<\/a>"],[0,1,"<a href=\"Property.php.html#274\">Skillcraft\\UiSchemaCraft\\Schema\\Property::prohibitedIf<\/a>"],[0,5,"<a href=\"Property.php.html#286\">Skillcraft\\UiSchemaCraft\\Schema\\Property::validateRequiredWithoutFields<\/a>"],[0,5,"<a href=\"Property.php.html#298\">Skillcraft\\UiSchemaCraft\\Schema\\Property::validateRequiredWithFields<\/a>"],[0,2,"<a href=\"Property.php.html#310\">Skillcraft\\UiSchemaCraft\\Schema\\Property::isEmptyValue<\/a>"],[0,34,"<a href=\"Property.php.html#315\">Skillcraft\\UiSchemaCraft\\Schema\\Property::validate<\/a>"],[0,2,"<a href=\"Property.php.html#384\">Skillcraft\\UiSchemaCraft\\Schema\\Property::getValidationMessage<\/a>"],[0,18,"<a href=\"Property.php.html#392\">Skillcraft\\UiSchemaCraft\\Schema\\Property::toArray<\/a>"],[0,2,"<a href=\"Property.php.html#464\">Skillcraft\\UiSchemaCraft\\Schema\\Property::required<\/a>"],[0,1,"<a href=\"Property.php.html#476\">Skillcraft\\UiSchemaCraft\\Schema\\Property::isNullable<\/a>"],[0,3,"<a href=\"Property.php.html#481\">Skillcraft\\UiSchemaCraft\\Schema\\Property::nullable<\/a>"],[0,1,"<a href=\"Property.php.html#495\">Skillcraft\\UiSchemaCraft\\Schema\\Property::enum<\/a>"],[0,1,"<a href=\"Property.php.html#501\">Skillcraft\\UiSchemaCraft\\Schema\\Property::description<\/a>"],[0,2,"<a href=\"Property.php.html#507\">Skillcraft\\UiSchemaCraft\\Schema\\Property::withBuilder<\/a>"],[0,7,"<a href=\"Property.php.html#519\">Skillcraft\\UiSchemaCraft\\Schema\\Property::when<\/a>"],[0,3,"<a href=\"Property.php.html#553\">Skillcraft\\UiSchemaCraft\\Schema\\Property::whenMatches<\/a>"],[0,3,"<a href=\"Property.php.html#569\">Skillcraft\\UiSchemaCraft\\Schema\\Property::whenCompare<\/a>"],[0,1,"<a href=\"Property.php.html#588\">Skillcraft\\UiSchemaCraft\\Schema\\Property::setName<\/a>"],[0,1,"<a href=\"Property.php.html#594\">Skillcraft\\UiSchemaCraft\\Schema\\Property::string<\/a>"],[0,1,"<a href=\"Property.php.html#599\">Skillcraft\\UiSchemaCraft\\Schema\\Property::number<\/a>"],[0,1,"<a href=\"Property.php.html#604\">Skillcraft\\UiSchemaCraft\\Schema\\Property::boolean<\/a>"],[0,1,"<a href=\"Property.php.html#609\">Skillcraft\\UiSchemaCraft\\Schema\\Property::object<\/a>"],[0,1,"<a href=\"Property.php.html#614\">Skillcraft\\UiSchemaCraft\\Schema\\Property::array<\/a>"],[0,4,"<a href=\"Property.php.html#619\">Skillcraft\\UiSchemaCraft\\Schema\\Property::timeRange<\/a>"],[0,1,"<a href=\"Property.php.html#661\">Skillcraft\\UiSchemaCraft\\Schema\\Property::dateRange<\/a>"],[0,2,"<a href=\"Property.php.html#697\">Skillcraft\\UiSchemaCraft\\Schema\\Property::time<\/a>"],[0,1,"<a href=\"Property.php.html#713\">Skillcraft\\UiSchemaCraft\\Schema\\Property::duration<\/a>"],[0,1,"<a href=\"PropertyBuilder.php.html#40\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder::__construct<\/a>"],[0,1,"<a href=\"PropertyBuilder.php.html#45\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder::new<\/a>"],[0,1,"<a href=\"PropertyBuilder.php.html#50\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder::add<\/a>"],[0,3,"<a href=\"PropertyBuilder.php.html#56\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder::toArray<\/a>"],[0,2,"<a href=\"PropertyBuilder.php.html#77\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder::merge<\/a>"],[0,2,"<a href=\"PropertyBuilder.php.html#86\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder::prefix<\/a>"],[0,1,"<a href=\"PropertyBuilder.php.html#100\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder::getProperties<\/a>"],[0,2,"<a href=\"PropertyBuilder.php.html#108\">Skillcraft\\UiSchemaCraft\\Schema\\PropertyBuilder::validate<\/a>"],[0,1,"<a href=\"Schema.php.html#52\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::addProperty<\/a>"],[0,3,"<a href=\"Schema.php.html#67\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::buildRulesFromProperty<\/a>"],[0,1,"<a href=\"Schema.php.html#92\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::getProperties<\/a>"],[0,1,"<a href=\"Schema.php.html#104\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::addRule<\/a>"],[0,1,"<a href=\"Schema.php.html#116\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::addRules<\/a>"],[0,1,"<a href=\"Schema.php.html#127\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::getRules<\/a>"],[0,1,"<a href=\"Schema.php.html#140\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::addMessage<\/a>"],[0,1,"<a href=\"Schema.php.html#152\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::withMessages<\/a>"],[0,1,"<a href=\"Schema.php.html#164\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::setMessages<\/a>"],[0,1,"<a href=\"Schema.php.html#175\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::getMessages<\/a>"],[0,1,"<a href=\"Schema.php.html#186\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::withAttributes<\/a>"],[0,1,"<a href=\"Schema.php.html#198\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::setAttributes<\/a>"],[0,1,"<a href=\"Schema.php.html#209\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::getAttributes<\/a>"],[0,7,"<a href=\"Schema.php.html#220\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::validate<\/a>"],[0,38,"<a href=\"Schema.php.html#276\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::processConditionalRules<\/a>"],[0,2,"<a href=\"Schema.php.html#418\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::toArray<\/a>"],[0,1,"<a href=\"Schema.php.html#439\">Skillcraft\\UiSchemaCraft\\Schema\\Schema::toJson<\/a>"],[0,3,"<a href=\"SchemaUtils.php.html#19\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindColor<\/a>"],[0,2,"<a href=\"SchemaUtils.php.html#72\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindSpacing<\/a>"],[0,3,"<a href=\"SchemaUtils.php.html#116\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindTypography<\/a>"],[0,1,"<a href=\"SchemaUtils.php.html#208\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindContainer<\/a>"],[0,1,"<a href=\"SchemaUtils.php.html#282\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindFlex<\/a>"],[0,3,"<a href=\"SchemaUtils.php.html#340\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindGrid<\/a>"],[0,3,"<a href=\"SchemaUtils.php.html#408\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindResponsive<\/a>"],[0,2,"<a href=\"SchemaUtils.php.html#461\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindAnimation<\/a>"],[0,1,"<a href=\"SchemaUtils.php.html#512\">Skillcraft\\UiSchemaCraft\\Schema\\SchemaUtils::tailwindInteractive<\/a>"],[0,1,"<a href=\"Traits\/AuthenticationTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\AuthenticationTrait::mfa<\/a>"],[0,1,"<a href=\"Traits\/AuthenticationTrait.php.html#35\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\AuthenticationTrait::otp<\/a>"],[0,1,"<a href=\"Traits\/AuthenticationTrait.php.html#45\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\AuthenticationTrait::captcha<\/a>"],[0,1,"<a href=\"Traits\/AuthenticationTrait.php.html#58\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\AuthenticationTrait::roleTransfer<\/a>"],[0,1,"<a href=\"Traits\/BasicTypesTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\BasicTypesTrait::string<\/a>"],[0,1,"<a href=\"Traits\/BasicTypesTrait.php.html#22\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\BasicTypesTrait::number<\/a>"],[0,1,"<a href=\"Traits\/BasicTypesTrait.php.html#32\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\BasicTypesTrait::boolean<\/a>"],[0,1,"<a href=\"Traits\/BasicTypesTrait.php.html#42\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\BasicTypesTrait::object<\/a>"],[0,1,"<a href=\"Traits\/BasicTypesTrait.php.html#52\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\BasicTypesTrait::array<\/a>"],[0,1,"<a href=\"Traits\/ChartTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ChartTrait::chart<\/a>"],[0,1,"<a href=\"Traits\/ChartTrait.php.html#26\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ChartTrait::lineChart<\/a>"],[0,1,"<a href=\"Traits\/ChartTrait.php.html#36\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ChartTrait::barChart<\/a>"],[0,1,"<a href=\"Traits\/ChartTrait.php.html#46\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ChartTrait::pieChart<\/a>"],[0,1,"<a href=\"Traits\/ChartTrait.php.html#56\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ChartTrait::scatterPlot<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::id<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#22\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::foreignKey<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#32\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::timestamp<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#42\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::slug<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#52\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::json<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#62\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::transfer<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#79\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::table<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#93\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::dynamicForm<\/a>"],[0,1,"<a href=\"Traits\/DataHandlingTrait.php.html#106\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\DataHandlingTrait::matrix<\/a>"],[0,1,"<a href=\"Traits\/EditorTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\EditorTrait::codeEditor<\/a>"],[0,1,"<a href=\"Traits\/EditorTrait.php.html#30\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\EditorTrait::markdown<\/a>"],[0,1,"<a href=\"Traits\/EditorTrait.php.html#56\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\EditorTrait::jsonEditor<\/a>"],[0,1,"<a href=\"Traits\/EditorTrait.php.html#72\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\EditorTrait::mask<\/a>"],[0,2,"<a href=\"Traits\/FormFieldsTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait::textField<\/a>"],[0,1,"<a href=\"Traits\/FormFieldsTrait.php.html#34\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait::email<\/a>"],[0,1,"<a href=\"Traits\/FormFieldsTrait.php.html#44\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait::password<\/a>"],[0,1,"<a href=\"Traits\/FormFieldsTrait.php.html#54\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait::phone<\/a>"],[0,1,"<a href=\"Traits\/FormFieldsTrait.php.html#64\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait::url<\/a>"],[0,1,"<a href=\"Traits\/FormFieldsTrait.php.html#79\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait::color<\/a>"],[0,1,"<a href=\"Traits\/FormFieldsTrait.php.html#106\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait::file<\/a>"],[0,1,"<a href=\"Traits\/FormFieldsTrait.php.html#123\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\FormFieldsTrait::richText<\/a>"],[0,3,"<a href=\"Traits\/LayoutTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LayoutTrait::grid<\/a>"],[0,3,"<a href=\"Traits\/LayoutTrait.php.html#41\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LayoutTrait::flex<\/a>"],[0,3,"<a href=\"Traits\/LayoutTrait.php.html#73\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LayoutTrait::container<\/a>"],[0,3,"<a href=\"Traits\/LayoutTrait.php.html#104\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LayoutTrait::tabs<\/a>"],[0,3,"<a href=\"Traits\/LayoutTrait.php.html#136\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LayoutTrait::stack<\/a>"],[0,3,"<a href=\"Traits\/LayoutTrait.php.html#166\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LayoutTrait::section<\/a>"],[0,1,"<a href=\"Traits\/LocationTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LocationTrait::coordinates<\/a>"],[0,1,"<a href=\"Traits\/LocationTrait.php.html#40\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LocationTrait::map<\/a>"],[0,1,"<a href=\"Traits\/LocationTrait.php.html#79\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\LocationTrait::cascader<\/a>"],[0,1,"<a href=\"Traits\/MediaTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\MediaTrait::imageUpload<\/a>"],[0,1,"<a href=\"Traits\/MediaTrait.php.html#46\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\MediaTrait::mediaGallery<\/a>"],[0,1,"<a href=\"Traits\/MediaTrait.php.html#78\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\MediaTrait::avatar<\/a>"],[0,1,"<a href=\"Traits\/NumericTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\NumericTrait::range<\/a>"],[0,1,"<a href=\"Traits\/NumericTrait.php.html#46\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\NumericTrait::rating<\/a>"],[0,1,"<a href=\"Traits\/NumericTrait.php.html#87\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\NumericTrait::currency<\/a>"],[0,1,"<a href=\"Traits\/NumericTrait.php.html#112\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\NumericTrait::percentage<\/a>"],[0,1,"<a href=\"Traits\/SelectionTrait.php.html#12\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\SelectionTrait::multiSelect<\/a>"],[0,1,"<a href=\"Traits\/SelectionTrait.php.html#50\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\SelectionTrait::treeSelect<\/a>"],[0,1,"<a href=\"Traits\/SelectionTrait.php.html#93\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\SelectionTrait::combobox<\/a>"],[0,1,"<a href=\"Traits\/SelectionTrait.php.html#135\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\SelectionTrait::autocomplete<\/a>"],[0,1,"<a href=\"Traits\/TimeTrait.php.html#10\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait::timeRange<\/a>"],[0,1,"<a href=\"Traits\/TimeTrait.php.html#19\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait::dateRange<\/a>"],[0,1,"<a href=\"Traits\/TimeTrait.php.html#29\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait::time<\/a>"],[0,1,"<a href=\"Traits\/TimeTrait.php.html#38\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait::duration<\/a>"],[0,1,"<a href=\"Traits\/TimeTrait.php.html#47\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait::timeRangeStatic<\/a>"],[0,1,"<a href=\"Traits\/TimeTrait.php.html#52\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait::dateRangeStatic<\/a>"],[0,1,"<a href=\"Traits\/TimeTrait.php.html#57\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait::timeStatic<\/a>"],[0,1,"<a href=\"Traits\/TimeTrait.php.html#62\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\TimeTrait::durationStatic<\/a>"],[0,1,"<a href=\"Traits\/UtilityTrait.php.html#13\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\UtilityTrait::group<\/a>"],[0,1,"<a href=\"Traits\/UtilityTrait.php.html#26\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\UtilityTrait::list<\/a>"],[0,1,"<a href=\"Traits\/UtilityTrait.php.html#42\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\UtilityTrait::conditional<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#13\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::rule<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#22\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::rules<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#31\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::message<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#40\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::messages<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#49\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::required<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#57\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::nullable<\/a>"],[0,2,"<a href=\"Traits\/ValidationTrait.php.html#65\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::when<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#78\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::requiredWith<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#86\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::requiredWithout<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#94\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::requiredIf<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#102\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::prohibitedIf<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#110\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::getRules<\/a>"],[0,1,"<a href=\"Traits\/ValidationTrait.php.html#118\">Skillcraft\\UiSchemaCraft\\Schema\\Traits\\ValidationTrait::getMessages<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

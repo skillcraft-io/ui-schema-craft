@@ -2,122 +2,149 @@
 
 namespace Skillcraft\UiSchemaCraft\Tests\Unit\Schema\Traits;
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Skillcraft\UiSchemaCraft\Tests\TestCase;
-use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
+use Skillcraft\UiSchemaCraft\Schema\Property;
 use Skillcraft\UiSchemaCraft\Schema\Traits\EditorTrait;
 
-#[CoversClass(EditorTrait::class)]
 class EditorTraitTest extends TestCase
 {
-    protected PropertyBuilder $builder;
+    /**
+     * Test class that uses the EditorTrait
+     */
+    private $traitUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->builder = new PropertyBuilder();
+        
+        // Create a test class that uses the trait
+        $this->traitUser = new class {
+            use EditorTrait;
+        };
     }
 
-    #[Test]
-    public function it_creates_code_editor_property()
+    public function testCodeEditorProperty(): void
     {
-        $property = $this->builder->codeEditor('script', 'Custom Script');
-        $schema = $property->toArray();
-
-        $this->assertEquals('script', $schema['name']);
-        $this->assertEquals('Custom Script', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'codeField';
+        $propertyDescription = 'Code Editor Field';
         
-        // Check editor properties
-        $this->assertArrayHasKey('language', $schema['properties']);
-        $this->assertArrayHasKey('theme', $schema['properties']);
-        $this->assertArrayHasKey('value', $schema['properties']);
-        $this->assertArrayHasKey('readOnly', $schema['properties']);
-        $this->assertArrayHasKey('minimap', $schema['properties']);
-        $this->assertArrayHasKey('lineNumbers', $schema['properties']);
-        $this->assertArrayHasKey('wordWrap', $schema['properties']);
+        $property = $this->traitUser->codeEditor($propertyName, $propertyDescription);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyDescription, $property->getDescription());
+        
+        // Check that the expected attributes are set
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties are present
+        $expectedProperties = [
+            'language', 'theme', 'value', 'readOnly', 
+            'minimap', 'lineNumbers', 'wordWrap'
+        ];
+        
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
         
         // Check default values
-        $this->assertEquals('plaintext', $schema['properties']['language']['default']);
-        $this->assertEquals('vs', $schema['properties']['theme']['default']);
-        $this->assertArrayNotHasKey('default', $schema['properties']['value']);
-        $this->assertFalse($schema['properties']['readOnly']['default']);
-        $this->assertTrue($schema['properties']['minimap']['default']);
-        $this->assertTrue($schema['properties']['lineNumbers']['default']);
-        $this->assertFalse($schema['properties']['wordWrap']['default']);
+        $this->assertEquals('plaintext', $attributes['properties']['language']['default']);
+        $this->assertEquals('vs', $attributes['properties']['theme']['default']);
+        $this->assertEquals(false, $attributes['properties']['readOnly']['default']);
+        $this->assertEquals(true, $attributes['properties']['minimap']['default']);
+        $this->assertEquals(true, $attributes['properties']['lineNumbers']['default']);
+        $this->assertEquals(false, $attributes['properties']['wordWrap']['default']);
     }
 
-    #[Test]
-    public function it_creates_json_editor_property()
+    public function testMarkdownProperty(): void
     {
-        $property = $this->builder->jsonEditor('config', 'Configuration');
-        $schema = $property->toArray();
-
-        $this->assertEquals('config', $schema['name']);
-        $this->assertEquals('Configuration', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'markdownField';
+        $propertyLabel = 'Markdown Editor Field';
         
-        // Check editor properties
-        $this->assertArrayHasKey('value', $schema['properties']);
-        $this->assertArrayHasKey('mode', $schema['properties']);
-        $this->assertArrayHasKey('schema', $schema['properties']);
-        $this->assertArrayHasKey('readOnly', $schema['properties']);
-        $this->assertArrayHasKey('indentation', $schema['properties']);
+        $property = $this->traitUser->markdown($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check that the expected attributes are set
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties
+        $this->assertArrayHasKey('value', $attributes['properties']);
+        $this->assertArrayHasKey('preview', $attributes['properties']);
+        $this->assertArrayHasKey('toolbar', $attributes['properties']);
+        
+        // Check toolbar structure
+        $this->assertEquals('object', $attributes['properties']['toolbar']['type']);
+        $this->assertArrayHasKey('properties', $attributes['properties']['toolbar']);
+        
+        // Check toolbar buttons
+        $toolbarButtons = [
+            'bold', 'italic', 'heading', 'code', 
+            'quote', 'link', 'image', 'list'
+        ];
+        
+        foreach ($toolbarButtons as $button) {
+            $this->assertArrayHasKey($button, $attributes['properties']['toolbar']['properties']);
+            $this->assertEquals(true, $attributes['properties']['toolbar']['properties'][$button]['default']);
+        }
+        
+        // Check preview default value
+        $this->assertEquals(true, $attributes['properties']['preview']['default']);
+    }
+
+    public function testJsonEditorProperty(): void
+    {
+        $propertyName = 'jsonField';
+        $propertyLabel = 'JSON Editor Field';
+        
+        $property = $this->traitUser->jsonEditor($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        // Check that the expected attributes are set
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific properties
+        $expectedProperties = ['value', 'mode', 'schema', 'readOnly', 'indentation'];
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
+        
+        // Check mode enum values
+        $this->assertArrayHasKey('enum', $attributes['properties']['mode']);
+        $this->assertEquals(['tree', 'code', 'form', 'text'], $attributes['properties']['mode']['enum']);
         
         // Check default values
-        $this->assertEquals('object', $schema['properties']['value']['type']);
-        $this->assertEquals('tree', $schema['properties']['mode']['default']);
-        $this->assertEquals('object', $schema['properties']['schema']['type']);
-        $this->assertFalse($schema['properties']['readOnly']['default']);
-        $this->assertEquals(2, $schema['properties']['indentation']['default']);
-        
-        // Check mode options
-        $this->assertEquals(['tree', 'code', 'form', 'text'], $schema['properties']['mode']['enum']);
+        $this->assertEquals('tree', $attributes['properties']['mode']['default']);
+        $this->assertEquals(false, $attributes['properties']['readOnly']['default']);
+        $this->assertEquals(2, $attributes['properties']['indentation']['default']);
     }
 
-    #[Test]
-    public function it_creates_markdown_editor_property()
+    public function testMaskProperty(): void
     {
-        $property = $this->builder->markdown('content', 'Article Content');
-        $schema = $property->toArray();
-
-        $this->assertEquals('content', $schema['name']);
-        $this->assertEquals('Article Content', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'maskField';
+        $propertyLabel = 'Masked Input Field';
         
-        // Check editor properties
-        $this->assertArrayHasKey('value', $schema['properties']);
-        $this->assertArrayHasKey('preview', $schema['properties']);
-        $this->assertArrayHasKey('toolbar', $schema['properties']);
+        $property = $this->traitUser->mask($propertyName, $propertyLabel);
         
-        // Check default values
-        $this->assertEquals('string', $schema['properties']['value']['type']);
-        $this->assertTrue($schema['properties']['preview']['default']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('string', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
         
-        // Check toolbar properties
-        $this->assertArrayHasKey('properties', $schema['properties']['toolbar']);
-        $toolbar = $schema['properties']['toolbar']['properties'];
-        
-        $this->assertTrue($toolbar['bold']['default']);
-        $this->assertTrue($toolbar['italic']['default']);
-        $this->assertTrue($toolbar['heading']['default']);
-        $this->assertTrue($toolbar['code']['default']);
-        $this->assertTrue($toolbar['quote']['default']);
-        $this->assertTrue($toolbar['link']['default']);
-        $this->assertTrue($toolbar['image']['default']);
-        $this->assertTrue($toolbar['list']['default']);
-    }
-
-    #[Test]
-    public function it_creates_mask_property()
-    {
-        $property = $this->builder->mask('phone', 'Phone Number');
-        $schema = $property->toArray();
-
-        $this->assertEquals('phone', $schema['name']);
-        $this->assertEquals('Phone Number', $schema['description']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('mask', $schema['format']);
+        // Check that format is set to mask
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('format', $attributes);
+        $this->assertEquals('mask', $attributes['format']);
     }
 }

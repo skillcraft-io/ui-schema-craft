@@ -2,105 +2,128 @@
 
 namespace Skillcraft\UiSchemaCraft\Tests\Unit\Schema\Traits;
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Skillcraft\UiSchemaCraft\Tests\TestCase;
-use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
+use Skillcraft\UiSchemaCraft\Schema\Property;
 use Skillcraft\UiSchemaCraft\Schema\Traits\AuthenticationTrait;
 
-#[CoversClass(AuthenticationTrait::class)]
 class AuthenticationTraitTest extends TestCase
 {
-    protected PropertyBuilder $builder;
+    /**
+     * Test class that uses the AuthenticationTrait
+     */
+    private $traitUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->builder = new PropertyBuilder();
+        
+        // Create a test class that uses the trait
+        $this->traitUser = new class {
+            use AuthenticationTrait;
+            
+            public array $properties = [];
+        };
     }
 
-    #[Test]
-    public function it_creates_mfa_property()
+    public function testMfaProperty(): void
     {
-        $property = $this->builder->mfa('two_factor', 'Two Factor Authentication');
-        $schema = $property->toArray();
-
-        $this->assertEquals('two_factor', $schema['name']);
-        $this->assertEquals('Two Factor Authentication', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'testMfa';
+        $propertyDescription = 'Test MFA';
         
-        // Check methods array
-        $this->assertArrayHasKey('methods', $schema['properties']);
-        $this->assertEquals('array', $schema['properties']['methods']['type']);
-        $this->assertEquals('string', $schema['properties']['methods']['items']['type']);
+        $property = $this->traitUser->mfa($propertyName, $propertyDescription);
         
-        // Check TOTP configuration
-        $this->assertArrayHasKey('totp', $schema['properties']);
-        $this->assertEquals('object', $schema['properties']['totp']['type']);
-        $this->assertArrayHasKey('enabled', $schema['properties']['totp']['properties']);
-        $this->assertArrayHasKey('secret', $schema['properties']['totp']['properties']);
-        $this->assertArrayHasKey('qrCode', $schema['properties']['totp']['properties']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyDescription, $property->getDescription());
+        
+        // Check that the expected attributes are set
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify specific MFA structure
+        $this->assertArrayHasKey('methods', $attributes['properties']);
+        $this->assertArrayHasKey('totp', $attributes['properties']);
+        
+        // Verify methods structure
+        $this->assertEquals('array', $attributes['properties']['methods']['type']);
+        $this->assertArrayHasKey('items', $attributes['properties']['methods']);
+        
+        // Verify totp structure
+        $this->assertEquals('object', $attributes['properties']['totp']['type']);
+        $this->assertArrayHasKey('properties', $attributes['properties']['totp']);
+        $this->assertArrayHasKey('enabled', $attributes['properties']['totp']['properties']);
+        $this->assertArrayHasKey('secret', $attributes['properties']['totp']['properties']);
+        $this->assertArrayHasKey('qrCode', $attributes['properties']['totp']['properties']);
     }
 
-    #[Test]
-    public function it_creates_otp_property()
+    public function testOtpProperty(): void
     {
-        $property = $this->builder->otp('verification_code', 'Verification Code');
-        $schema = $property->toArray();
-
-        $this->assertEquals('verification_code', $schema['name']);
-        $this->assertEquals('Verification Code', $schema['description']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('otp', $schema['format']);
+        $propertyName = 'testOtp';
+        $propertyDescription = 'Test OTP';
+        
+        $property = $this->traitUser->otp($propertyName, $propertyDescription);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('string', $property->getType());
+        $this->assertEquals($propertyDescription, $property->getDescription());
+        
+        // Check that format is set to otp
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('format', $attributes);
+        $this->assertEquals('otp', $attributes['format']);
     }
 
-    #[Test]
-    public function it_creates_captcha_property()
+    public function testCaptchaProperty(): void
     {
-        $property = $this->builder->captcha('security_check', 'Security Check');
-        $schema = $property->toArray();
-
-        $this->assertEquals('security_check', $schema['name']);
-        $this->assertEquals('Security Check', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'testCaptcha';
+        $propertyDescription = 'Test Captcha';
         
-        $this->assertArrayHasKey('token', $schema['properties']);
-        $this->assertEquals('string', $schema['properties']['token']['type']);
+        $property = $this->traitUser->captcha($propertyName, $propertyDescription);
         
-        $this->assertArrayHasKey('type', $schema['properties']);
-        $this->assertEquals('string', $schema['properties']['type']['type']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyDescription, $property->getDescription());
+        
+        // Check captcha structure
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        $this->assertArrayHasKey('token', $attributes['properties']);
+        $this->assertArrayHasKey('type', $attributes['properties']);
+        
+        // Verify property types
+        $this->assertEquals('string', $attributes['properties']['token']['type']);
+        $this->assertEquals('string', $attributes['properties']['type']['type']);
     }
 
-    #[Test]
-    public function it_creates_role_transfer_property()
+    public function testRoleTransferProperty(): void
     {
-        $property = $this->builder->roleTransfer('role_transfer', 'Role Transfer');
-        $schema = $property->toArray();
-
-        $this->assertEquals('role_transfer', $schema['name']);
-        $this->assertEquals('Role Transfer', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'testRoleTransfer';
+        $propertyDescription = 'Test Role Transfer';
         
-        // Check basic properties
-        $this->assertArrayHasKey('selected', $schema['properties']);
-        $this->assertArrayHasKey('source', $schema['properties']);
-        $this->assertArrayHasKey('target', $schema['properties']);
-        $this->assertArrayHasKey('titles', $schema['properties']);
-        $this->assertArrayHasKey('operations', $schema['properties']);
+        $property = $this->traitUser->roleTransfer($propertyName, $propertyDescription);
         
-        // Check array types
-        $this->assertEquals('array', $schema['properties']['selected']['type']);
-        $this->assertEquals('array', $schema['properties']['source']['type']);
-        $this->assertEquals('array', $schema['properties']['target']['type']);
-        $this->assertEquals('array', $schema['properties']['titles']['type']);
-        $this->assertEquals('array', $schema['properties']['operations']['type']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyDescription, $property->getDescription());
         
-        // Check configuration options
-        $this->assertArrayHasKey('searchable', $schema['properties']);
-        $this->assertArrayHasKey('sortable', $schema['properties']);
-        $this->assertEquals('boolean', $schema['properties']['searchable']['type']);
-        $this->assertEquals('boolean', $schema['properties']['sortable']['type']);
-        $this->assertTrue($schema['properties']['searchable']['default']);
-        $this->assertTrue($schema['properties']['sortable']['default']);
+        // Check role transfer structure
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify all expected properties exist
+        $expectedProperties = ['selected', 'source', 'target', 'titles', 'operations', 'searchable', 'sortable'];
+        foreach ($expectedProperties as $expectedProperty) {
+            $this->assertArrayHasKey($expectedProperty, $attributes['properties']);
+        }
+        
+        // Verify boolean properties have default values
+        $this->assertEquals('boolean', $attributes['properties']['searchable']['type']);
+        $this->assertEquals(true, $attributes['properties']['searchable']['default']);
+        $this->assertEquals('boolean', $attributes['properties']['sortable']['type']);
+        $this->assertEquals(true, $attributes['properties']['sortable']['default']);
     }
 }

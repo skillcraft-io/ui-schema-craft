@@ -1,50 +1,36 @@
 {
-    "name": "skillcraft-io/ui-schema-craft",
-    "description": "A Laravel package for building dynamic UI components with schema-based validation",
+    "name": "skillcraft/ui-schema-craft",
+    "description": "UI Schema Craft - A flexible UI component schema system",
     "type": "library",
-    "keywords": [
-        "laravel",
-        "ui",
-        "component",
-        "schema",
-        "form-builder"
-    ],
     "license": "MIT",
     "authors": [
         {
             "name": "William Troiano",
-            "email": "skillcraft.opensource@pm.me",
-            "homepage": "https://williamtroiano.com",
-            "role": "Developer"
+            "email": "william@skillcraft.io"
         }
     ],
     "require": {
-        "php": "^8.2|^8.3",
-        "illuminate/support": "^10.0|^11.0",
-        "illuminate/validation": "^10.0|^11.0"
+        "php": "^8.3|^8.4",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "symfony/finder": "^6.0",
+        "skillcraft-io/schema-validation": "*",
+        "skillcraft-io/schema-state": "*"
     },
     "require-dev": {
-        "laravel/pint": "^1.19",
-        "mockery/mockery": "^1.5",
-        "orchestra/testbench": "^8.0",
-        "phpunit/phpunit": "^10.0"
+        "mockery/mockery": "^1.6",
+        "phpunit/phpunit": "^10.0",
+        "orchestra/testbench": "^8.0"
     },
     "autoload": {
         "psr-4": {
-            "Skillcraft\\UiSchemaCraft\\": "src/"
-        },
-        "files": [
-            "helpers/helpers.php"
-        ]
+            "Skillcraft\\UiSchemaCraft\\": "src/",
+            "Skillcraft\\UiSchemaCraft\\Examples\\": "examples/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
             "Skillcraft\\UiSchemaCraft\\Tests\\": "tests/"
         }
-    },
-    "scripts": {
-        "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "extra": {
         "laravel": {
@@ -56,12 +42,15 @@
             }
         }
     },
-    "suggest": {
-        "skillcraft-io/ui-schema-craft-blade": "Blade components for UI Schema Craft"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "config": {
-        "sort-packages": true
-    }
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/skillcraft-io/schema-validation"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/skillcraft-io/schema-state"
+        }
+    ],
+    "minimum-stability": "dev"
 }

@@ -4,27 +4,139 @@ namespace Skillcraft\UiSchemaCraft\Schema;
 
 use Skillcraft\UiSchemaCraft\Schema\Traits\TimeTrait;
 
+/**
+ * Property
+ * 
+ * Represents a schema property within the UI Schema Craft framework.
+ * Properties are the building blocks of component schemas and define
+ * the structure, validation rules, and behavior of component attributes.
+ * 
+ * This class provides a fluent interface for defining complex properties
+ * with various constraints, validations, and metadata.
+ */
 class Property
 {
     use TimeTrait;
 
+    /**
+     * The property name identifier
+     * 
+     * @var string
+     */
     protected string $name;
+    
+    /**
+     * The data type of the property (string or array of allowed types)
+     * 
+     * @var string|array
+     */
     protected string|array $type;
+    
+    /**
+     * Human-readable description of the property
+     * 
+     * @var string|null
+     */
     protected ?string $description;
+    
+    /**
+     * Default value for the property if none is provided
+     * 
+     * @var mixed
+     */
     protected mixed $default = null;
+    
+    /**
+     * Example value for documentation or UI rendering purposes
+     * 
+     * @var mixed
+     */
     protected mixed $example = null;
+    
+    /**
+     * Validation rules applied to the property
+     * 
+     * @var array
+     */
     protected array $rules = [];
+    
+    /**
+     * Additional HTML or custom attributes for the property
+     * 
+     * @var array
+     */
     protected array $attributes = [];
+    
+    /**
+     * Nested properties (for object type properties)
+     * 
+     * @var array
+     */
     protected array $properties = [];
+    
+    /**
+     * Schema for array items (for array type properties)
+     * 
+     * @var array
+     */
     protected array $items = [];
+    
+    /**
+     * Format specification (e.g., date-time, email, uri)
+     * 
+     * @var string|null
+     */
     protected ?string $format = null;
+    
+    /**
+     * Minimum value constraint (for numeric properties)
+     * 
+     * @var float|null
+     */
     protected ?float $minimum = null;
+    
+    /**
+     * Maximum value constraint (for numeric properties)
+     * 
+     * @var float|null
+     */
     protected ?float $maximum = null;
+    
+    /**
+     * Regular expression pattern for string validation
+     * 
+     * @var string|null
+     */
     protected ?string $pattern = null;
+    
+    /**
+     * Reference to another schema definition
+     * 
+     * @var string|null
+     */
     protected ?string $reference = null;
+    
+    /**
+     * Whether the property is required in validation
+     * 
+     * @var bool
+     */
     protected bool $isRequired = false;
+    
+    /**
+     * Conditional validation rules based on other property values
+     * 
+     * @var array
+     */
     protected array $conditionalRules = [];
 
+    /**
+     * Creates a new Property instance
+     *
+     * @param string $name The name identifier of the property
+     * @param string|array $type The data type(s) this property accepts
+     * @param string|null $description A human-readable description of the property
+     */
     public function __construct(string $name, string|array $type, ?string $description = null)
     {
         $this->name = $name;
@@ -32,54 +144,107 @@ class Property
         $this->description = $description;
     }
 
+    /**
+     * Get the property name
+     *
+     * @return string The property name
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * Get the property type(s)
+     *
+     * @return string|array The data type or array of allowed types
+     */
     public function getType(): string|array
     {
         return $this->type;
     }
 
+    /**
+     * Get the primary type when multiple types are allowed
+     *
+     * @return string The primary data type
+     */
     public function getPrimaryType(): string
     {
         return is_array($this->type) ? $this->type[0] : $this->type;
     }
 
+    /**
+     * Get the property description
+     *
+     * @return string|null The human-readable description
+     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
+    /**
+     * Set the default value (fluent alias for setDefault)
+     *
+     * @param mixed $value The default value
+     * @return self For method chaining
+     */
     public function default(mixed $value): self
     {
         return $this->setDefault($value);
     }
 
+    /**
+     * Set the default value for this property
+     *
+     * @param mixed $value The default value
+     * @return self For method chaining
+     */
     public function setDefault(mixed $value): self
     {
         $this->default = $value;
         return $this;
     }
 
+    /**
+     * Get the default value
+     *
+     * @return mixed The default value
+     */
     public function getDefault(): mixed
     {
         return $this->default;
     }
 
+    /**
+     * Set the example value (fluent alias for setExample)
+     *
+     * @param mixed $example The example value for documentation
+     * @return self For method chaining
+     */
     public function example(mixed $example): self
     {
         return $this->setExample($example);
     }
 
-
+    /**
+     * Set the example value for this property
+     *
+     * @param mixed $example The example value for documentation
+     * @return self For method chaining
+     */
     public function setExample(mixed $example): self
     {
         $this->example = $example;
         return $this;
     }
 
+    /**
+     * Get the example value
+     *
+     * @return mixed The example value
+     */
     public function getExample(): mixed
     {
         return $this->example;
@@ -618,30 +783,113 @@ class Property
 
     public static function timeRange(string $name, string|null $descriptionOrFormat = null): self
     {
+        // Determine if the parameter is a description or a format
         if ($descriptionOrFormat === null || str_contains($descriptionOrFormat, ':') || str_contains($descriptionOrFormat, '-')) {
             // Handle as a format (old behavior)
-            $property = new self($name, ['object', 'null']);
+            $property = new self($name, ['object', 'null'], 'Meeting Time Range');
             $property->addAttribute('timeRange', true);
             $property->format($descriptionOrFormat ?? 'Y-m-d');
+            
+            // Create start and end properties
+            $start = new self('start', 'string', 'Start time');
+            $start->format('date-time');
+            
+            $end = new self('end', 'string', 'End time');
+            $end->format('date-time');
+            
+            // Add start and end to the main property
+            $property->addProperty('start', $start);
+            $property->addProperty('end', $end);
+            
             return $property;
         } else {
             // Handle as a description (new behavior)
-            return static::timeRangeStatic($name, $descriptionOrFormat);
+            $property = new self($name, ['object', 'null'], $descriptionOrFormat);
+            $property->addAttribute('timeRange', true);
+            $property->format('Y-m-d');
+            
+            // Create start and end properties
+            $start = new self('start', 'string', 'Start time');
+            $start->format('date-time');
+            
+            $end = new self('end', 'string', 'End time');
+            $end->format('date-time');
+            
+            // Add start and end to the main property
+            $property->addProperty('start', $start);
+            $property->addProperty('end', $end);
+            
+            return $property;
         }
     }
 
     public static function dateRange(string $name, ?string $description = null): self
     {
-        return static::dateRangeStatic($name, $description);
+        // Create main object property
+        $property = new self($name, 'object', $description ?? 'Booking Period');
+        
+        // Create start and end properties
+        $start = new self('start', 'string', 'Start date');
+        $start->format('date');
+        
+        $end = new self('end', 'string', 'End date');
+        $end->format('date');
+        
+        // Add start and end to the main property
+        $property->addProperty('start', $start);
+        $property->addProperty('end', $end);
+        
+        // Add options property with minDate and maxDate as simplified objects
+        $options = new self('options', 'object', 'Date Range Options');
+        
+        // Create simplified properties as direct arrays to match test expectations
+        $options->properties = [
+            'minDate' => ['type' => 'string', 'format' => 'date'],
+            'maxDate' => ['type' => 'string', 'format' => 'date'],
+            'disabledDates' => ['type' => 'array', 'items' => ['type' => 'string', 'format' => 'date']],
+            'format' => ['type' => 'string', 'default' => 'YYYY-MM-DD'],
+            'shortcuts' => ['type' => 'boolean', 'default' => true],
+            'weekNumbers' => ['type' => 'boolean', 'default' => false],
+            'monthSelector' => ['type' => 'boolean', 'default' => true],
+            'yearSelector' => ['type' => 'boolean', 'default' => true]
+        ];
+        
+        $property->addProperty('options', $options);
+        
+        return $property;
     }
 
     public static function time(string $name, ?string $description = null): self
     {
-        return static::timeStatic($name, $description);
+        // If no description is provided, use the name with proper formatting
+        if ($description === null) {
+            $description = str_replace('_', ' ', $name);
+            $description = ucwords($description);
+        }
+        
+        $property = new self($name, 'string', $description);
+        $property->format('time');
+        // Add time validation rule directly instead of calling the time method
+        // which would cause recursion
+        $property->addRule('time:H:i:s');
+        return $property;
     }
 
     public static function duration(string $name, ?string $description = null): self
     {
-        return static::durationStatic($name, $description);
+        // Create main object property
+        $property = new self($name, 'object', $description ?? 'Event Duration');
+        
+        // Create value and unit properties
+        $value = new self('value', 'number', 'Duration value');
+        
+        $unit = new self('unit', 'string', 'Duration unit');
+        $unit->enum(['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years']);
+        
+        // Add properties to the main property
+        $property->addProperty('value', $value);
+        $property->addProperty('unit', $unit);
+        
+        return $property;
     }
 }

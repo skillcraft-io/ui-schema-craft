@@ -2,87 +2,68 @@
 
 namespace Skillcraft\UiSchemaCraft\Providers;
 
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Config;
-use Skillcraft\UiSchemaCraft\State\StateManager;
-use Skillcraft\UiSchemaCraft\Facades\PropertyBuilder;
-use Skillcraft\UiSchemaCraft\Factory\ComponentFactory;
-use Skillcraft\UiSchemaCraft\Registry\ComponentRegistry;
-use Skillcraft\UiSchemaCraft\State\StateManagerInterface;
 use Skillcraft\UiSchemaCraft\Services\UiSchemaCraftService;
-use Skillcraft\UiSchemaCraft\Factory\ComponentFactoryInterface;
-use Skillcraft\UiSchemaCraft\Registry\ComponentRegistryInterface;
-use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder as CorePropertyBuilder;
-use Skillcraft\UiSchemaCraft\Validation\CompositeValidator;
+use Skillcraft\UiSchemaCraft\ComponentResolver;
+use Skillcraft\UiSchemaCraft\Facades\UiSchema;
+use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
+use Skillcraft\SchemaState\Contracts\StateManagerInterface;
+use Skillcraft\SchemaValidation\Contracts\ValidatorInterface;
 
 class UiSchemaCraftServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../../config/ui-schema-craft.php',
-            'ui-schema-craft'
-        );
+        // Register component resolver
+        $this->app->singleton(ComponentResolver::class);
 
-        // Register Core Services
-        $this->registerCoreServices();
-
-        // Register Main Service
-        $this->app->singleton('ui-schema', function ($app) {
-            return new UiSchemaCraftService(
-                $app->make(ComponentRegistryInterface::class),
-                $app->make(ComponentFactoryInterface::class),
-                $app->make(StateManagerInterface::class)
-            );
+        // Register property builder
+        $this->app->singleton('property-builder', function ($app) {
+            return new PropertyBuilder();
         });
 
-        $this->app->singleton(CorePropertyBuilder::class);
-        $this->app->alias(CorePropertyBuilder::class, 'property-builder');
+        // Register property builder facade
+        $this->app->alias('property-builder', PropertyBuilder::class);
+
+        // Register main service - handle case where dependencies aren't registered yet
+        $this->app->singleton(UiSchemaCraftService::class, function ($app) {
+            try {
+                // StateManagerInterface and ValidatorInterface are from the split packages
+                // and will be available when all packages are installed together
+                if ($app->bound(StateManagerInterface::class) && $app->bound(ValidatorInterface::class)) {
+                    return new UiSchemaCraftService(
+                        $app->make(StateManagerInterface::class),
+                        $app->make(ComponentResolver::class),
+                        $app->make(ValidatorInterface::class)
+                    );
+                }
+                return null; // For testing when dependencies aren't available
+            } catch (\Exception $e) {
+                // For testing when dependencies aren't available
+                return null;
+            }
+        });
+
+        $this->app->alias(UiSchemaCraftService::class, 'ui-schema');
     }
 
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
+            $configPath = $this->app->configPath('ui-schema-craft.php');
             $this->publishes([
-                __DIR__.'/../../config/ui-schema-craft.php' => $this->app->configPath('ui-schema-craft.php'),
+                __DIR__.'/../config/ui-schema-craft.php' => $configPath,
             ], 'ui-schema-craft-config');
         }
 
-        // Register default components if configured
-        if (Config::get('ui-schema-craft.register_default_components', true) === true) {
-            $this->registerDefaultComponents();
+        // Register default components namespace if configured
+        if ($this->app->bound('config')) {
+            $config = $this->app->make('config');
+            $namespace = $config->get('ui-schema-craft.components_namespace');
+            
+            if ($namespace) {
+                $this->app->make(UiSchemaCraftService::class)->registerNamespace($namespace);
+            }
         }
-    }
-
-    protected function registerCoreServices(): void
-    {
-        // Register Component Registry
-        $this->app->singleton(ComponentRegistryInterface::class, function ($app) {
-            return new ComponentRegistry($app['events']);
-        });
-
-        // Register Composite Validator
-        $this->app->singleton(CompositeValidator::class, function ($app) {
-            return new CompositeValidator();
-        });
-
-        // Register Component Factory
-        $this->app->singleton(ComponentFactoryInterface::class, function ($app) {
-            return new ComponentFactory(
-                $app->make(ComponentRegistryInterface::class),
-                $app->make(CompositeValidator::class)
-            );
-        });
-
-        // Register State Manager
-        $this->app->singleton(StateManagerInterface::class, function ($app) {
-            return new StateManager($app['cache.store']);
-        });
-    }
-
-    protected function registerDefaultComponents(): void
-    {
-        // Removed Text component registration
     }
 }

@@ -2,175 +2,258 @@
 
 namespace Skillcraft\UiSchemaCraft\Tests\Unit\Schema\Traits;
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Skillcraft\UiSchemaCraft\Tests\TestCase;
+use Skillcraft\UiSchemaCraft\Schema\Property;
 use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
 use Skillcraft\UiSchemaCraft\Schema\Traits\LocationTrait;
 
-#[CoversClass(LocationTrait::class)]
 class LocationTraitTest extends TestCase
 {
-    protected PropertyBuilder $builder;
+    /**
+     * Test class that uses the LocationTrait
+     */
+    private $traitUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->builder = new PropertyBuilder();
+        
+        // Create a test class that uses the trait
+        $this->traitUser = new class {
+            use LocationTrait;
+            
+            public function object(string $name, ?string $description = null): Property
+            {
+                return new Property($name, 'object', $description);
+            }
+            
+            public function withBuilder(callable $callback): mixed
+            {
+                $builder = new PropertyBuilder();
+                $callback($builder);
+                return $this;
+            }
+        };
     }
 
-    #[Test]
-    public function it_creates_coordinates_property()
+    public function testCoordinatesProperty(): void
     {
-        $property = $this->builder->coordinates('location', 'Location Coordinates');
-        $schema = $property->toArray();
-
-        $this->assertEquals('location', $schema['name']);
-        $this->assertEquals('Location Coordinates', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'location';
+        $propertyLabel = 'Location Coordinates';
         
-        // Check value object properties
-        $this->assertArrayHasKey('value', $schema['properties']);
-        $value = $schema['properties']['value'];
-        $this->assertEquals('object', $value['type']);
+        $property = $this->traitUser->coordinates($propertyName, $propertyLabel);
         
-        // Check coordinate properties
-        $this->assertArrayHasKey('latitude', $value['properties']);
-        $this->assertArrayHasKey('longitude', $value['properties']);
-        $this->assertArrayHasKey('altitude', $value['properties']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+    }
+    
+    public function testCoordinatesPropertyWithAutoLabel(): void
+    {
+        $propertyName = 'gps_coordinates';
         
-        // Check property types and constraints
-        $latitude = $value['properties']['latitude'];
-        $this->assertEquals('number', $latitude['type']);
-        $this->assertEquals(-90, $latitude['minimum']);
-        $this->assertEquals(90, $latitude['maximum']);
+        $property = $this->traitUser->coordinates($propertyName);
         
-        $longitude = $value['properties']['longitude'];
-        $this->assertEquals('number', $longitude['type']);
-        $this->assertEquals(-180, $longitude['minimum']);
-        $this->assertEquals(180, $longitude['maximum']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals('Gps Coordinates', $property->getDescription());
+    }
+    
+    public function testCoordinatesHasCorrectStructure(): void
+    {
+        $propertyName = 'position';
+        $propertyLabel = 'Position';
         
-        $altitude = $value['properties']['altitude'];
-        $this->assertEquals('number', $altitude['type']);
-        $this->assertTrue($altitude['nullable']);
+        // Create a real property object with the proper builder
+        $mockTraitUser = new class {
+            use LocationTrait;
+            
+            public function object(string $name, ?string $description = null): Property
+            {
+                return new Property($name, 'object', $description);
+            }
+        };
+        
+        $property = $mockTraitUser->coordinates($propertyName, $propertyLabel);
+        $attributes = $property->toArray();
+        
+        // Check if builder added the value object with coordinates
+        $this->assertArrayHasKey('properties', $attributes);
+        if (isset($attributes['properties'])) {
+            $this->assertArrayHasKey('value', $attributes['properties']);
+            $this->assertArrayHasKey('properties', $attributes['properties']['value']);
+            
+            $valueProperties = $attributes['properties']['value']['properties'];
+            
+            // Check latitude
+            $this->assertArrayHasKey('latitude', $valueProperties);
+            $this->assertEquals('number', $valueProperties['latitude']['type']);
+            $this->assertEquals(-90, $valueProperties['latitude']['minimum']);
+            $this->assertEquals(90, $valueProperties['latitude']['maximum']);
+            
+            // Check longitude
+            $this->assertArrayHasKey('longitude', $valueProperties);
+            $this->assertEquals('number', $valueProperties['longitude']['type']);
+            $this->assertEquals(-180, $valueProperties['longitude']['minimum']);
+            $this->assertEquals(180, $valueProperties['longitude']['maximum']);
+            
+            // Check altitude
+            $this->assertArrayHasKey('altitude', $valueProperties);
+            $this->assertEquals('number', $valueProperties['altitude']['type']);
+            $this->assertEquals(true, $valueProperties['altitude']['nullable']);
+        }
     }
 
-    #[Test]
-    public function it_creates_coordinates_with_default_label()
+    public function testMapProperty(): void
     {
-        $property = $this->builder->coordinates('user_location');
-        $schema = $property->toArray();
-
-        $this->assertEquals('user_location', $schema['name']);
-        $this->assertEquals('User Location', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'locationMap';
+        $propertyLabel = 'Location Map';
+        
+        $property = $this->traitUser->map($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+    }
+    
+    public function testMapPropertyWithAutoLabel(): void
+    {
+        $propertyName = 'city_map';
+        
+        $property = $this->traitUser->map($propertyName);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals('City Map', $property->getDescription());
+    }
+    
+    public function testMapHasCorrectStructure(): void
+    {
+        $propertyName = 'storeMap';
+        $propertyLabel = 'Store Map';
+        
+        // Create a real property object with the proper builder
+        $mockTraitUser = new class {
+            use LocationTrait;
+            
+            public function object(string $name, ?string $description = null): Property
+            {
+                return new Property($name, 'object', $description);
+            }
+        };
+        
+        $property = $mockTraitUser->map($propertyName, $propertyLabel);
+        $attributes = $property->toArray();
+        
+        // Check if builder added the value object with map properties
+        $this->assertArrayHasKey('properties', $attributes);
+        if (isset($attributes['properties'])) {
+            $this->assertArrayHasKey('value', $attributes['properties']);
+            $this->assertArrayHasKey('properties', $attributes['properties']['value']);
+            
+            $valueProperties = $attributes['properties']['value']['properties'];
+            
+            // Check center
+            $this->assertArrayHasKey('center', $valueProperties);
+            $this->assertEquals('object', $valueProperties['center']['type']);
+            $this->assertArrayHasKey('properties', $valueProperties['center']);
+            $this->assertArrayHasKey('latitude', $valueProperties['center']['properties']);
+            $this->assertArrayHasKey('longitude', $valueProperties['center']['properties']);
+            
+            // Check zoom
+            $this->assertArrayHasKey('zoom', $valueProperties);
+            $this->assertEquals('number', $valueProperties['zoom']['type']);
+            $this->assertEquals(0, $valueProperties['zoom']['minimum']);
+            $this->assertEquals(20, $valueProperties['zoom']['maximum']);
+            $this->assertEquals(13, $valueProperties['zoom']['default']);
+            
+            // Check markers
+            $this->assertArrayHasKey('markers', $valueProperties);
+            $this->assertEquals('array', $valueProperties['markers']['type']);
+            $this->assertArrayHasKey('items', $valueProperties['markers']);
+            $this->assertEquals('object', $valueProperties['markers']['items']['type']);
+            $this->assertArrayHasKey('properties', $valueProperties['markers']['items']);
+            
+            // Check marker properties
+            $markerProps = $valueProperties['markers']['items']['properties'];
+            $expectedMarkerProps = ['latitude', 'longitude', 'title', 'description'];
+            foreach ($expectedMarkerProps as $prop) {
+                $this->assertArrayHasKey($prop, $markerProps);
+            }
+        }
     }
 
-    #[Test]
-    public function it_creates_map_property()
+    public function testCascaderProperty(): void
     {
-        $property = $this->builder->map('area_map', 'Area Map');
-        $schema = $property->toArray();
-
-        $this->assertEquals('area_map', $schema['name']);
-        $this->assertEquals('Area Map', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'regionSelector';
+        $propertyLabel = 'Region Selector';
         
-        // Check value object
-        $this->assertArrayHasKey('value', $schema['properties']);
-        $value = $schema['properties']['value'];
-        $this->assertEquals('object', $value['type']);
+        $property = $this->traitUser->cascader($propertyName, $propertyLabel);
         
-        // Check center properties
-        $this->assertArrayHasKey('center', $value['properties']);
-        $center = $value['properties']['center'];
-        $this->assertEquals('object', $center['type']);
-        $this->assertArrayHasKey('latitude', $center['properties']);
-        $this->assertArrayHasKey('longitude', $center['properties']);
-        $this->assertEquals('number', $center['properties']['latitude']['type']);
-        $this->assertEquals('number', $center['properties']['longitude']['type']);
-        
-        // Check zoom property
-        $this->assertArrayHasKey('zoom', $value['properties']);
-        $zoom = $value['properties']['zoom'];
-        $this->assertEquals('number', $zoom['type']);
-        $this->assertEquals(0, $zoom['minimum']);
-        $this->assertEquals(20, $zoom['maximum']);
-        $this->assertEquals(13, $zoom['default']);
-        
-        // Check markers property
-        $this->assertArrayHasKey('markers', $value['properties']);
-        $markers = $value['properties']['markers'];
-        $this->assertEquals('array', $markers['type']);
-        
-        // Check marker item properties
-        $markerItem = $markers['items'];
-        $this->assertEquals('object', $markerItem['type']);
-        $this->assertArrayHasKey('latitude', $markerItem['properties']);
-        $this->assertArrayHasKey('longitude', $markerItem['properties']);
-        $this->assertArrayHasKey('title', $markerItem['properties']);
-        $this->assertArrayHasKey('description', $markerItem['properties']);
-        
-        // Check marker property types
-        $this->assertEquals('number', $markerItem['properties']['latitude']['type']);
-        $this->assertEquals('number', $markerItem['properties']['longitude']['type']);
-        $this->assertEquals('string', $markerItem['properties']['title']['type']);
-        $this->assertEquals('string', $markerItem['properties']['description']['type']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
     }
-
-    #[Test]
-    public function it_creates_map_with_default_label()
+    
+    public function testCascaderPropertyWithAutoLabel(): void
     {
-        $property = $this->builder->map('store_locations');
-        $schema = $property->toArray();
-
-        $this->assertEquals('store_locations', $schema['name']);
-        $this->assertEquals('Store Locations', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'location_selector';
+        
+        $property = $this->traitUser->cascader($propertyName);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals('Location Selector', $property->getDescription());
     }
-
-    #[Test]
-    public function it_creates_cascader_property()
+    
+    public function testCascaderHasCorrectStructure(): void
     {
-        $property = $this->builder->cascader('region_selector', 'Region Selection');
-        $schema = $property->toArray();
-
-        $this->assertEquals('region_selector', $schema['name']);
-        $this->assertEquals('Region Selection', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'addressSelector';
+        $propertyLabel = 'Address Selector';
         
-        // Check value array
-        $this->assertArrayHasKey('value', $schema['properties']);
-        $value = $schema['properties']['value'];
-        $this->assertEquals('array', $value['type']);
+        // Create a real property object with the proper builder
+        $mockTraitUser = new class {
+            use LocationTrait;
+            
+            public function object(string $name, ?string $description = null): Property
+            {
+                return new Property($name, 'object', $description);
+            }
+        };
         
-        // Check item properties
-        $item = $value['items'];
-        $this->assertEquals('object', $item['type']);
-        $this->assertArrayHasKey('value', $item['properties']);
-        $this->assertArrayHasKey('label', $item['properties']);
-        $this->assertArrayHasKey('children', $item['properties']);
+        $property = $mockTraitUser->cascader($propertyName, $propertyLabel);
+        $attributes = $property->toArray();
         
-        // Check property types
-        $this->assertEquals('string', $item['properties']['value']['type']);
-        $this->assertEquals('string', $item['properties']['label']['type']);
-        $this->assertEquals('array', $item['properties']['children']['type']);
-        
-        // Check configuration options
-        $this->assertArrayHasKey('multiple', $schema['properties']);
-        $this->assertArrayHasKey('clearable', $schema['properties']);
-        $this->assertFalse($schema['properties']['multiple']['default']);
-        $this->assertTrue($schema['properties']['clearable']['default']);
-    }
-
-    #[Test]
-    public function it_creates_cascader_with_default_label()
-    {
-        $property = $this->builder->cascader('location_hierarchy');
-        $schema = $property->toArray();
-
-        $this->assertEquals('location_hierarchy', $schema['name']);
-        $this->assertEquals('Location Hierarchy', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        // Check if builder added the required properties
+        $this->assertArrayHasKey('properties', $attributes);
+        if (isset($attributes['properties'])) {
+            // Check value array
+            $this->assertArrayHasKey('value', $attributes['properties']);
+            $this->assertEquals('array', $attributes['properties']['value']['type']);
+            
+            // Check items structure in value array
+            $this->assertArrayHasKey('items', $attributes['properties']['value']);
+            $itemProps = $attributes['properties']['value']['items']['properties'];
+            $expectedItemProps = ['value', 'label', 'children'];
+            foreach ($expectedItemProps as $prop) {
+                $this->assertArrayHasKey($prop, $itemProps);
+            }
+            
+            // Check multiple flag
+            $this->assertArrayHasKey('multiple', $attributes['properties']);
+            $this->assertEquals('boolean', $attributes['properties']['multiple']['type']);
+            $this->assertEquals(false, $attributes['properties']['multiple']['default']);
+            
+            // Check clearable flag
+            $this->assertArrayHasKey('clearable', $attributes['properties']);
+            $this->assertEquals('boolean', $attributes['properties']['clearable']['type']);
+            $this->assertEquals(true, $attributes['properties']['clearable']['default']);
+        }
     }
 }

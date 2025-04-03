@@ -2,196 +2,226 @@
 
 namespace Skillcraft\UiSchemaCraft\Tests\Unit\Schema\Traits;
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Skillcraft\UiSchemaCraft\Tests\TestCase;
-use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
+use Skillcraft\UiSchemaCraft\Schema\Property;
 use Skillcraft\UiSchemaCraft\Schema\Traits\DataHandlingTrait;
 
-#[CoversClass(DataHandlingTrait::class)]
 class DataHandlingTraitTest extends TestCase
 {
-    protected PropertyBuilder $builder;
+    /**
+     * Test class that uses the DataHandlingTrait
+     */
+    private $traitUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->builder = new PropertyBuilder();
-    }
-
-    #[Test]
-    public function it_creates_id_property()
-    {
-        $property = $this->builder->id();
-        $schema = $property->toArray();
-
-        $this->assertEquals('id', $schema['name']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('Unique identifier', $schema['description']);
-        $this->assertTrue($schema['required']);
-    }
-
-    #[Test]
-    public function it_creates_custom_id_property()
-    {
-        $property = $this->builder->id('user_id');
-        $schema = $property->toArray();
-
-        $this->assertEquals('user_id', $schema['name']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('Unique identifier', $schema['description']);
-        $this->assertTrue($schema['required']);
-    }
-
-    #[Test]
-    public function it_creates_foreign_key_property()
-    {
-        $property = $this->builder->foreignKey('user_id', 'users');
-        $schema = $property->toArray();
-
-        $this->assertEquals('user_id', $schema['name']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('Foreign key reference to users', $schema['description']);
-        $this->assertTrue($schema['required']);
-    }
-
-    #[Test]
-    public function it_creates_timestamp_property()
-    {
-        $property = $this->builder->timestamp('created_at');
-        $schema = $property->toArray();
-
-        $this->assertEquals('created_at', $schema['name']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('date-time', $schema['format']);
-        $this->assertEquals('Timestamp field', $schema['description']);
-    }
-
-    #[Test]
-    public function it_creates_slug_property()
-    {
-        $property = $this->builder->slug();
-        $schema = $property->toArray();
-
-        $this->assertEquals('slug', $schema['name']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('^[a-z0-9]+(?:-[a-z0-9]+)*$', $schema['pattern']);
-        $this->assertEquals('URL-friendly slug', $schema['description']);
-    }
-
-    #[Test]
-    public function it_creates_custom_slug_property()
-    {
-        $property = $this->builder->slug('post_slug');
-        $schema = $property->toArray();
-
-        $this->assertEquals('post_slug', $schema['name']);
-        $this->assertEquals('string', $schema['type']);
-        $this->assertEquals('^[a-z0-9]+(?:-[a-z0-9]+)*$', $schema['pattern']);
-        $this->assertEquals('URL-friendly slug', $schema['description']);
-    }
-
-    #[Test]
-    public function it_creates_json_property()
-    {
-        $property = $this->builder->json('metadata');
-        $schema = $property->toArray();
-
-        $this->assertEquals('metadata', $schema['name']);
-        $this->assertEquals('object', $schema['type']);
-        $this->assertEquals('json', $schema['format']);
-        $this->assertEquals('JSON data field', $schema['description']);
-    }
-
-    #[Test]
-    public function it_creates_table_property()
-    {
-        $property = $this->builder->table('users_table', 'Users Table');
-        $schema = $property->toArray();
-
-        $this->assertEquals('users_table', $schema['name']);
-        $this->assertEquals('Users Table', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
         
-        // Check table components
-        $this->assertArrayHasKey('columns', $schema['properties']);
-        $this->assertArrayHasKey('data', $schema['properties']);
-        $this->assertArrayHasKey('pagination', $schema['properties']);
-        
-        // Check property types
-        $this->assertEquals('array', $schema['properties']['columns']['type']);
-        $this->assertEquals('array', $schema['properties']['data']['type']);
-        $this->assertEquals('object', $schema['properties']['pagination']['type']);
+        // Create a test class that uses the trait
+        $this->traitUser = new class {
+            use DataHandlingTrait;
+            
+            // Required method called by some trait methods
+            public function string(string $name, ?string $label = null): Property
+            {
+                $property = new Property($name, 'string', $label);
+                return $property;
+            }
+        };
     }
 
-    #[Test]
-    public function it_creates_dynamic_form_property()
+    public function testIdProperty(): void
     {
-        $property = $this->builder->dynamicForm('custom_form', 'Custom Form');
-        $schema = $property->toArray();
-
-        $this->assertEquals('custom_form', $schema['name']);
-        $this->assertEquals('Custom Form', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $property = $this->traitUser->id();
         
-        // Check form components
-        $this->assertArrayHasKey('fields', $schema['properties']);
-        $this->assertArrayHasKey('data', $schema['properties']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals('id', $property->getName());
+        $this->assertEquals('string', $property->getType());
+        $this->assertEquals('Unique identifier', $property->getDescription());
         
-        // Check property types
-        $this->assertEquals('array', $schema['properties']['fields']['type']);
-        $this->assertEquals('object', $schema['properties']['data']['type']);
+        $attributes = $property->toArray();
+        $this->assertContains('required', $attributes['rules'] ?? []);
+    }
+    
+    public function testIdPropertyWithCustomName(): void
+    {
+        $customName = 'userId';
+        $property = $this->traitUser->id($customName);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($customName, $property->getName());
     }
 
-    #[Test]
-    public function it_creates_matrix_property()
+    public function testForeignKeyProperty(): void
     {
-        $property = $this->builder->matrix('data_matrix', 'Data Matrix');
-        $schema = $property->toArray();
-
-        $this->assertEquals('data_matrix', $schema['name']);
-        $this->assertEquals('Data Matrix', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+        $propertyName = 'categoryId';
+        $references = 'categories';
         
-        // Check matrix components
-        $this->assertArrayHasKey('rows', $schema['properties']);
-        $this->assertArrayHasKey('columns', $schema['properties']);
-        $this->assertArrayHasKey('cells', $schema['properties']);
+        $property = $this->traitUser->foreignKey($propertyName, $references);
         
-        // Check property types
-        $this->assertEquals('array', $schema['properties']['rows']['type']);
-        $this->assertEquals('array', $schema['properties']['columns']['type']);
-        $this->assertEquals('array', $schema['properties']['cells']['type']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('string', $property->getType());
+        $this->assertEquals("Foreign key reference to $references", $property->getDescription());
+        
+        $attributes = $property->toArray();
+        $this->assertContains('required', $attributes['rules'] ?? []);
     }
 
-    #[Test]
-    public function it_creates_transfer_property()
+    public function testTimestampProperty(): void
     {
-        $property = $this->builder->transfer('payment', 'Payment Transfer');
-        $schema = $property->toArray();
+        $propertyName = 'createdAt';
+        
+        $property = $this->traitUser->timestamp($propertyName);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('string', $property->getType());
+        $this->assertEquals('Timestamp field', $property->getDescription());
+        
+        $attributes = $property->toArray();
+        $this->assertEquals('date-time', $attributes['format'] ?? null);
+    }
 
-        $this->assertEquals('payment', $schema['name']);
-        $this->assertEquals('Payment Transfer', $schema['description']);
-        $this->assertEquals('object', $schema['type']);
+    public function testSlugProperty(): void
+    {
+        $property = $this->traitUser->slug();
         
-        // Check transfer components
-        $this->assertArrayHasKey('source', $schema['properties']);
-        $this->assertArrayHasKey('destination', $schema['properties']);
-        $this->assertArrayHasKey('amount', $schema['properties']);
-        $this->assertArrayHasKey('currency', $schema['properties']);
-        $this->assertArrayHasKey('status', $schema['properties']);
-        $this->assertArrayHasKey('timestamp', $schema['properties']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals('slug', $property->getName());
+        $this->assertEquals('string', $property->getType());
+        $this->assertEquals('URL-friendly slug', $property->getDescription());
         
-        // Check property types
-        $this->assertEquals('string', $schema['properties']['source']['type']);
-        $this->assertEquals('string', $schema['properties']['destination']['type']);
-        $this->assertEquals('number', $schema['properties']['amount']['type']);
-        $this->assertEquals('string', $schema['properties']['currency']['type']);
-        $this->assertEquals('string', $schema['properties']['status']['type']);
-        $this->assertEquals('string', $schema['properties']['timestamp']['type']);
+        $attributes = $property->toArray();
+        $this->assertEquals('^[a-z0-9]+(?:-[a-z0-9]+)*$', $attributes['pattern'] ?? null);
+    }
+    
+    public function testSlugPropertyWithCustomName(): void
+    {
+        $customName = 'productSlug';
+        $property = $this->traitUser->slug($customName);
         
-        // Check specific validations
-        $this->assertEquals(['pending', 'completed', 'failed'], $schema['properties']['status']['enum']);
-        $this->assertEquals('date-time', $schema['properties']['timestamp']['format']);
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($customName, $property->getName());
+    }
+
+    public function testJsonProperty(): void
+    {
+        $propertyName = 'metadata';
+        
+        $property = $this->traitUser->json($propertyName);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals('JSON data field', $property->getDescription());
+        
+        $attributes = $property->toArray();
+        $this->assertEquals('json', $attributes['format'] ?? null);
+    }
+
+    public function testTransferProperty(): void
+    {
+        $propertyName = 'payment';
+        $propertyLabel = 'Payment Transfer';
+        
+        $property = $this->traitUser->transfer($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify expected properties exist
+        $expectedFields = ['source', 'destination', 'amount', 'currency', 'status', 'timestamp'];
+        foreach ($expectedFields as $field) {
+            $this->assertArrayHasKey($field, $attributes['properties']);
+        }
+        
+        // Verify specific attribute values
+        $this->assertEquals('number', $attributes['properties']['amount']['type']);
+        $this->assertEquals(['pending', 'completed', 'failed'], $attributes['properties']['status']['enum']);
+        $this->assertEquals('date-time', $attributes['properties']['timestamp']['format']);
+    }
+
+    public function testTableProperty(): void
+    {
+        $propertyName = 'usersTable';
+        $propertyLabel = 'Users Table';
+        
+        $property = $this->traitUser->table($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify expected properties exist
+        $expectedFields = ['columns', 'data', 'pagination'];
+        foreach ($expectedFields as $field) {
+            $this->assertArrayHasKey($field, $attributes['properties']);
+        }
+        
+        // Verify types
+        $this->assertEquals('array', $attributes['properties']['columns']['type']);
+        $this->assertEquals('array', $attributes['properties']['data']['type']);
+        $this->assertEquals('object', $attributes['properties']['pagination']['type']);
+    }
+
+    public function testDynamicFormProperty(): void
+    {
+        $propertyName = 'dynamicForm';
+        $propertyLabel = 'Dynamic Form Builder';
+        
+        $property = $this->traitUser->dynamicForm($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify expected properties exist
+        $this->assertArrayHasKey('fields', $attributes['properties']);
+        $this->assertArrayHasKey('data', $attributes['properties']);
+        
+        // Verify types
+        $this->assertEquals('array', $attributes['properties']['fields']['type']);
+        $this->assertEquals('object', $attributes['properties']['data']['type']);
+    }
+
+    public function testMatrixProperty(): void
+    {
+        $propertyName = 'matrix';
+        $propertyLabel = 'Data Matrix';
+        
+        $property = $this->traitUser->matrix($propertyName, $propertyLabel);
+        
+        $this->assertInstanceOf(Property::class, $property);
+        $this->assertEquals($propertyName, $property->getName());
+        $this->assertEquals('object', $property->getType());
+        $this->assertEquals($propertyLabel, $property->getDescription());
+        
+        $attributes = $property->toArray();
+        $this->assertArrayHasKey('properties', $attributes);
+        
+        // Verify expected properties exist
+        $expectedFields = ['rows', 'columns', 'cells'];
+        foreach ($expectedFields as $field) {
+            $this->assertArrayHasKey($field, $attributes['properties']);
+        }
+        
+        // Verify all are arrays
+        $this->assertEquals('array', $attributes['properties']['rows']['type']);
+        $this->assertEquals('array', $attributes['properties']['columns']['type']);
+        $this->assertEquals('array', $attributes['properties']['cells']['type']);
     }
 }

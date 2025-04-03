@@ -2,49 +2,28 @@
 
 namespace Skillcraft\UiSchemaCraft\Abstracts;
 
-use Skillcraft\UiSchemaCraft\Composition\ComposableTrait;
-use Skillcraft\UiSchemaCraft\Validation\ValidationResult;
-use Skillcraft\UiSchemaCraft\Schema\Property;
+use Skillcraft\SchemaValidation\Contracts\ValidatorInterface;
+use Skillcraft\UiSchemaCraft\Exceptions\ValidationException;
+use Skillcraft\UiSchemaCraft\Exceptions\ValidationSchemaNotDefinedException;
+use Illuminate\Support\Str;
 
-abstract class UIComponentSchema
+abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\UIComponentSchemaInterface
 {
-    use ComposableTrait;
-
-    protected string $type;
-    protected string $component;
     protected string $version = '1.0.0';
-    protected array $propertyValues = [];
+    protected ?array $validationSchema = null;
+    protected string $component = '';
+
+    public function __construct(
+        protected readonly ValidatorInterface $validator
+    ) {}
 
     /**
-     * Get example data for the component
-     *
-     * @return array
+     * Get component properties
      */
-    public function getExampleData(): array
-    {
-        $values = [];
-
-        foreach ($this->properties() as $key => $property) {
-            $values[$key] = data_get($property, 'example_data', null);
-        }
-
-        return array_merge($values, $this->propertyValues);
-    }
-
-    /**
-     * Get component identifier
-     *
-     * @return string
-     */
-    public function getIdentifier(): string
-    {
-        return $this->type;
-    }
+    abstract public function properties(): array;
 
     /**
      * Get component version
-     *
-     * @return string
      */
     public function getVersion(): string
     {
@@ -52,129 +31,74 @@ abstract class UIComponentSchema
     }
 
     /**
-     * Convert component to array representation
-     *
-     * @return array
+     * Convert component to array
      */
     public function toArray(): array
     {
         return [
-            'type' => $this->type,
-            'component' => $this->component,
+            'type' => $this->getType(),
             'version' => $this->version,
-            'properties' => $this->properties(),
-            'children' => $this->getChildrenSchema(),
+            'component' => $this->getComponent(),
+            'properties' => $this->properties()
         ];
     }
 
     /**
-     * Get property values
-     *
-     * @return array
+     * Get component type
      */
-    public function getPropertyValues(): array
+    public function getType(): string
     {
-        $values = [];
-        foreach ($this->properties() as $property) {
-            $values[$property->getName()] = $property->getDefault();
+        // If type is explicitly set, use it
+        if (isset($this->type)) {
+            return $this->type;
         }
-        return array_merge($values, $this->propertyValues);
+
+        // Otherwise, derive from class name
+        return Str::kebab(
+            str_replace('UIComponent', '', 
+                Str::beforeLast(class_basename($this), 'Schema')
+            )
+        );
     }
 
     /**
-     * Get property names
-     *
-     * @return array
+     * Get component name
      */
-    public function getPropertyNames(): array
+    public function getComponent(): string
     {
-        return array_map(function ($property) {
-            return $property->getName();
-        }, $this->properties());
+        return $this->component;
     }
 
     /**
-     * Set a property value
-     *
-     * @param string $name
-     * @param mixed $value
-     * @return self
+     * Validate component state
+     * 
+     * @param array $data Data to validate
+     * @return array An array with keys: 'valid' (boolean) and 'errors' (MessageBag|null)
      */
-    public function setPropertyValue(string $name, mixed $value): self
+    public function validate(array $data): array
     {
-        if (in_array($name, $this->getPropertyNames())) {
-            $this->propertyValues[$name] = $value;
+        if (!$this->getValidationSchema()) {
+            return [
+                'valid' => true,
+                'errors' => null
+            ];
         }
-        return $this;
+
+        $schema = $this->getValidationSchema();
+        $rules = $schema ? $schema : [];
+        $valid = $this->validator->validate($data, $rules);
+        
+        return [
+            'valid' => $valid,
+            'errors' => $valid ? null : new \Illuminate\Support\MessageBag(['validation' => ['Validation failed']])
+        ];
     }
 
     /**
-     * Validate component data
-     *
-     * @param array $data
-     * @return ValidationResult
+     * Get validation schema
      */
-    public function validate(array $data): ValidationResult
+    protected function getValidationSchema(): ?array
     {
-        $result = new ValidationResult();
-
-        foreach ($this->properties() as $property) {
-            $propertyName = $property->getName();
-            $propertyArray = $property->toArray();
-            
-            // Check if property is required and missing
-            if (!array_key_exists($propertyName, $data)) {
-                if ($propertyArray['required'] ?? false) {
-                    $result->addError($propertyName, "The {$propertyName} field is required.");
-                }
-                continue;
-            }
-
-            $value = $data[$propertyName];
-            
-            // Validate the property value (including null values)
-            if (!$property->validate($value)) {
-                $result->addError($propertyName, $property->getValidationMessage());
-            }
-        }
-
-        // Validate nested children if present
-        if (isset($data['children'])) {
-            foreach ($data['children'] as $identifier => $childData) {
-                if (isset($this->children[$identifier])) {
-                    $childResult = $this->children[$identifier]->validate($childData);
-                    if ($childResult->hasErrors()) {
-                        foreach ($childResult->toArray()['errors'] as $field => $messages) {
-                            foreach ($messages as $message) {
-                                $result->addError($field, $message);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $result;
+        return $this->validationSchema;
     }
-
-    /**
-     * Clone the component
-     */
-    public function __clone()
-    {
-        if ($this->children) {
-            $children = [];
-            foreach ($this->children as $key => $child) {
-                $children[$key] = clone $child;
-            }
-            $this->children = $children;
-        }
-    }
-
-    /**
-     * Get component properties
-     *
-     * @return array<Property>
-     */
-    abstract public function properties(): array;
 }

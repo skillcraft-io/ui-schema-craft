@@ -2,108 +2,65 @@
 
 namespace Skillcraft\UiSchemaCraft\Schema\Traits;
 
-use Skillcraft\UiSchemaCraft\Schema\Property;
-
 trait TimeTrait
 {
     /**
-     * Create a time range property.
+     * Add time range validation
      */
-    public function timeRange(string $name, ?string $description = null): Property
+    public function timeRange(string $min = '00:00', string $max = '23:59'): self
     {
-        return static::timeRangeStatic($name, $description);
+        $this->rule("time_range:$min,$max");
+        return $this;
     }
 
     /**
-     * Create a time range property (static version).
+     * Add date range validation
      */
-    public static function timeRangeStatic(string $name, ?string $description = null): Property
+    public function dateRange(string $min = null, string $max = null): self
     {
-        $property = new Property($name, ['object', 'null'], $description ?? ucwords(str_replace('_', ' ', $name)));
-        $property->addAttribute('properties', [
-            'start' => ['type' => 'string', 'format' => 'date-time'],
-            'end' => ['type' => 'string', 'format' => 'date-time']
-        ]);
-        return $property;
+        $range = implode(',', array_filter([$min, $max]));
+        $this->rule("date_range:$range");
+        return $this;
     }
 
     /**
-     * Create a date range property.
+     * Add time validation
      */
-    public function dateRange(string $name, ?string $description = null): Property
+    public function time(string $format = 'H:i'): self
     {
-        return static::dateRangeStatic($name, $description);
+        $this->rule("time:$format");
+        return $this;
     }
 
     /**
-     * Create a date range property (static version).
+     * Add duration validation
      */
-    public static function dateRangeStatic(string $name, ?string $description = null): Property
+    public function duration(): self
     {
-        $property = Property::object($name, $description ?? ucwords(str_replace('_', ' ', $name)));
-        $property->withBuilder(function ($builder) {
-            $builder->string('start')
-                ->format('date')
-                ->description('Start date');
-
-            $builder->string('end')
-                ->format('date')
-                ->description('End date');
-
-            $builder->object('options')
-                ->properties([
-                    'minDate' => ['type' => 'string', 'format' => 'date'],
-                    'maxDate' => ['type' => 'string', 'format' => 'date'],
-                    'disabledDates' => ['type' => 'array', 'items' => ['type' => 'string', 'format' => 'date']],
-                    'format' => ['type' => 'string', 'default' => 'YYYY-MM-DD'],
-                    'shortcuts' => ['type' => 'boolean', 'default' => true],
-                    'weekNumbers' => ['type' => 'boolean', 'default' => false],
-                    'monthSelector' => ['type' => 'boolean', 'default' => true],
-                    'yearSelector' => ['type' => 'boolean', 'default' => true]
-                ]);
-        });
-        return $property;
+        $this->rule('duration');
+        return $this;
     }
 
     /**
-     * Create a time property.
+     * Static methods for fluent interface
      */
-    public function time(string $name, ?string $description = null): Property
+    public static function timeRangeStatic(string $name, string $min = '00:00', string $max = '23:59'): self
     {
-        return static::timeStatic($name, $description);
+        return (new static($name, 'object'))->timeRange($min, $max);
     }
 
-    /**
-     * Create a time property (static version).
-     */
-    public static function timeStatic(string $name, ?string $description = null): Property
+    public static function dateRangeStatic(string $name, string $min = null, string $max = null): self
     {
-        $property = new Property($name, 'string', $description ?? ucwords(str_replace('_', ' ', $name)));
-        $property->format('time');
-        return $property;
+        return (new static($name, 'object'))->dateRange($min, $max);
     }
 
-    /**
-     * Create a duration property.
-     */
-    public function duration(string $name, ?string $description = null): Property
+    public static function timeStatic(string $name, string $format = 'H:i'): self
     {
-        return static::durationStatic($name, $description);
+        return (new static($name, 'string'))->time($format);
     }
 
-    /**
-     * Create a duration property (static version).
-     */
-    public static function durationStatic(string $name, ?string $description = null): Property
+    public static function durationStatic(string $name): self
     {
-        $property = new Property($name, 'object', $description ?? ucwords(str_replace('_', ' ', $name)));
-        $property->addAttribute('properties', [
-            'value' => ['type' => 'number'],
-            'unit' => [
-                'type' => 'string',
-                'enum' => ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years']
-            ]
-        ]);
-        return $property;
+        return (new static($name, 'string'))->duration();
     }
 }
