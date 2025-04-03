@@ -32,10 +32,12 @@ class UiSchemaCraftServiceProvider extends ServiceProvider
         $this->app->singleton(UiSchemaCraftService::class, function ($app) {
             // StateManagerInterface and ValidatorInterface should now be available
             // thanks to our FixValidatorBindingServiceProvider
+            // Create service with validation disabled by default
             return new UiSchemaCraftService(
                 $app->make(StateManagerInterface::class),
                 $app->make(ComponentResolver::class),
-                $app->make(ValidatorInterface::class)
+                $app->make(ValidatorInterface::class),
+                false // Disable validation by default
             );
         });
 

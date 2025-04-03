@@ -16,15 +16,16 @@ class UiSchemaCraftService
     /**
      * @var bool Whether validation is enabled
      */
-    protected bool $validationEnabled = true;
+    protected bool $validationEnabled = false;
     
     public function __construct(
         protected readonly StateManagerInterface $stateManager,
         protected readonly ComponentResolver $resolver = new ComponentResolver(),
-        protected readonly ?ValidatorInterface $validator = null
+        protected readonly ?ValidatorInterface $validator = null,
+        bool $enableValidation = false
     ) {
-        // Validation is disabled if no validator is provided
-        $this->validationEnabled = $validator !== null;
+        // Validation is disabled by default, and can be enabled via parameter
+        $this->validationEnabled = $enableValidation && $validator !== null;
     }
 
     /**
