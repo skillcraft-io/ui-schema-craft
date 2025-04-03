@@ -4,13 +4,16 @@ namespace Skillcraft\UiSchemaCraft\Traits;
 
 use Skillcraft\UiSchemaCraft\Interfaces\ComposableInterface;
 use Skillcraft\UiSchemaCraft\Schema\Property;
+use Skillcraft\UiSchemaCraft\Schema\PropertyBuilder;
 
 /**
  * Trait for hierarchical array serialization
  * 
  * This trait provides a standardized implementation of toArray() that preserves
- * the hierarchical structure of properties, maintaining nested objects and arrays
- * as defined in the property definitions.
+ * the hierarchical structure of properties, maintaining nested objects and arrays.
+ * It keeps container properties organized and eliminates duplication of nested properties.
+ * 
+ * Optimized for UI rendering and form generation with clean, organized structure.
  * 
  * @package Skillcraft\UiSchemaCraft\Traits
  */
@@ -21,16 +24,16 @@ trait HierarchicalArraySerializationTrait
      * 
      * @var array
      */
-    protected array $propertyValues = [];
-    
-    /**
-     * Properties that should not be included in the serialized output
-     * 
-     * @var array
-     */
     protected array $hiddenProperties = [
         'validator',
     ];
+    
+    /**
+     * Property values storage
+     * 
+     * @var array
+     */
+    protected array $propertyValues = [];
     
     /**
      * Convert the component to a hierarchical array preserving structure
@@ -76,9 +79,73 @@ trait HierarchicalArraySerializationTrait
      */
     protected function processPropertiesHierarchy(array $schema): array
     {
-        $schema['properties'] = $this->transformPropertiesStructure($this->properties());
+        // Get component properties
+        $properties = $this->properties();
+        
+        // Extract top-level objects for hierarchy
+        $hierarchicalProperties = $this->extractHierarchicalStructure($properties);
+        
+        // Only use hierarchical properties in the output
+        $schema['properties'] = $hierarchicalProperties;
+        
         return $schema;
     }
+    
+    /**
+     * Extract only hierarchical properties (objects that contain other properties)
+     * 
+     * @param array $properties All component properties
+     * @return array Hierarchical properties only
+     */
+    protected function extractHierarchicalStructure(array $properties): array
+    {
+        // Get only two primary container objects - strictly hierarchical approach
+        $mainContainers = ['form_text', 'form_config'];
+        $hierarchical = [];
+        
+        // Only include the main container objects
+        foreach ($mainContainers as $containerKey) {
+            if (isset($properties[$containerKey])) {
+                // Skip hidden properties
+                if (in_array($containerKey, $this->hiddenProperties)) {
+                    continue;
+                }
+                
+                $hierarchical[$containerKey] = $properties[$containerKey];
+            }
+        }
+        
+        // If neither of the main containers exists, look for any other container objects
+        if (empty($hierarchical)) {
+            foreach ($properties as $key => $config) {
+                // Skip hidden properties
+                if (in_array($key, $this->hiddenProperties)) {
+                    continue;
+                }
+                
+                // Only include object properties with nested structure
+                $isObjectWithProperties = 
+                    (is_array($config) && isset($config['type']) && $config['type'] === 'object' && isset($config['properties'])) ||
+                    ($config instanceof Property && $config->getType() === 'object' && !empty($config->getProperties()));
+                    
+                if ($isObjectWithProperties) {
+                    $hierarchical[$key] = $config;
+                    break; // Only include one container as fallback
+                }
+            }
+        }
+        
+        // If still no hierarchical properties found, use the first property as fallback
+        if (empty($hierarchical) && !empty($properties)) {
+            // Get first property as fallback
+            $firstKey = array_key_first($properties);
+            $hierarchical[$firstKey] = $properties[$firstKey];
+        }
+        
+        return $this->transformPropertiesStructure($hierarchical);
+    }
+    
+
     
     /**
      * Transform property definitions into a hierarchical structure
@@ -109,10 +176,12 @@ trait HierarchicalArraySerializationTrait
                 ];
                 
                 // Process nested properties recursively
+                $nestedProperties = $this->transformPropertiesStructure($config['properties']);
+                
                 $result[$key] = array_merge(
                     $result[$key], 
                     $this->extractBasicConfig($config),
-                    ['properties' => $this->transformPropertiesStructure($config['properties'])]
+                    ['properties' => $nestedProperties]
                 );
             } 
             // Handle array properties with object items
@@ -135,10 +204,13 @@ trait HierarchicalArraySerializationTrait
                 if (is_array($items) && isset($items['type']) && $items['type'] === 'object' && isset($items['properties'])) {
                     $itemProperties = $items['properties'];
                     
+                    // Process nested properties in items
+                    $nestedItemProperties = $this->transformPropertiesStructure($itemProperties);
+                    
                     $items = array_merge(
                         ['type' => $items['type']],
                         $this->extractBasicConfig($items),
-                        ['properties' => $this->transformPropertiesStructure($itemProperties)]
+                        ['properties' => $nestedItemProperties]
                     );
                 }
                 

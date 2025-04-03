@@ -4,7 +4,10 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\UiSchemas\LoginSchema;
+// Include the LoginSchema directly since it's in the same directory
+require_once __DIR__ . '/LoginSchema.php';
+
+// Use the necessary namespace
 use Skillcraft\SchemaValidation\Contracts\ValidatorInterface;
 
 // Create a simple mock validator for demonstration
@@ -20,7 +23,7 @@ class DemoValidator implements ValidatorInterface
 $validator = new DemoValidator();
 
 // Create the login schema component
-$loginSchema = new LoginSchema($validator);
+$loginSchema = new \App\UiSchemas\LoginSchema($validator);
 
 // Convert to array with hierarchical structure
 $output = $loginSchema->toArray();
