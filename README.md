@@ -6,22 +6,55 @@ A flexible and extensible UI schema system for Laravel applications.
 
 UI Schema Craft provides a robust foundation for building dynamic UI components with:
 - Type-safe component definitions
-- Flexible validation (via `validation-craft`)
-- State management (via `state-craft`)
+- Flexible validation (via `skillcraft-io/schema-validation`)
+- State management (via `skillcraft-io/schema-state`)
 - Component discovery across packages
 - Component composition and nesting
+- Hook-based serialization for clean, maintainable components
 
 ## Installation
 
 ```bash
-composer require skillcraft/ui-schema-craft
+composer require skillcraft-io/ui-schema-craft
 ```
 
 This will also install the required packages:
-- `skillcraft/validation-craft`: For validation
-- `skillcraft/state-craft`: For state management
+- `skillcraft-io/schema-validation`: For validation
+- `skillcraft-io/schema-state`: For state management
 
-## Basic Usage
+## Key Features
+
+### Component Serialization
+
+The package includes a powerful trait for consistent schema serialization:
+
+```php
+use Skillcraft\UiSchemaCraft\Traits\SimplifiedArraySerializationTrait;
+
+class MyComponent extends UIComponentSchema
+{
+    use SimplifiedArraySerializationTrait;
+    
+    // Override any of these hook methods to customize schema serialization:
+    protected function buildBaseSchema(): array { /* ... */ }
+    protected function addPropertiesToSchema(array $schema): array { /* ... */ }
+    protected function addChildrenToSchema(array $schema): array { /* ... */ }
+    protected function extendSchema(array $schema): array { /* ... */ }
+}
+```
+
+### Component Composition
+
+Components can contain children for complex UI structures:
+
+```php
+$parentComponent = new CardFormComponent();
+$parentComponent->addChild('submitButton', new ButtonComponent());
+$parentComponent->addChild('emailField', new FormInputComponent());
+
+// Children are included in serialized output
+$schema = $parentComponent->toArray();
+```
 
 ### 1. Create a Component Schema
 
@@ -29,11 +62,15 @@ This will also install the required packages:
 namespace App\UiSchemas;
 
 use Skillcraft\UiSchemaCraft\Abstracts\UIComponentSchema;
-use Skillcraft\ValidationCraft\ValidationSchema;
+use Skillcraft\UiSchemaCraft\Traits\SimplifiedArraySerializationTrait;
+use Skillcraft\SchemaValidation\ValidationSchema;
 
 class TextInputSchema extends UIComponentSchema
 {
-    protected string $version = '1.0.0';
+    use SimplifiedArraySerializationTrait;
+    
+    protected string $component = 'text-input';
+    protected string $title = 'Text Input';
     
     public function properties(): array
     {
@@ -63,16 +100,41 @@ You can register components in several ways:
 // 1. Register a namespace
 $uiSchema->registerNamespace('App\\UiSchemas');
 
-// 2. Register individual components
+// 2. Register an individual component
 $uiSchema->registerComponent(TextInputSchema::class);
 
-// 3. Configure default namespace in config/ui-schema-craft.php
-return [
-    'components_namespace' => 'App\\UiSchemas'
-];
+// 3. Register using the config file
+// In config/ui-schema-craft.php, define namespaces:
+// 'namespaces' => [
+//    'App\UiSchemas',
+//    'VendorPackage\UiSchemas'
+// ]
 ```
 
-### 3. Use Components
+### 3. Component Validation
+
+Components integrate with `skillcraft-io/schema-validation` for powerful validation:
+
+```php
+use Skillcraft\SchemaValidation\Interfaces\ValidatorInterface;
+
+// Create a component
+$formComponent = new CardFormComponent();
+
+// Set required properties
+$formComponent->setProperty('title', 'Contact Form');
+
+// Validate the component
+$validator = app(ValidatorInterface::class);
+$result = $validator->validate($formComponent->toArray(), $formComponent->getValidationSchema());
+
+if (!$result['valid']) {
+    // Handle validation errors
+    $errors = $result['errors'];
+}
+```
+
+### 4. Use Components
 
 ```php
 use Skillcraft\UiSchemaCraft\Facades\UiSchema;
@@ -711,7 +773,13 @@ Validation is handled by the `validation-craft` package. See the [validation-cra
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## Testing
+
+```bash
+composer test
+```
 
 ## License
 
