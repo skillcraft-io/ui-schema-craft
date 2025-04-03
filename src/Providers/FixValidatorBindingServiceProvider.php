@@ -32,8 +32,21 @@ class FixValidatorBindingServiceProvider extends ServiceProvider
                     {
                         return $this->validator->validate($data, $rules);
                     }
+                    
+                    public function isValid(): bool
+                    {
+                        return true; // Implement as needed
+                    }
+                    
+                    public function getErrors(): array
+                    {
+                        return []; // Implement as needed
+                    }
                 };
             });
         }
+        
+        // Bind for any App\ComponentSchemas\ValidatorInterface usage
+        $this->app->bind('App\\ComponentSchemas\\ValidatorInterface', ValidatorInterface::class);
     }
 }

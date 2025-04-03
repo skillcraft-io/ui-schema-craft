@@ -225,8 +225,14 @@ class UiSchemaCraftService
             throw new \InvalidArgumentException("Component type '{$type}' not found");
         }
         
-        // Instantiate the component with our validator
-        return new $class($this->validator);
+        // Use Laravel's container to make the component with the right validator
+        // This leverages Laravel's interface binding capability so the component will
+        // receive the right validator implementation for its interface requirement
+        return app()->makeWith($class, [
+            // This will use the bindings in FixValidatorBindingServiceProvider
+            // to ensure the right validator interface is resolved
+            'validator' => $this->validator
+        ]);
     }
 
     /**
