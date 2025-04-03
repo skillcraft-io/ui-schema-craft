@@ -14,6 +14,14 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
     protected string $version = '1.0.0';
     protected ?array $validationSchema = null;
     protected string $component = '';
+    
+    /**
+     * Define the main container properties that should be included in the hierarchical output
+     * Each component can override this to specify its top-level structure
+     * 
+     * @var array
+     */
+    protected array $mainContainers = [];
 
     public function __construct(
         protected readonly ValidatorInterface $validator

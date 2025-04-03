@@ -101,7 +101,39 @@ trait HierarchicalArraySerializationTrait
     {
         $hierarchical = [];
         
-        // Automatically detect and include all container objects
+        // First check if component has defined main containers
+        if (!empty($this->mainContainers)) {
+            // Only include the explicitly defined main containers
+            foreach ($this->mainContainers as $containerKey) {
+                if (isset($properties[$containerKey]) && !in_array($containerKey, $this->hiddenProperties)) {
+                    $hierarchical[$containerKey] = $properties[$containerKey];
+                }
+            }
+            
+            // If mainContainers is defined but none were found, fall back to auto-detection
+            if (empty($hierarchical)) {
+                return $this->autoDetectContainers($properties);
+            }
+            
+            return $this->transformPropertiesStructure($hierarchical);
+        }
+        
+        // No explicit mainContainers defined, auto-detect container objects
+        return $this->autoDetectContainers($properties);
+    }
+    
+    /**
+     * Auto-detect container objects in properties
+     * 
+     * @param array $properties Component properties
+     * @return array Hierarchical properties
+     */
+    protected function autoDetectContainers(array $properties): array
+    {
+        $hierarchical = [];
+        $alreadyProcessed = [];
+        
+        // First pass: identify all objects with nested properties
         foreach ($properties as $key => $config) {
             // Skip hidden properties
             if (in_array($key, $this->hiddenProperties)) {
@@ -115,6 +147,18 @@ trait HierarchicalArraySerializationTrait
                 
             if ($isObjectWithProperties) {
                 $hierarchical[$key] = $config;
+                $alreadyProcessed[] = $key;
+                
+                // Add nested properties to the processed list to avoid duplication
+                $nestedProps = is_array($config) ? ($config['properties'] ?? []) : $config->getProperties();
+                $this->trackNestedProperties($nestedProps, $alreadyProcessed);
+            }
+        }
+        
+        // Remove any properties that are already included inside other containers
+        foreach ($alreadyProcessed as $processedKey) {
+            if (isset($hierarchical[$processedKey]) && in_array($processedKey, $alreadyProcessed, true)) {
+                unset($hierarchical[$processedKey]);
             }
         }
         
@@ -126,6 +170,27 @@ trait HierarchicalArraySerializationTrait
         }
         
         return $this->transformPropertiesStructure($hierarchical);
+    }
+    
+    /**
+     * Track nested property names to avoid duplication
+     * 
+     * @param array $properties Nested properties to track
+     * @param array &$processed Reference to array of processed property names
+     * @return void
+     */
+    protected function trackNestedProperties(array $properties, array &$processed): void
+    {
+        foreach ($properties as $key => $prop) {
+            $processed[] = $key;
+            
+            // Recursively track nested properties
+            if (is_array($prop) && isset($prop['properties'])) {
+                $this->trackNestedProperties($prop['properties'], $processed);
+            } elseif ($prop instanceof Property && !empty($prop->getProperties())) {
+                $this->trackNestedProperties($prop->getProperties(), $processed);
+            }
+        }
     }
     
 

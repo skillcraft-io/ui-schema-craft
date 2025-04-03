@@ -12,6 +12,15 @@ class LoginSchema extends UIComponentSchema
     protected string $component = 'Login';
     protected string $version = '1.0.0';
     protected string $description = 'Login Page schema for authentication';
+    
+    /**
+     * Define which properties should be considered top-level containers
+     * This controls the hierarchical structure of the output
+     */
+    protected array $mainContainers = [
+        'form_text',
+        'form_config'
+    ];
 
     public function __construct(ValidatorInterface $validator) 
     {
