@@ -29,16 +29,6 @@ class LoginSchema extends UIComponentSchema
         'username' => 'required|string|min:3',
         'password' => 'required|string|min:8',
     ];
-
-    /**
-     * Constructor with optional validator support
-     * 
-     * @param ValidatorInterface|null $validator Optional validator instance
-     */
-    public function __construct(?ValidatorInterface $validator = null) 
-    {
-        parent::__construct($validator);
-    }
     
     /**
      * Get example data for this component
