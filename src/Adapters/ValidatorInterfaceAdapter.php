@@ -105,40 +105,81 @@ class ValidatorInterfaceAdapter
             return $className;
         }
         
-        // Create a class definition that implements the target interface
-        // and forwards all calls to our package validator
-        $code = "
-            class {$className} implements \\{$targetInterface}
-            {
-                private \Skillcraft\SchemaValidation\Contracts\ValidatorInterface \$validator;
-                
-                public function __construct(\Skillcraft\SchemaValidation\Contracts\ValidatorInterface \$validator)
+        // Check if the interface exists - if not, create a class that just proxies to our validator
+        if (!interface_exists($targetInterface)) {
+            // Create a class that just forwards calls to our validator
+            $code = "
+                class {$className}
                 {
-                    \$this->validator = \$validator;
+                    private \Skillcraft\SchemaValidation\Contracts\ValidatorInterface \$validator;
+                    
+                    public function __construct(\Skillcraft\SchemaValidation\Contracts\ValidatorInterface \$validator)
+                    {
+                        \$this->validator = \$validator;
+                    }
+                    
+                    public function __call(string \$method, array \$arguments)
+                    {
+                        return \$this->validator->{\$method}(...\$arguments);
+                    }
+                    
+                    // Implement key methods that are likely to be called
+                    public function validate(array \$data, array \$schema): array
+                    {
+                        return \$this->validator->validate(\$data, \$schema);
+                    }
+                    
+                    public function isValid(): bool
+                    {
+                        return \$this->validator->isValid();
+                    }
+                    
+                    public function getErrors(): array
+                    {
+                        return \$this->validator->getErrors();
+                    }
                 }
-                
-                public function __call(string \$method, array \$arguments)
-                {
-                    return \$this->validator->{\$method}(...\$arguments);
-                }
-                
-                // Implement key methods from ValidatorInterface (these would need to be customized based on the actual interface)
-                public function validate(array \$data, array \$schema): array
-                {
-                    return \$this->validator->validate(\$data, \$schema);
-                }
-                
-                public function isValid(): bool
-                {
-                    return \$this->validator->isValid();
-                }
-                
-                public function getErrors(): array
-                {
-                    return \$this->validator->getErrors();
-                }
+            ";
+            
+            // Log the missing interface
+            if (class_exists(\Illuminate\Support\Facades\Log::class)) {
+                \Illuminate\Support\Facades\Log::warning("Interface {$targetInterface} not found. Creating proxy class without interface.");
             }
-        ";
+        } else {
+            // Interface exists, create a class that implements it
+            $code = "
+                class {$className} implements \{$targetInterface}
+                {
+                    private \Skillcraft\SchemaValidation\Contracts\ValidatorInterface \$validator;
+                    
+                    public function __construct(\Skillcraft\SchemaValidation\Contracts\ValidatorInterface \$validator)
+                    {
+                        \$this->validator = \$validator;
+                    }
+                    
+                    public function __call(string \$method, array \$arguments)
+                    {
+                        return \$this->validator->{\$method}(...\$arguments);
+                    }
+                    
+                    // Implement key methods from ValidatorInterface
+                    public function validate(array \$data, array \$schema): array
+                    {
+                        return \$this->validator->validate(\$data, \$schema);
+                    }
+                    
+                    public function isValid(): bool
+                    {
+                        return \$this->validator->isValid();
+                    }
+                    
+                    public function getErrors(): array
+                    {
+                        return \$this->validator->getErrors();
+                    }
+                }
+            ";
+        }
         
         // Evaluate the code to define the class
         eval($code);
