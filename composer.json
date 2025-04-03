@@ -1,12 +1,12 @@
 {
-    "name": "skillcraft/ui-schema-craft",
+    "name": "skillcraft-io/ui-schema-craft",
     "description": "UI Schema Craft - A flexible UI component schema system",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "William Troiano",
-            "email": "william@skillcraft.io"
+            "email": "william.troiano@pm.me"
         }
     ],
     "require": {
