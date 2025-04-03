@@ -249,10 +249,18 @@ class UiSchemaCraftService
                 
                 // Check if the component has an example data method
                 if (method_exists($component, 'getExampleData')) {
-                    $examples[$type] = $component->getExampleData();
+                    $exampleData = $component->getExampleData();
+                    
+                    // Ensure we're dealing with an array
+                    if (is_array($exampleData)) {
+                        $examples[$type] = $exampleData;
+                    }
                 }
             } catch (\Exception $e) {
-                // Skip components that can't be resolved
+                // Log error but continue with other components
+                if (app()->hasDebugModeEnabled()) {
+                    logger()->error("Error getting example data for component type {$type}: " . $e->getMessage());
+                }
                 continue;
             }
         }
@@ -275,9 +283,19 @@ class UiSchemaCraftService
         foreach ($types as $type) {
             try {
                 $component = $this->resolveComponent($type);
-                $schemas[$type] = $component->toArray();
+                
+                // Make sure we safely convert to array, handling Property objects
+                $componentSchema = $component->toArray();
+                
+                // Verify we're working with an array before adding it
+                if (is_array($componentSchema)) {
+                    $schemas[$type] = $componentSchema;
+                }
             } catch (\Exception $e) {
-                // Skip components that can't be resolved
+                // Log error but continue with other components
+                if (app()->hasDebugModeEnabled()) {
+                    logger()->error("Error resolving component schema for type {$type}: " . $e->getMessage());
+                }
                 continue;
             }
         }
