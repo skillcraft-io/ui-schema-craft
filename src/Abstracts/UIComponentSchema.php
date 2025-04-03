@@ -5,10 +5,12 @@ namespace Skillcraft\UiSchemaCraft\Abstracts;
 use Skillcraft\SchemaValidation\Contracts\ValidatorInterface;
 use Skillcraft\UiSchemaCraft\Exceptions\ValidationException;
 use Skillcraft\UiSchemaCraft\Exceptions\ValidationSchemaNotDefinedException;
+use Skillcraft\UiSchemaCraft\Traits\HierarchicalArraySerializationTrait;
 use Illuminate\Support\Str;
 
 abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\UIComponentSchemaInterface
 {
+    use HierarchicalArraySerializationTrait;
     protected string $version = '1.0.0';
     protected ?array $validationSchema = null;
     protected string $component = '';
@@ -30,18 +32,7 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
         return $this->version;
     }
 
-    /**
-     * Convert component to array
-     */
-    public function toArray(): array
-    {
-        return [
-            'type' => $this->getType(),
-            'version' => $this->version,
-            'component' => $this->getComponent(),
-            'properties' => $this->properties()
-        ];
-    }
+    // toArray() implementation is now provided by HierarchicalArraySerializationTrait
 
     /**
      * Get component type
