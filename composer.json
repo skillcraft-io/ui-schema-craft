@@ -12,7 +12,7 @@
     "require": {
         "php": "^8.3|^8.4",
         "illuminate/support": "^10.0|^11.0|^12.0",
-        "symfony/finder": "^6.0",
+        "symfony/finder": "^6.0|^7.0",
         "skillcraft-io/schema-validation": "dev-main",
         "skillcraft-io/schema-state": "dev-main"
     },
