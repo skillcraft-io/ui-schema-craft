@@ -29,19 +29,6 @@ class LoginSchema extends UIComponentSchema
         'username' => 'required|string|min:3',
         'password' => 'required|string|min:8',
     ];
-    
-    /**
-     * Get example data for this component
-     * 
-     * @return array Example data
-     */
-    public function getExampleData(): array
-    {
-        return [
-            'username' => 'john_doe',
-            'password' => 'secure_password',
-        ];
-    }
 
     /**
      * Define the component properties schema

@@ -250,50 +250,7 @@ class UiSchemaCraftService
         }
     }
 
-    /**
-     * Get example data from all available components
-     *
-     * This method maps all registered components and retrieves their example data
-     * if they implement a getExampleData method. The output is guaranteed to have
-     * the same structure as getAllSchemas() with component types as keys.
-     *
-     * @return array Associative array of component types and their example data
-     */
-    public function getAllExampleData(): array
-    {
-        $examples = [];
-        $types = $this->resolver->getTypes();
-
-        foreach ($types as $type) {
-            try {
-                $component = $this->resolveComponent($type);
-                
-                // Check if the component has an example data method
-                if (method_exists($component, 'getExampleData')) {
-                    $exampleData = $component->getExampleData();
-                    
-                    // Ensure we're dealing with an array
-                    if (is_array($exampleData)) {
-                        // Make sure type is included in the example data
-                        $examples[$type] = $exampleData;
-                    }
-                }
-            } catch (\Exception $e) {
-                // Log error but continue with other components
-                if (app()->hasDebugModeEnabled()) {
-                    logger()->error("Error getting example data for component type {$type}: " . $e->getMessage());
-                }
-                continue;
-            }
-        }
-        
-        // If no components provided examples, return empty array
-        if (empty($examples)) {
-            return [];
-        }
-        
-        return $examples;
-    }
+    // getAllExampleData removed - use getAllSchemas and process the data as needed
 
     /**
      * Get schemas for all registered components
