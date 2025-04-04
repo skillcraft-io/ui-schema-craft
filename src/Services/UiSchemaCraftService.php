@@ -348,12 +348,52 @@ class UiSchemaCraftService
         // If example is empty or not available, try to use properties() method
         $properties = $component->properties();
         if (!empty($properties)) {
-            // If properties() returns data directly, wrap it in config for consistent format
-            return ['config' => $properties];
+            // Extract just the example values from PropertyBuilder schema
+            $configValues = $this->extractExampleValues($properties);
+            if (!empty($configValues)) {
+                return ['config' => $configValues];
+            }
         }
         
         // If both example and properties() are empty, return empty array
         return [];
+    }
+    
+    /**
+     * Extract example values from PropertyBuilder schema
+     *
+     * @param array $properties PropertyBuilder schema array
+     * @return array Extracted example values
+     */
+    protected function extractExampleValues(array $properties): array
+    {
+        $result = [];
+        
+        foreach ($properties as $key => $property) {
+            // Skip metadata entries (type, nullable, etc.)
+            if (in_array($key, ['type', 'nullable', 'description', 'required'])) {
+                continue;
+            }
+            
+            // If this is an object with nested properties, process them recursively
+            if (isset($property['type']) && $property['type'] === 'object' && isset($property['properties'])) {
+                $result[$key] = $this->extractExampleValues($property['properties']);
+                continue;
+            }
+            
+            // For arrays, extract the example if present
+            if (isset($property['type']) && $property['type'] === 'array' && isset($property['example'])) {
+                $result[$key] = $property['example'];
+                continue;
+            }
+            
+            // Extract example value if present
+            if (isset($property['example'])) {
+                $result[$key] = $property['example'];
+            }
+        }
+        
+        return $result;
     }
     
     /**
