@@ -54,6 +54,11 @@ class Property
     protected mixed $example = null;
     
     /**
+     * The current runtime value of this property.
+     */
+    protected mixed $value = null;
+    
+    /**
      * Validation rules applied to the property
      * 
      * @var array
@@ -248,6 +253,39 @@ class Property
     public function getExample(): mixed
     {
         return $this->example;
+    }
+    
+    /**
+     * Set the runtime value for this property
+     * 
+     * @param mixed $value The current runtime value (e.g., from API data)
+     * @return self
+     */
+    public function value(mixed $value): self
+    {
+        return $this->setValue($value);
+    }
+    
+    /**
+     * Set the runtime value for this property
+     * 
+     * @param mixed $value The current runtime value (e.g., from API data)
+     * @return self
+     */
+    public function setValue(mixed $value): self
+    {
+        $this->value = $value;
+        return $this;
+    }
+    
+    /**
+     * Get the runtime value
+     * 
+     * @return mixed The current runtime value
+     */
+    public function getValue(): mixed
+    {
+        return $this->value;
     }
 
     public function addRule(string $rule): self
@@ -619,6 +657,10 @@ class Property
 
         if ($this->example !== null) {
             $array['example'] = $this->example;
+        }
+        
+        if ($this->value !== null) {
+            $array['value'] = $this->value;
         }
 
         $array['required'] = $this->isRequired;
