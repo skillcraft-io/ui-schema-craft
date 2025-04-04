@@ -331,27 +331,63 @@ class UiSchemaCraftService
         
         // Extract just the properties section
         if (isset($schema['properties']) && is_array($schema['properties'])) {
-            $result = $this->flattenProperties($schema['properties']);
+            $properties = $this->flattenProperties($schema['properties']);
+        } else {
+            $properties = [];
         }
         
-        // If component has mainContainers defined, organize the output accordingly
-        if (property_exists($component, 'mainContainers') && !empty($component->mainContainers)) {
-            $containerResult = [];
+        // Use reflection to check for protected example property
+        $reflection = new \ReflectionClass($component);
+        $hasExample = $reflection->hasProperty('example');
+        $hasExampleValue = false;
+        
+        if ($hasExample) {
+            $exampleProp = $reflection->getProperty('example');
+            $exampleProp->setAccessible(true);
+            $example = $exampleProp->getValue($component);
             
-            foreach ($component->mainContainers as $container) {
-                if (isset($result[$container])) {
-                    // For container properties, include them in the top level
-                    if (isset($result[$container]['properties'])) {
-                        $containerResult[$container] = $result[$container]['properties'];
-                    } else {
-                        $containerResult[$container] = $result[$container];
-                    }
-                }
+            // If component has an explicit example format, use that directly
+            if (!empty($example)) {
+                $result = $example;
+                $hasExampleValue = true;
+            }
+        }
+        
+        // If we don't have a valid example value, build from properties
+        if (!$hasExampleValue) {
+            // Check for mainContainers property using reflection
+            $hasMainContainers = $reflection->hasProperty('mainContainers');
+            $mainContainers = [];
+            
+            if ($hasMainContainers) {
+                $mainContainersProp = $reflection->getProperty('mainContainers');
+                $mainContainersProp->setAccessible(true);
+                $mainContainers = $mainContainersProp->getValue($component);
             }
             
-            // If we found container properties, use that structure
-            if (!empty($containerResult)) {
-                $result = $containerResult;
+            // Construct the format based on mainContainers
+            if (!empty($mainContainers)) {
+                $containerResult = [];
+                
+                foreach ($mainContainers as $container) {
+                    if (isset($properties[$container])) {
+                        // For container properties, include them in the correct structure
+                        if (isset($properties[$container]['properties'])) {
+                            $containerResult[$container] = $properties[$container]['properties'];
+                        } else {
+                            $containerResult[$container] = $properties[$container];
+                        }
+                    }
+                }
+                
+                // If we found container properties, use that structure
+                if (!empty($containerResult)) {
+                    // Wrap in 'config' to match the example format
+                    $result['config'] = $containerResult;
+                }
+            } else {
+                // If no mainContainers, still wrap in 'config' for consistency
+                $result['config'] = $properties;
             }
         }
         
