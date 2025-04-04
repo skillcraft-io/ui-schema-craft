@@ -114,24 +114,48 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
     }
     
     /**
-     * Get example data for the component
+     * Get example data for this component
      *
-     * This default implementation extracts example data from property definitions,
-     * looking for 'example' or 'example_data' keys in the property definitions.
-     * Components can override this method to provide custom example data.
-     *
-     * @return array Example data for this component
+     * @return array Example data specifically formatted for actual use in forms/UIs
      */
     public function getExampleData(): array
     {
-        $exampleData = [
-            'type' => $this->getType(),
-            'component' => $this->getComponent(),
-        ];
+        // Core component properties - useful for UI routing/identification
+        $result = [];
         
         // Process the properties to extract example values
         $properties = $this->properties();
-        $propertyValues = [];
+        
+        // Extract examples from nested properties recursively
+        $extractedValues = $this->extractExampleValues($properties);
+        
+        // If we have main containers defined, structure the result hierarchically
+        if (!empty($this->mainContainers)) {
+            foreach ($this->mainContainers as $container) {
+                if (isset($extractedValues[$container]) && is_array($extractedValues[$container])) {
+                    $result[$container] = $extractedValues[$container];
+                    unset($extractedValues[$container]);
+                }
+            }
+        }
+        
+        // Add any remaining properties at the root level
+        foreach ($extractedValues as $key => $value) {
+            $result[$key] = $value;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Recursively extract example values from property configuration
+     *
+     * @param array $properties Property configuration array
+     * @return array Extracted example values
+     */
+    protected function extractExampleValues(array $properties): array
+    {
+        $result = [];
         
         foreach ($properties as $propertyName => $propertyConfig) {
             // Skip any property that doesn't have a structure we recognize
@@ -139,25 +163,27 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
                 continue;
             }
             
+            // Handle nested objects recursively
+            if (isset($propertyConfig['properties']) && is_array($propertyConfig['properties'])) {
+                $result[$propertyName] = $this->extractExampleValues($propertyConfig['properties']);
+                continue;
+            }
+            
             // First try the 'example' key (used by PropertyBuilder)
             if (isset($propertyConfig['example'])) {
-                $propertyValues[$propertyName] = $propertyConfig['example'];
+                $result[$propertyName] = $propertyConfig['example'];
             }
             // Then fall back to 'example_data' key (may be used in some components)
             elseif (isset($propertyConfig['example_data'])) {
-                $propertyValues[$propertyName] = $propertyConfig['example_data'];
+                $result[$propertyName] = $propertyConfig['example_data'];
             }
             // Use default value as a last resort
             elseif (isset($propertyConfig['default'])) {
-                $propertyValues[$propertyName] = $propertyConfig['default'];
+                $result[$propertyName] = $propertyConfig['default'];
             }
         }
         
-        if (!empty($propertyValues)) {
-            $exampleData['properties'] = $propertyValues;
-        }
-        
-        return $exampleData;
+        return $result;
     }
 
 
