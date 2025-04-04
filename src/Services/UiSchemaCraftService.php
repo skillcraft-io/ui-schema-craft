@@ -331,73 +331,7 @@ class UiSchemaCraftService
      */
     protected function extractComponentValues(UIComponentSchema $component): array
     {
-        $className = get_class($component);
-        
-        // Special handling for LoginSchema class
-        if (strpos($className, 'LoginSchema') !== false) {
-            return [
-                'config' => [
-                    'form_text' => [
-                        'title' => 'Log In',
-                        'faq_title' => 'Frequently Asked Questions',
-                        'login_text' => "Don't have an account?",
-                    ],
-                    'form_config' => [
-                        'endpoint' => "/action/login",
-                        'schema' => [
-                            'email' => [
-                                'type' => 'text',
-                                'inputType' => 'email',
-                                'rules' => ['required', 'email'],
-                                'label' => 'Email',
-                                'placeholder' => 'Enter Your Email',
-                                'floating' => false,
-                            ],
-                            'password' => [
-                                'type' => 'text',
-                                'inputType' => 'password',
-                                'rules' => ['required', 'min:8'],
-                                'label' => 'Password',
-                                'placeholder' => 'Enter Your Password',
-                                'floating' => false,
-                            ],
-                            'link' => [
-                                'type' => 'static',
-                                'content' => 'Forgot Password',
-                                'tag' => 'a',
-                                'href' => '/forgot-password',
-                                'align' => 'right',
-                            ],
-                            'primaryButton' => [
-                                'type' => 'button',
-                                'buttonLabel' => 'Log In',
-                                'submits' => true,
-                                'size' => 'lg',
-                                'full' => true,
-                            ],
-                        ],
-                    ],
-                    'ui' => [
-                        'field' => [
-                            'general' => 'mt-1 block w-full rounded-md shadow-sm',
-                            'colors' => 'placeholder-gray-400 text-black border-gray-300',
-                            'focus' => 'focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
-                        ],
-                        'label' => [
-                            'text' => 'block font-medium text-sm text-white',
-                        ],
-                        'button' => [
-                            'general' => 'w-full border rounded-md shadow-sm',
-                            'padding' => 'px-4 py-2',
-                            'colors' => 'text-white bg-gray-800 border-transparent hover:bg-gray-900',
-                            'text' => 'text-lg font-medium',
-                        ]
-                    ]
-                ]
-            ];
-        }
-        
-        // For other components, try to use reflection to access protected example property
+        // Use reflection to access protected example property
         $reflection = new \ReflectionClass($component);
         
         if ($reflection->hasProperty('example')) {
