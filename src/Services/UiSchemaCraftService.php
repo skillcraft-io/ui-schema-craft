@@ -305,9 +305,17 @@ class UiSchemaCraftService
                 $component = $this->resolveComponent($type);
                 $componentValue = $this->extractComponentValues($component);
                 
-                // Extract proper name from the class for use as the key (loginschema, etc.)
+                // Extract original component name for use as the key (preserving case for backward compatibility)
+                // First check if the component has a protected $component property
                 $reflection = new \ReflectionClass($component);
-                $shortName = strtolower(str_replace('Schema', '', $reflection->getShortName()));
+                if ($reflection->hasProperty('component')) {
+                    $componentProp = $reflection->getProperty('component');
+                    $componentProp->setAccessible(true);
+                    $shortName = $componentProp->getValue($component);
+                } else {
+                    // Fallback: use the class short name without 'Schema' suffix but preserve case
+                    $shortName = str_replace('Schema', '', $reflection->getShortName());
+                }
                 
                 // Place extracted component values directly under the key
                 $componentsValues[$shortName] = $componentValue;
