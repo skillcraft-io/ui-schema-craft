@@ -339,13 +339,20 @@ class UiSchemaCraftService
             $exampleProp->setAccessible(true);
             $example = $exampleProp->getValue($component);
             
-            // If component has an example property, use it exactly as-is
+            // If component has a non-empty example property, use it exactly as-is
             if (!empty($example)) {
                 return $example;
             }
         }
         
-        // If no example available, return empty array
+        // If example is empty or not available, try to use properties() method
+        $properties = $component->properties();
+        if (!empty($properties)) {
+            // If properties() returns data directly, wrap it in config for consistent format
+            return ['config' => $properties];
+        }
+        
+        // If both example and properties() are empty, return empty array
         return [];
     }
     
