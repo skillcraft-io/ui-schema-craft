@@ -414,4 +414,130 @@ class UiSchemaCraftService
         
         return $result;
     }
+    
+    /**
+     * Get property examples for all registered components
+     *
+     * This method outputs examples/values of each property in a structured format
+     * with container and property keys grouped under a 'config' key
+     *
+     * @return array Array of component examples in the format ['config' => ['container_key' => ['property_key' => 'property_value']]]
+     */
+    public function getPropertyExamples(): array
+    {
+        $result = [];
+        $schemas = $this->getAllSchemas();
+        
+        foreach ($schemas as $type => $schema) {
+            // Get the component
+            try {
+                $component = $this->resolveComponent($type);
+                
+                // Extract component name for use as container key
+                $reflection = new \ReflectionClass($component);
+                $containerKey = null;
+                
+                if ($reflection->hasProperty('component')) {
+                    $componentProp = $reflection->getProperty('component');
+                    $componentProp->setAccessible(true);
+                    $containerKey = $componentProp->getValue($component);
+                } else {
+                    // Fallback: use the class short name without 'Schema' suffix
+                    $containerKey = str_replace('Schema', '', $reflection->getShortName());
+                }
+                
+                // Initialize the config structure if not exists
+                if (!isset($result['config'])) {
+                    $result['config'] = [];
+                }
+                
+                // Extract property values
+                $propertyValues = $this->extractComponentPropertyValues($component);
+                
+                if (!empty($propertyValues)) {
+                    $result['config'][$containerKey] = $propertyValues;
+                }
+            } catch (\Exception $e) {
+                // Log error but continue with other components
+                if (app()->hasDebugModeEnabled()) {
+                    logger()->error("Error extracting property examples for type {$type}: " . $e->getMessage());
+                }
+                continue;
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Extract property values from a component
+     *
+     * @param UIComponentSchema $component The component to extract property values from
+     * @return array The extracted property values
+     */
+    protected function extractComponentPropertyValues(UIComponentSchema $component): array
+    {
+        $result = [];
+        
+        // Check if component has schema method
+        $schema = $component->toArray();
+        
+        if (isset($schema['properties'])) {
+            // Process each property in the schema
+            foreach ($schema['properties'] as $key => $property) {
+                // Extract property value or default
+                if (isset($property['example'])) {
+                    $result[$key] = $property['example'];
+                } elseif (isset($property['value'])) {
+                    $result[$key] = $property['value'];
+                } elseif (isset($property['default'])) {
+                    $result[$key] = $property['default'];
+                } elseif (isset($property['enum']) && !empty($property['enum'])) {
+                    // Use first enum value as example
+                    $result[$key] = $property['enum'][0];
+                }
+                
+                // Handle special property types
+                if (isset($property['type'])) {
+                    // For objects with properties, recursively process
+                    if ($property['type'] === 'object' && isset($property['properties'])) {
+                        $nestedValues = [];
+                        foreach ($property['properties'] as $nestedKey => $nestedProperty) {
+                            if (isset($nestedProperty['example'])) {
+                                $nestedValues[$nestedKey] = $nestedProperty['example'];
+                            } elseif (isset($nestedProperty['value'])) {
+                                $nestedValues[$nestedKey] = $nestedProperty['value'];
+                            } elseif (isset($nestedProperty['default'])) {
+                                $nestedValues[$nestedKey] = $nestedProperty['default'];
+                            }
+                        }
+                        
+                        if (!empty($nestedValues)) {
+                            $result[$key] = $nestedValues;
+                        }
+                    }
+                    
+                    // For arrays with items, provide example structure
+                    elseif ($property['type'] === 'array' && isset($property['items'])) {
+                        // If example array is provided, use it
+                        if (isset($property['examples']) && !empty($property['examples'])) {
+                            $result[$key] = $property['examples'];
+                        } 
+                        // Or create an example with one item based on the items schema
+                        elseif (isset($property['items']['example'])) {
+                            $result[$key] = [$property['items']['example']];
+                        } elseif (isset($property['items']['value'])) {
+                            $result[$key] = [$property['items']['value']];
+                        } elseif (isset($property['items']['default'])) {
+                            $result[$key] = [$property['items']['default']];
+                        } elseif (isset($property['items']['enum']) && !empty($property['items']['enum'])) {
+                            $result[$key] = [$property['items']['enum'][0]];
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $result;
+    }
 }
