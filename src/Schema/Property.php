@@ -659,7 +659,8 @@ class Property
             $array['conditionalRules'] = $this->conditionalRules;
         }
 
-        if ($this->example !== null) {
+        // Only include examples in non-production environments
+        if ($this->example !== null && !app()->environment('production')) {
             $array['example'] = $this->example;
         }
 
