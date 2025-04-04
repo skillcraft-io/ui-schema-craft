@@ -286,4 +286,121 @@ class UiSchemaCraftService
 
         return $schemas;
     }
+    
+    /**
+     * Get simplified values for all registered components
+     *
+     * This method provides a frontend-friendly version of component schemas
+     * with just the values/defaults needed for rendering, without the schema metadata
+     *
+     * @return array Associative array of component types and their consumable values
+     */
+    public function getAllComponentValues(): array
+    {
+        $componentsValues = [];
+        $types = $this->resolver->getTypes();
+
+        foreach ($types as $type) {
+            try {
+                $component = $this->resolveComponent($type);
+                $componentsValues[$type] = $this->extractComponentValues($component);
+            } catch (\Exception $e) {
+                // Log error but continue with other components
+                if (app()->hasDebugModeEnabled()) {
+                    logger()->error("Error extracting component values for type {$type}: " . $e->getMessage());
+                }
+                continue;
+            }
+        }
+
+        return $componentsValues;
+    }
+    
+    /**
+     * Extract consumable values from a component
+     *
+     * @param UIComponentSchema $component The component to extract values from
+     * @return array The simplified value structure for frontend consumption
+     */
+    protected function extractComponentValues(UIComponentSchema $component): array
+    {
+        $result = [];
+        
+        // Get the full schema with all metadata
+        $schema = $component->toArray();
+        
+        // Extract just the properties section
+        if (isset($schema['properties']) && is_array($schema['properties'])) {
+            $result = $this->flattenProperties($schema['properties']);
+        }
+        
+        // If component has mainContainers defined, organize the output accordingly
+        if (property_exists($component, 'mainContainers') && !empty($component->mainContainers)) {
+            $containerResult = [];
+            
+            foreach ($component->mainContainers as $container) {
+                if (isset($result[$container])) {
+                    // For container properties, include them in the top level
+                    if (isset($result[$container]['properties'])) {
+                        $containerResult[$container] = $result[$container]['properties'];
+                    } else {
+                        $containerResult[$container] = $result[$container];
+                    }
+                }
+            }
+            
+            // If we found container properties, use that structure
+            if (!empty($containerResult)) {
+                $result = $containerResult;
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Recursively flatten properties to extract values/defaults
+     *
+     * @param array $properties The properties to flatten
+     * @return array The flattened values
+     */
+    protected function flattenProperties(array $properties): array
+    {
+        $result = [];
+        
+        foreach ($properties as $key => $property) {
+            // If this is an object with nested properties
+            if (isset($property['type']) && $property['type'] === 'object' && isset($property['properties'])) {
+                // Process the nested properties
+                $nestedResult = $this->flattenProperties($property['properties']);
+                
+                // Include values/defaults from this level
+                $result[$key] = [];
+                
+                if (isset($property['value'])) {
+                    $result[$key]['value'] = $property['value'];
+                } elseif (isset($property['default'])) {
+                    $result[$key]['value'] = $property['default'];
+                }
+                
+                // Add nested properties
+                $result[$key]['properties'] = $nestedResult;
+            } else {
+                // For simple properties, just extract the value or default
+                if (isset($property['value'])) {
+                    $result[$key] = $property['value'];
+                } elseif (isset($property['default'])) {
+                    $result[$key] = $property['default'];
+                } else {
+                    // For complex properties, keep the structure but remove unnecessary fields
+                    $cleanedProperty = array_diff_key($property, array_flip(['required', 'description', 'example']));
+                    if (!empty($cleanedProperty)) {
+                        $result[$key] = $cleanedProperty;
+                    }
+                }
+            }
+        }
+        
+        return $result;
+    }
 }
