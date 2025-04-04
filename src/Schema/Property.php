@@ -607,6 +607,10 @@ class Property
         if ($this->default !== null) {
             $array['default'] = $this->default;
         }
+        
+        if ($this->value !== null) {
+            $array['value'] = $this->value;
+        }
 
         if ($this->format !== null) {
             $array['format'] = $this->format;
@@ -657,10 +661,6 @@ class Property
 
         if ($this->example !== null) {
             $array['example'] = $this->example;
-        }
-        
-        if ($this->value !== null) {
-            $array['value'] = $this->value;
         }
 
         $array['required'] = $this->isRequired;
