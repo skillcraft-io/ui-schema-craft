@@ -459,7 +459,7 @@ class UiSchemaCraftService
                 }
             } catch (\Exception $e) {
                 // Log error but continue with other components
-                if (app()->hasDebugModeEnabled()) {
+                if ($this->isDebugModeEnabled()) {
                     logger()->error("Error extracting property examples for type {$type}: " . $e->getMessage());
                 }
                 continue;
@@ -539,5 +539,19 @@ class UiSchemaCraftService
         }
         
         return $result;
+    }
+    
+    /**
+     * Check if debug mode is enabled
+     * 
+     * @return bool
+     */
+    protected function isDebugModeEnabled(): bool
+    {
+        try {
+            return config('app.debug', false) === true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
