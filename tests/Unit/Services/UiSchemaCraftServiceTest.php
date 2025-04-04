@@ -1190,45 +1190,46 @@ protected function tearDown(): void
                 ]
             ];
             
-            // Override getAllSchemas to return our test schema
+            // Override getAllSchemas to return our test schema using PropertyBuilder
             public function getAllSchemas(): array
             {
+                // Create a PropertyBuilder instance for defining properties
+                $builder = new \Skillcraft\UiSchemaCraft\Schema\PropertyBuilder();
+                
+                // Add simple property with example
+                $builder->string('simpleProperty')
+                    ->required()
+                    ->example('Example Value');
+                
+                // Add property with default value
+                $builder->number('defaultProperty')
+                    ->setDefault(42);
+                
+                // Add enum property
+                $builder->string('enumProperty')
+                    ->enum(['option1', 'option2', 'option3']);
+                
+                // Add object property with nested properties
+                $builder->object('objectProperty')
+                    ->properties([
+                        $builder->string('nestedProp')
+                            ->example('Nested Example')
+                    ]);
+                
+                // Add array property with examples
+                $builder->array('arrayProperty')
+                    ->items([
+                        'type' => 'string',
+                        'example' => 'Array Item Example'
+                    ])
+                    ->addAttribute('examples', ['Item 1', 'Item 2']);
+                
+                // Convert to the expected format
                 return [
                     'example-component' => [
                         'type' => 'example-component',
                         'version' => '1.0.0',
-                        'properties' => [
-                            'simpleProperty' => [
-                                'type' => 'string',
-                                'example' => 'Example Value',
-                                'required' => true
-                            ],
-                            'defaultProperty' => [
-                                'type' => 'number',
-                                'default' => 42
-                            ],
-                            'enumProperty' => [
-                                'type' => 'string',
-                                'enum' => ['option1', 'option2', 'option3']
-                            ],
-                            'objectProperty' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'nestedProp' => [
-                                        'type' => 'string',
-                                        'example' => 'Nested Example'
-                                    ]
-                                ]
-                            ],
-                            'arrayProperty' => [
-                                'type' => 'array',
-                                'items' => [
-                                    'type' => 'string',
-                                    'example' => 'Array Item Example'
-                                ],
-                                'examples' => ['Item 1', 'Item 2']
-                            ]
-                        ]
+                        'properties' => $builder->toArray()
                     ]
                 ];
             }
