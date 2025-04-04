@@ -1135,49 +1135,36 @@ protected function tearDown(): void
             
             public function properties(): array
             {
-                // Use PropertyBuilder pattern to define properties
+                // Use PropertyBuilder pattern similar to LoginSchema example
                 $builder = new \Skillcraft\UiSchemaCraft\Schema\PropertyBuilder();
                 
                 // Add simple property with example
-                $builder->add(
-                    (new \Skillcraft\UiSchemaCraft\Schema\Property('simpleProperty', 'string'))
-                        ->example('Example Value')
-                        ->rules(['required'])
-                );
+                $builder->string('simpleProperty')
+                    ->required()
+                    ->example('Example Value');
                 
                 // Add property with default value
-                $builder->add(
-                    (new \Skillcraft\UiSchemaCraft\Schema\Property('defaultProperty', 'number'))
-                        ->setDefault(42)
-                );
+                $builder->number('defaultProperty')
+                    ->setDefault(42);
                 
                 // Add enum property
-                $builder->add(
-                    (new \Skillcraft\UiSchemaCraft\Schema\Property('enumProperty', 'string'))
-                        ->enum(['option1', 'option2', 'option3'])
-                );
+                $builder->string('enumProperty')
+                    ->enum(['option1', 'option2', 'option3']);
                 
                 // Add object property with nested properties
-                $nestedBuilder = new \Skillcraft\UiSchemaCraft\Schema\PropertyBuilder();
-                $nestedBuilder->add(
-                    (new \Skillcraft\UiSchemaCraft\Schema\Property('nestedProp', 'string'))
-                        ->example('Nested Example')
-                );
-                
-                $builder->add(
-                    (new \Skillcraft\UiSchemaCraft\Schema\Property('objectProperty', 'object'))
-                        ->properties($nestedBuilder)
-                );
+                $builder->object('objectProperty')
+                    ->properties([
+                        $builder->string('nestedProp')
+                            ->example('Nested Example')
+                    ]);
                 
                 // Add array property with examples
-                $builder->add(
-                    (new \Skillcraft\UiSchemaCraft\Schema\Property('arrayProperty', 'array'))
-                        ->items([
-                            'type' => 'string',
-                            'example' => 'Array Item Example'
-                        ])
-                        ->addAttribute('examples', ['Item 1', 'Item 2'])
-                );
+                $builder->array('arrayProperty')
+                    ->items([
+                        'type' => 'string',
+                        'example' => 'Array Item Example'
+                    ])
+                    ->addAttribute('examples', ['Item 1', 'Item 2']);
                 
                 return $builder->toArray();
             }
@@ -1281,9 +1268,9 @@ protected function tearDown(): void
             // Override getAllSchemas to return our test schema with PropertyBuilder format
             public function getAllSchemas(): array
             {
-                // Using PropertyBuilder pattern even for the error case
+                // Using PropertyBuilder pattern similar to LoginSchema example
                 $builder = new \Skillcraft\UiSchemaCraft\Schema\PropertyBuilder();
-                // Empty properties, just used for structure
+                // Empty properties, just for structure demonstration
                 
                 return [
                     'error-component' => [
