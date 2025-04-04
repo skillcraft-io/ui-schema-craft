@@ -120,28 +120,49 @@ abstract class UIComponentSchema implements \Skillcraft\UiSchemaCraft\Contracts\
      */
     public function getExampleData(): array
     {
-        // Core component properties - useful for UI routing/identification
-        $result = [];
-        
         // Process the properties to extract example values
         $properties = $this->properties();
         
         // Extract examples from nested properties recursively
         $extractedValues = $this->extractExampleValues($properties);
         
-        // If we have main containers defined, structure the result hierarchically
-        if (!empty($this->mainContainers)) {
-            foreach ($this->mainContainers as $container) {
-                if (isset($extractedValues[$container]) && is_array($extractedValues[$container])) {
-                    $result[$container] = $extractedValues[$container];
-                    unset($extractedValues[$container]);
-                }
+        // If no main containers are defined, return all properties at root level
+        if (empty($this->mainContainers)) {
+            return $extractedValues;
+        }
+        
+        // Structure the result hierarchically based on main containers
+        $result = [];
+        $processedKeys = [];
+        
+        // First, populate main containers
+        foreach ($this->mainContainers as $container) {
+            if (isset($extractedValues[$container]) && is_array($extractedValues[$container])) {
+                $result[$container] = $extractedValues[$container];
+                $processedKeys[$container] = true;
             }
         }
         
-        // Add any remaining properties at the root level
+        // Then add only properties that aren't part of main containers
+        // and aren't already part of a container's hierarchy
         foreach ($extractedValues as $key => $value) {
-            $result[$key] = $value;
+            // Skip keys that have already been processed as containers
+            if (isset($processedKeys[$key])) {
+                continue;
+            }
+            
+            // Skip properties that belong to containers but appeared at root level
+            $skipProperty = false;
+            foreach ($result as $containerValues) {
+                if (isset($containerValues[$key])) {
+                    $skipProperty = true;
+                    break;
+                }
+            }
+            
+            if (!$skipProperty) {
+                $result[$key] = $value;
+            }
         }
         
         return $result;
