@@ -303,7 +303,12 @@ class UiSchemaCraftService
         foreach ($types as $type) {
             try {
                 $component = $this->resolveComponent($type);
-                $componentsValues[$type] = $this->extractComponentValues($component);
+                $componentValue = $this->extractComponentValues($component);
+                
+                // Extract the component name from the class for use as the key
+                $reflection = new \ReflectionClass($component);
+                $shortName = strtolower($reflection->getShortName());
+                $componentsValues[$shortName] = $componentValue;
             } catch (\Exception $e) {
                 // Log error but continue with other components
                 if (app()->hasDebugModeEnabled()) {
