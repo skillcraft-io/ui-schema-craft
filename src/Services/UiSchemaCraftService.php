@@ -331,7 +331,12 @@ class UiSchemaCraftService
      */
     protected function extractComponentValues(UIComponentSchema $component): array
     {
-        // Use reflection to access protected example property
+        // First check if component has getExampleData method (most flexible approach)
+        if (method_exists($component, 'getExampleData')) {
+            return $component->getExampleData();
+        }
+        
+        // Next, try to use protected example property
         $reflection = new \ReflectionClass($component);
         
         if ($reflection->hasProperty('example')) {
@@ -345,17 +350,7 @@ class UiSchemaCraftService
             }
         }
         
-        // If example is empty or not available, try to use properties() method
-        $properties = $component->properties();
-        if (!empty($properties)) {
-            // Extract just the example values from PropertyBuilder schema
-            $configValues = $this->extractExampleValues($properties);
-            if (!empty($configValues)) {
-                return ['config' => $configValues];
-            }
-        }
-        
-        // If both example and properties() are empty, return empty array
+        // Fallback to empty array if no data is available
         return [];
     }
     
@@ -365,37 +360,7 @@ class UiSchemaCraftService
      * @param array $properties PropertyBuilder schema array
      * @return array Extracted example values
      */
-    protected function extractExampleValues(array $properties): array
-    {
-        $result = [];
-        
-        foreach ($properties as $key => $property) {
-            // Skip metadata entries (type, nullable, etc.)
-            if (in_array($key, ['type', 'nullable', 'description', 'required'])) {
-                continue;
-            }
-            
-            // If this is an object with nested properties, process them recursively
-            if (isset($property['type']) && $property['type'] === 'object' && isset($property['properties'])) {
-                $result[$key] = $this->extractExampleValues($property['properties']);
-                continue;
-            }
-            
-            // For arrays, extract the example if present
-            if (isset($property['type']) && $property['type'] === 'array' && isset($property['example'])) {
-                $result[$key] = $property['example'];
-                continue;
-            }
-            
-            // Extract example value if present
-            if (isset($property['example'])) {
-                $result[$key] = $property['example'];
-            }
-        }
-        
-        return $result;
-    }
-    
+
     /**
      * Recursively flatten properties to extract values/defaults
      *
