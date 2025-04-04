@@ -254,7 +254,8 @@ class UiSchemaCraftService
      * Get example data from all available components
      *
      * This method maps all registered components and retrieves their example data
-     * if they implement a getExampleData method
+     * if they implement a getExampleData method. The output is guaranteed to have
+     * the same structure as getAllSchemas() with component types as keys.
      *
      * @return array Associative array of component types and their example data
      */
@@ -273,6 +274,7 @@ class UiSchemaCraftService
                     
                     // Ensure we're dealing with an array
                     if (is_array($exampleData)) {
+                        // Make sure type is included in the example data
                         $examples[$type] = $exampleData;
                     }
                 }
@@ -284,7 +286,12 @@ class UiSchemaCraftService
                 continue;
             }
         }
-
+        
+        // If no components provided examples, return empty array
+        if (empty($examples)) {
+            return [];
+        }
+        
         return $examples;
     }
 
