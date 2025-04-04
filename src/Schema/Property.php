@@ -618,7 +618,7 @@ class Property
         }
 
         if ($this->example !== null) {
-            $array['example_data'] = $this->example;
+            $array['example'] = $this->example;
         }
 
         $array['required'] = $this->isRequired;
